@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 6 · PageRank &amp; Link Analysis</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 6 — PageRank &amp; Link Analysis</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 75–86 · how the web graph solved search — importance flows recursively — and two NetworkX implementations of PageRank.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky mint">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>How does Google rank pages? Model the web as a <b>directed graph</b>: pages are nodes, a hyperlink is a one-way edge. You can <b>collect</b> this graph by crawling (a random walk covers it in ~n·log n steps). Then rank pages by a recursive notion of <b>importance</b>: <mark class="mint">you're important if important pages point to you</mark> — not merely if many do. Two "games" — <b>equal point-sharing</b> and <b>random-walk coin-drop</b> — give the <em>same</em> ranking, which is <b>PageRank</b>. We implement both in NetworkX, handle the <b>dangling-node</b> trap with damping, and see why endorsement count (<b>DegreeRank</b>) and PageRank need not agree.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 6</h3>
+    <ol>
+      <li><a href="#s1">The web graph &amp; the search problem</a></li>
+      <li><a href="#s2">Collecting the web graph — random-walk crawling</a></li>
+      <li><a href="#s3">Two ranking games &amp; recursive importance</a></li>
+      <li><a href="#s4">Implementing PageRank — points distribution</a><br><span class="small">the sink problem + damping</span></li>
+      <li><a href="#s5">Random-walk method &amp; DegreeRank vs PageRank</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 75</div>
+    <h2>The web graph</h2>
+    <div class="lsub">the idea that became a ~450-billion-dollar company</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> From "hire 1000 raters" to a graph</h2>
+  <p>Imagine it's the 1990s and the web is exploding with pages linked by <b>hyperlinks</b>. To find the best page for a keyword, the naive idea is to <em>hire thousands of people</em> to read and rate every page — hopeless at web scale. Larry Page and Sergey Brin's insight: use the <span class="def-term">web graph</span> itself.</p>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>the web graph is directed</h4>
+      <svg viewBox="0 0 240 130">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <defs><marker id="arr2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.4"/></marker></defs>
+          <circle cx="45" cy="35" r="15" fill="var(--blue)" stroke="var(--ink)"/><text x="34" y="39">A</text>
+          <circle cx="150" cy="30" r="15" fill="var(--mint)" stroke="var(--ink)"/><text x="140" y="34">B</text>
+          <circle cx="110" cy="100" r="15" fill="var(--yellow)" stroke="var(--ink)"/><text x="102" y="104">C</text>
+          <circle cx="210" cy="95" r="15" fill="var(--pink)" stroke="var(--ink)"/><text x="202" y="99">D</text>
+          <path d="M60 33 Q100 20 135 30" fill="none" stroke="var(--ink)" stroke-width="1.6" marker-end="url(#arr2)"/>
+          <path d="M52 49 Q78 78 98 92" fill="none" stroke="var(--ink)" stroke-width="1.6" marker-end="url(#arr2)"/>
+          <path d="M158 44 Q140 75 122 88" fill="none" stroke="var(--ink)" stroke-width="1.6" marker-end="url(#arr2)"/>
+          <path d="M165 35 Q195 55 205 80" fill="none" stroke="var(--ink)" stroke-width="1.6" marker-end="url(#arr2)"/>
+        </g>
+      </svg>
+      <div class="cap">Page = node; a hyperlink A→B = a <b>directed</b> edge. A linking to B does not mean B links to A.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-blue">
+        <span class="label">📖 web graph — and why it's directed</span>
+        <p style="margin:2px 0;">In the <span class="def-term">web graph</span>, each web page (or social-media account) is a node; a hyperlink / endorsement is a <b>directed edge</b> A→B. It's directed because the relation is <b>one-way</b> — you can link to (or endorse) an account that doesn't link back. Build it with <code class="inline">nx.DiGraph()</code>.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 76</div>
+    <h2>Collecting the web graph</h2>
+    <div class="lsub">crawling = a random walk that covers the graph in ~n·log n steps</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Crawling by random walk</h2>
+  <p><b>Analogy:</b> drop into a strange city with a car and no map. At every junction, pick a random turn. After a while you'll have driven down <em>almost every road</em>. The same works on a graph: a <span class="def-term">random walk</span> (crawl) visits essentially all nodes.</p>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ how long to cover the graph?</span>
+    <p style="margin:2px 0;">An experiment (walk from a random start, count steps until every node is visited) shows the cover time grows like <mark class="mint">~n·log n</mark> — a small multiple of n, nearly linear (not quadratic). So collecting the whole structure is entirely practical. It takes <em>more</em> than exactly n steps (the walk revisits nodes) but far less than n².</p>
+  </div>
+  <div class="code">
+    <div class="fname"><span>cover_time.py — the experiment</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx, random, numpy as np
+
+def walk(n, p):                          # steps to cover a random G(n,p) graph
+    G = nx.gnp_random_graph(n, p)
+    v = random.choice(list(G.nodes()))   # random start
+    visited = {v}; steps = 0
+    while len(visited) &lt; n:               # until EVERY vertex is seen
+        v = random.choice(list(G.neighbors(v)))   # random hop
+        visited.add(v); steps += 1
+    return steps
+
+xs, ys = [], []
+for n in range(20, 300):                 # graphs of size 20..299
+    z = [walk(n, 0.3) for _ in range(10)]   # repeat 10x and average out noise
+    xs.append(n); ys.append(np.average(z))
+plt.plot(xs, ys); plt.xlabel("#nodes"); plt.ylabel("#random-walk steps"); plt.show()
+# the curve looks nearly straight (~n log n): e.g. ~299 nodes -> ~2000 steps.
+</code></pre>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 77–79</div>
+    <h2>Two ranking games &amp; recursive importance</h2>
+    <div class="lsub">equal point-sharing = random-walk coin-drop = PageRank</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> How to rank the nodes</h2>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the two games (they rank identically)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Equal-sharing game:</span> give every node 100 points. Each round, every node splits its <em>current</em> points equally among the accounts it endorses (its out-links). Iterate until the points settle; rank by final points.</li>
+      <li><span class="def-term">Random-walk-drop game:</span> a surfer walks the graph at random, dropping one coin on every node it lands on. After ~a million steps, rank by coins collected.</li>
+    </ul>
+    <p style="margin:8px 0 0;"><mark>Remarkably, both games produce the <b>same ranking</b></mark> — so either computes PageRank.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>equal sharing — one round on 3 accounts</h4>
+      <svg viewBox="0 0 240 130">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <defs><marker id="arr3" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.4"/></marker></defs>
+          <circle cx="40" cy="40" r="16" fill="var(--blue)" stroke="var(--ink)"/><text x="34" y="44">A</text>
+          <circle cx="200" cy="40" r="16" fill="var(--mint)" stroke="var(--ink)"/><text x="194" y="44">B</text>
+          <circle cx="120" cy="105" r="16" fill="var(--yellow)" stroke="var(--ink)"/><text x="114" y="109">C</text>
+          <path d="M56 40 Q128 26 184 40" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arr3)"/><text x="118" y="24" font-size="9">A→B 50</text>
+          <path d="M50 54 Q80 88 106 98" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arr3)"/><text x="52" y="86" font-size="9">A→C 50</text>
+          <path d="M190 55 Q160 90 136 99" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arr3)"/><text x="164" y="86" font-size="9">B→C 100</text>
+          <path d="M110 90 Q60 80 44 56" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arr3)"/><text x="60" y="70" font-size="9">C→A 100</text>
+        </g>
+      </svg>
+      <div class="cap">A endorses B,C; B endorses C; C endorses A.</div>
+    </div>
+    <div>
+      <div class="worked">
+        <span class="tag">✍️ worked example — one round</span>
+        <p style="margin:2px 0;">Start: A=B=C=100. A splits 100 over its 2 endorsements → 50 to B, 50 to C. B sends all 100 to C. C sends 100 to A.</p>
+        <ul class="notes" style="margin:6px 0 0;">
+          <li><b>C</b> = 50 (from A) + 100 (from B) = $\boxed{150}$</li>
+          <li><b>A</b> = 100 (from C)</li>
+          <li><b>B</b> = 50 (from A)</li>
+        </ul>
+        <p class="small" style="margin:6px 0 0;">General: a node with P points and d out-links sends P/d along each (100 over 4 links → 25 each).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">💡 the recursive notion of importance</span>
+    <p style="margin:2px 0;">A node hoards points only if <em>its</em> pointers hoard points — which depends on <em>their</em> pointers. So: <mark class="yellow">you're important if <b>important</b> nodes point to you</mark> — a recursive definition ("you're famous if famous people say you're famous"). Best of all: be pointed to by a <b>rich backer who points to few others</b> (a wealthy relative with few people to help → each gets a big share). Sheer <em>count</em> of endorsements doesn't do it.</p>
+  </div>
+  <p><b>How Google uses it:</b> crawl the web (drop coins), giving each page a score. For a keyword ("Britney Spears"), retrieve all matching pages and display them <b>sorted by score</b> (highest first). Simple, and it works like a charm.</p>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 80–83</div>
+    <h2>Implementing PageRank — points distribution</h2>
+    <div class="lsub">DiGraph → 100 points → distribute → handle the sink → rank</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> The points-distribution method</h2>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the pipeline (memorise the order)</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li>Create a <b>directed</b> graph and add its edges probabilistically.</li>
+      <li>Initialise every node with <b>100 points</b>.</li>
+      <li><b>Distribute</b> points along out-links, repeatedly, <b>with sink handling</b>, until convergence.</li>
+      <li><b>Sort</b> nodes by final points → the ranking.</li>
+      <li><b>Validate</b> against <code class="inline">nx.pagerank</code>.</li>
+    </ol>
+  </div>
+
+  <div class="code">
+    <div class="fname"><span>pagerank_points.py — build &amp; distribute</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx, random, numpy as np
+
+def add_edges(G, p):
+    for i in G.nodes():
+        for j in G.nodes():
+            if i != j:
+                r = random.random()             # uniform in [0,1]
+                if r &lt;= p:                       # biased coin: head with prob p
+                    G.add_edge(i, j)            # directed edge i -> j (i endorses j)
+    return G
+
+def distribute_points(G, points):
+    previous   = points
+    new_points = [0 for _ in range(G.number_of_nodes())]
+    for i in G.nodes():
+        out = list(G.out_edges(i))              # edges LEAVING i (its endorsements)
+        if len(out) == 0:                       # dangling node: no out-link
+            new_points[i] += previous[i]        # ...keep its own points
+        else:
+            share = float(previous[i]) / len(out)   # split equally
+            for e in out:
+                new_points[e[1]] += share       # e[1] = the endorsed node
+    return new_points
+</code></pre>
+  </div>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 <code>G.out_edges(i)</code></span>
+    <p style="margin:2px 0;">On a directed graph, <code class="inline">G.out_edges(i)</code> returns the edges <b>leaving</b> i, each as a <code class="inline">(source, target)</code> tuple. So <code class="inline">e[0]</code> is i and <code class="inline">e[1]</code> is the endorsed node that receives the share. A node with 100 points and 4 out-links sends 25 to each.</p>
+  </div>
+
+  <h3 class="sub">The sink (dangling-node) problem &amp; the damping fix</h3>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ the sink problem</span>
+    <p style="margin:2px 0;">A <span class="def-term">dangling node</span> (an account that endorses no one) keeps <em>receiving</em> points via its in-links but never passes any on — so points <b>pile up</b> there (or in a small closed group), distorting the ranking. Our raw method then disagrees with <code class="inline">nx.pagerank</code>.</p>
+  </div>
+  <div class="code">
+    <div class="fname"><span>pagerank_points.py — damping (the fix)</span><span class="lang">python</span></div>
+<pre><code class="language-python">def handle_sink(G, points, s=0.8):
+    for i in range(len(points)):
+        points[i] = points[i] * s               # each node KEEPS 80%
+    n = G.number_of_nodes()
+    pooled = n * 100 * (1 - s)                   # the 20% gathered across the network
+    extra  = pooled / n                          # shared back EQUALLY to all (= 20)
+    for i in range(len(points)):
+        points[i] += extra
+    return points                                # total points unchanged (conserved)
+</code></pre>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "a tax: every node keeps a fraction <b>s = 0.8</b> of its points; the pooled <b>20%</b> is shared back equally to <em>all</em> nodes." Points can no longer pile up forever at a sink. The total is <b>conserved</b> — nothing is deleted, and dangling nodes are kept, not removed. With this, our ranking matches <code class="inline">nx.pagerank</code>.</div>
+
+  <div class="code">
+    <div class="fname"><span>pagerank_points.py — main loop &amp; rank</span><span class="lang">python</span></div>
+<pre><code class="language-python">G = nx.DiGraph()
+G.add_nodes_from(range(10))
+G = add_edges(G, 0.3)
+points = [100 for _ in range(G.number_of_nodes())]     # 100 each
+
+while True:                                     # iterate to convergence
+    new_points = distribute_points(G, points)
+    new_points = handle_sink(G, new_points)     # damping fixes the sink
+    if max(abs(new_points[i] - points[i]) for i in range(len(points))) &lt; 1e-6:
+        points = new_points
+        break
+    points = new_points
+
+ranking = np.argsort(-np.array(points))         # NEGATE -> highest points first
+
+pr = nx.pagerank(G)                             # {node: score} dictionary
+pr_sorted = sorted(pr.items(), key=lambda x: x[1], reverse=True)   # rank the built-in
+</code></pre>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ ranking &amp; validating</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">np.argsort</code> returns indices that sort <b>ascending</b>; negate the array (<code class="inline">-np.array(points)</code>) so the highest score comes first (descending).</li>
+      <li><code class="inline">nx.pagerank(G)</code> returns a <b>dict</b> <code class="inline">{node: score}</code> — not a ready ranking. Turn it into <code class="inline">(node, score)</code> tuples and sort by value, descending.</li>
+      <li>Points are <b>conserved</b> each iteration; with damping, the ranking matches the built-in <code class="inline">pagerank</code>. (Tiny mismatches can come from ties or stopping before full convergence.)</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 84–86</div>
+    <h2>Random-walk method &amp; DegreeRank vs PageRank</h2>
+    <div class="lsub">teleport out of dead-ends — and why popularity ≠ importance</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> The random-walk method</h2>
+  <div class="code">
+    <div class="fname"><span>pagerank_walk.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">def random_walk(G, steps=1000000):
+    nodes = list(G.nodes())
+    rw = [0 for _ in range(G.number_of_nodes())]    # random-walk points
+    focus = random.choice(nodes)
+    rw[focus] += 1
+    for _ in range(steps):
+        out = list(G.out_edges(focus))
+        if len(out) == 0:                            # dead-end (dangling node)
+            focus = random.choice(nodes)             # TELEPORT to a random node
+        else:
+            e = random.choice(out)                   # a random endorsed account
+            focus = e[1]                             # move there (e[1] = target)
+        rw[focus] += 1                               # drop a coin on the visited node
+    return rw
+</code></pre>
+  </div>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 teleportation</span>
+    <p style="margin:2px 0;">A dangling node has nowhere to walk to. <span class="def-term">Teleportation</span> = jump to a <b>uniformly random</b> node and resume. (The walk never stops, never back-tracks, and never deletes the node.) A node with many in-links — especially from often-visited nodes — is landed on more often, so its coin count reflects PageRank. Rank by <code class="inline">rw</code> points; it matches <code class="inline">nx.pagerank</code>.</p>
+  </div>
+
+  <h3 class="sub">DegreeRank vs PageRank — popularity ≠ importance</h3>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>in-degree vs PageRank (citation network)</h4>
+      <svg viewBox="0 0 240 140">
+        <g font-family="Kalam" font-size="9" fill="var(--ink)">
+          <line x1="30" y1="120" x2="230" y2="120" stroke="var(--ink)" stroke-width="1.3"/>
+          <line x1="30" y1="120" x2="30" y2="15" stroke="var(--ink)" stroke-width="1.3"/>
+          <text x="120" y="135">in-degree →</text>
+          <text x="6" y="70" transform="rotate(-90 10,70)">PageRank →</text>
+          <!-- scattered, uncorrelated points -->
+          <circle cx="60" cy="40" r="3.5" fill="var(--coral)"/><circle cx="90" cy="95" r="3.5" fill="var(--coral)"/>
+          <circle cx="120" cy="55" r="3.5" fill="var(--coral)"/><circle cx="70" cy="80" r="3.5" fill="var(--coral)"/>
+          <circle cx="150" cy="100" r="3.5" fill="var(--coral)"/><circle cx="45" cy="30" r="3.5" fill="var(--coral)"/>
+          <circle cx="190" cy="90" r="3.5" fill="var(--coral)"/><circle cx="100" cy="35" r="3.5" fill="var(--coral)"/>
+          <circle cx="205" cy="105" r="4.5" fill="var(--blue)" stroke="var(--ink)"/><text x="150" y="112" font-size="8">high deg, low PR</text>
+          <circle cx="55" cy="25" r="4.5" fill="var(--mint)" stroke="var(--ink)"/><text x="65" y="24" font-size="8">low deg, high PR</text>
+        </g>
+      </svg>
+      <div class="cap">No linear trend → in-degree and PageRank are <b>not</b> correlated.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-pink">
+        <span class="label">⚠️ DegreeRank ≠ PageRank</span>
+        <p style="margin:2px 0;"><span class="def-term">DegreeRank</span> = rank by raw in-degree (endorsement count). <span class="def-term">PageRank</span> = the recursive importance score. On a real citation network they <b>don't line up</b>:</p>
+        <ul class="notes" style="margin:6px 0 0;">
+          <li>A paper cited by <b>many unimportant</b> papers → <em>high</em> in-degree but <em>low</em> PageRank.</li>
+          <li>A paper cited by a <b>few important</b> papers → <em>low</em> in-degree but <em>high</em> PageRank.</li>
+        </ul>
+        <p class="small" style="margin:6px 0 0;">So many weak endorsements can lose to a few important ones.</p>
+      </div>
+    </div>
+  </div>
+  <div class="code">
+    <div class="fname"><span>degree_vs_pagerank.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import matplotlib.pyplot as plt
+
+# SNAP citation dataset: each row "A B" means paper A cites paper B (e.g. 17 18)
+G = nx.read_edgelist("citation.txt", create_using=nx.DiGraph)   # load as DIRECTED
+
+deg = G.in_degree()        # {node: in-degree}   -> DegreeRank signal
+pr  = nx.pagerank(G)       # {node: pagerank}    -> PageRank score
+
+# align the two dicts into the same node order, then scatter
+pr_values = [pr[i] for i in deg.keys()]
+plt.plot(list(deg.values()), pr_values, "ro")     # in-degree (x) vs PageRank (y)
+plt.xlabel("in-degree"); plt.ylabel("PageRank"); plt.show()
+# the cloud shows NO linear trend: high-in-degree papers can have low PageRank, and
+# a paper cited by a few IMPORTANT papers can have high PageRank with low in-degree.
+</code></pre>
+  </div>
+
+
+  <!-- ============ takeaway banner ============ -->
+  <div class="banner">
+    <h3>Importance flows recursively along directed links: you rank high when high-ranked nodes (that point to few others) point to you.</h3>
+    <p>Collect the web graph by random-walk crawl (~n·log n). Equal-sharing = random-walk-drop = PageRank. Points distribution: 100 each → send P/d along out-links → damping (keep 80%, pool 20%) fixes dangling sinks → rank via argsort(−points). DegreeRank ≠ PageRank.</p>
+  </div>
+
+  <!-- ============ quiz ============ -->
+  <div class="quiz">
+    <ol>
+      <li>Why is the endorsement/web graph directed?
+        <div class="ans">An endorsement/link is <b>one-way</b>: A endorsing B doesn't mean B endorses A. Use <code class="inline">nx.DiGraph</code>.</div></li>
+      <li>Roughly how many random-walk steps to visit every node of an n-node graph?
+        <div class="ans">About <b>n·log n</b> — a small multiple of n (near-linear), not n², and more than exactly n.</div></li>
+      <li>What is the recursive notion of influence?
+        <div class="ans">You're influential if <b>influential</b> accounts endorse you — which depends on who endorses them. Not sheer counts.</div></li>
+      <li>Relationship between the equal-sharing and random-walk-drop games?
+        <div class="ans">Different procedures, but they rank the accounts in <b>exactly the same order</b> (both = PageRank).</div></li>
+      <li>A=B=C=100; A→B,C; B→C; C→A. After one round, C holds?
+        <div class="ans">50 (from A) + 100 (from B) = <b>150</b>. (A=100, B=50.)</div></li>
+      <li>Node with 100 points, 4 out-links — each endorsed account gets?
+        <div class="ans"><b>25</b> (P ÷ d = 100/4).</div></li>
+      <li>What is the sink problem, and how does damping fix it?
+        <div class="ans">A <b>dangling node</b> (endorses no one) hoards points. Damping: each node keeps <b>80%</b>, the pooled <b>20%</b> is shared equally among all — points can't pile up. Total conserved.</div></li>
+      <li>In the random walk, what happens at a node with no out-links?
+        <div class="ans"><b>Teleport</b> — jump to a uniformly random node and continue (don't stop, back-track, or delete).</div></li>
+      <li>How does <code class="inline">np.argsort</code> give a highest-first ranking?
+        <div class="ans">argsort is <b>ascending</b>; run it on the <b>negated</b> points (<code class="inline">-np.array(points)</code>) so the largest sorts first.</div></li>
+      <li>What does <code class="inline">nx.pagerank(G)</code> return, and how is it used?
+        <div class="ans">A <b>dict</b> <code class="inline">{node: score}</code> — not a ranking. Sort its <code class="inline">.items()</code> by value, descending.</div></li>
+      <li>Order the points-distribution pipeline.
+        <div class="ans">Create DiGraph + edges → init 100 points → distribute (with sink handling) to convergence → sort by points → compare with <code class="inline">nx.pagerank</code>.</div></li>
+      <li>What do they find comparing in-degree (DegreeRank) with PageRank?
+        <div class="ans">They're <b>not correlated</b>: many weak endorsements can lose to a few important ones (high in-degree can have low PageRank, and vice versa).</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 6 ✏️</div>
+  <a class="backtop" href="#top">↑ back to top</a>
+</div>
+
+</body>
+</html>

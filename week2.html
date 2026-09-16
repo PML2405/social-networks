@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 2 · Datasets &amp; Emergence of Connectedness</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 2 — Datasets &amp; the Emergence of Connectedness</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 14–26 · where real network data lives, how to read &amp; measure it, and the deep reason a graph connects after only ~n·log n links.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky mint">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Two halves. <b>(1) Real datasets:</b> the internet age gives us huge network datasets (friendships, roads, citations, the web…). This week teaches the <em>file formats</em> they come in, <em>where</em> to download them, and the four structural <em>measurements</em> you ask of any graph — <b>degree distribution, density, clustering coefficient, diameter</b> — in NetworkX and in <b>Gephi</b>. <b>(2) Synthetic experiments:</b> we finally <em>prove</em> the Week-1 miracle — as random links pile up, a graph becomes connected after only about <b>n·log n</b> edges (barely more than n). You'll both derive it and simulate it.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 2</h3>
+    <ol>
+      <li><a href="#s1">Why datasets? &amp; a zoo of real networks</a><br><span class="small">Zachary karate, ingredients, synonyms, the web, social — directed vs undirected</span></li>
+      <li><a href="#s2">File formats &amp; where to download</a><br><span class="small">edge-list, adjacency-list, GML, Pajek, GraphML, GEXF; SNAP/UCI; NetworkX readers</span></li>
+      <li><a href="#s3">Analysing a network in NetworkX</a><br><span class="small">degree distribution, density, clustering coefficient, diameter, connectivity</span></li>
+      <li><a href="#s4">Gephi — visual analysis</a><br><span class="small">layouts, ranking by degree, the built-in metrics</span></li>
+      <li><a href="#s5">Emergence of connectedness — the argument</a><br><span class="small">the basket-of-balls intuition + the avoid-probability maths</span></li>
+      <li><a href="#s6">Simulating it — <code>connectivity.py</code></a><br><span class="small">add nodes, add random edges till connected, plot vs n·log n</span></li>
+      <li><a href="#s7">Summary &amp; synthetic datasets</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 14–18</div>
+    <h2>Why datasets — and a zoo of real networks</h2>
+    <div class="lsub">friendship · ingredients · synonyms · the web · social — and which are directed</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> Real network datasets, and the questions they invite</h2>
+  <p>Once you have <em>data</em> on a real network, it becomes like <b>Play-Doh</b> — you can shape endless questions from it: <em>Is the graph connected? What are the node degrees — the average and spread? Are there communities?</em> Decades ago we had tiny hand-collected graphs; the internet era gives us enormous ones.</p>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">📖 the classic tiny dataset — Zachary's Karate Club</span>
+    <p style="margin:2px 0;">A <span class="def-term">friendship network</span> of a US university karate club: <b>34 nodes</b> (members), edges = friendships. A real fight split the club into two groups around the instructor and the administrator; Zachary's analysis <em>predicted</em> the split. It's the standard toy graph for testing community-detection algorithms (Week 3).</p>
+  </div>
+
+  <h3 class="sub">Five example networks (each teaches one idea)</h3>
+  <table class="hand">
+    <thead><tr><th>network</th><th>node / edge</th><th>the surprise</th></tr></thead>
+    <tbody>
+      <tr><td><b>Ingredients</b></td><td>ingredient / "appear together in a popular dish"</td><td>Strong <b>communities</b> — clusters of ingredients densely linked inside, sparse across (e.g. sweet vs savoury).</td></tr>
+      <tr><td><b>Synonymy</b></td><td>word / "are synonyms" (from a thesaurus)</td><td>The graph is <b>connected</b> — so there's a synonym-path from <em>love</em> to <em>hate</em>! Synonymy looks symmetric but is <b>not transitive</b>: A≈B and B≈C need not make A≈C (meaning degrades along the chain).</td></tr>
+      <tr><td><b>Web graph</b></td><td>web page / hyperlink (one page points to another)</td><td>Looks useless, but the link structure hides the answer to "which page is most important?" → <b>Google / PageRank</b> (Week 6).</td></tr>
+      <tr><td><b>Social</b> (Facebook, LinkedIn…)</td><td>person / friendship</td><td>Structure predicts <em>who your next friend will be</em> → <b>link prediction</b> ("People You May Know").</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 directed vs undirected — decide by the relationship</span>
+    <p style="margin:2px 0;">Use an <span class="def-term">undirected</span> edge when the relation is <b>mutual/symmetric</b>; a <span class="def-term">directed</span> edge when it is <b>one-way</b>.</p>
+    <ul class="notes" style="margin:6px 0 0;">
+      <li><b>Undirected:</b> friendship, a road between cities, a shared paper (co-authorship), a transmission line (power grid) — "if A relates to B, then B relates to A".</li>
+      <li><b>Directed:</b> an <b>email</b> A→B, a <b>citation</b> (paper A cites B), a <b>predator→prey</b> food web — "X preys on Y says nothing about Y preying on X".</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 19–20</div>
+    <h2>File formats &amp; where to download</h2>
+    <div class="lsub">edge-list · adjacency-list · GML · Pajek · GraphML · GEXF · the NetworkX readers</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> The formats network data comes in</h2>
+  <p>Public repositories store networks in a handful of formats. You rarely write these by hand — but you must recognise them to pick the right reader.</p>
+
+  <table class="hand">
+    <thead><tr><th>format</th><th>extension</th><th>layout / notes</th><th>attributes?</th></tr></thead>
+    <tbody>
+      <tr><td><b>Edge-list</b> (CSV)</td><td><code class="inline">.txt</code>/<code class="inline">.csv</code></td><td>each row = one edge: <code class="inline">source target</code> (optionally a 3rd column = weight)</td><td><b>No</b> (numbers only)</td></tr>
+      <tr><td><b>Adjacency-list</b> (CSV)</td><td><code class="inline">.txt</code>/<code class="inline">.csv</code></td><td>each row = a node followed by <em>all its neighbours</em></td><td><b>No</b></td></tr>
+      <tr><td><b>GML</b> (Graph Modeling Language)</td><td><code class="inline">.gml</code></td><td><code class="inline">graph [ node [id 1] … edge [source 1 target 2] … ]</code></td><td><b>Yes</b> (labels, attrs)</td></tr>
+      <tr><td><b>Pajek</b></td><td><code class="inline">.net</code>/<code class="inline">.paj</code></td><td><code class="inline">*Vertices n</code> … then <code class="inline">*Edges</code>/<code class="inline">*Arcs</code></td><td>Yes (some)</td></tr>
+      <tr><td><b>GraphML</b></td><td><code class="inline">.graphml</code></td><td>XML tags (<code class="inline">&lt;graph&gt;&lt;node&gt;&lt;edge&gt;</code>); <code class="inline">&lt;key&gt;</code> defines attrs</td><td><b>Yes</b> (rich)</td></tr>
+      <tr><td><b>GEXF</b></td><td><code class="inline">.gexf</code></td><td>XML (Graph Exchange XML Format), made by the Gephi team</td><td><b>Yes</b> (rich)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="bubble"><span class="say">read it as:</span> "there's a <b>trade-off between simplicity and flexibility</b>. Edge-list &amp; adjacency-list are dead simple but <em>cannot</em> carry labels/colours/attributes. GML, GraphML and GEXF are richer (XML-based for the last two) and <em>can</em>." GraphML/GEXF are <b>not</b> plain two-column text.</p></div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>edge-list vs adjacency-list (same 4 edges)</h4>
+      <svg viewBox="0 0 300 120">
+        <g font-family="Fira Code, monospace" font-size="11" fill="var(--ink)">
+          <text x="8" y="16" font-family="Kalam" font-size="13" font-weight="700">edge-list</text>
+          <text x="10" y="38">1 2</text><text x="10" y="54">1 5</text><text x="10" y="70">1 7</text><text x="10" y="86">2 4</text>
+          <text x="150" y="16" font-family="Kalam" font-size="13" font-weight="700">adjacency-list</text>
+          <text x="152" y="38">1 2 5 7</text><text x="152" y="54">2 4 6</text><text x="152" y="70">3 1 4 7</text>
+        </g>
+      </svg>
+      <div class="cap">Edge-list: one edge per row. Adjacency-list: node + all its neighbours per row.</div>
+    </div>
+    <div>
+      <h3 class="sub">Where to download</h3>
+      <ul class="notes">
+        <li><b>SNAP</b> (Stanford) — the most-used repo: social, communication, citation, web, road, Wikipedia, temporal networks (with node/edge counts, some with ground-truth communities).</li>
+        <li><b>UCI</b> / <b>KONECT</b> (Koblenz) — Pajek datasets, Zachary karate, air-traffic, Twitter, etc.</li>
+      </ul>
+      <p class="small">NetworkX can also <b>convert</b> formats: read GML, write GEXF, etc.</p>
+    </div>
+  </div>
+
+  <h3 class="sub">Reading each format in NetworkX</h3>
+  <div class="code">
+    <div class="fname"><span>read_datasets.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+
+g1 = nx.read_edgelist("facebook_combined.txt")   # edge-list (.txt/.csv)
+g2 = nx.read_adjlist("adj.txt")                   # adjacency-list
+g3 = nx.read_gml("karate.gml")                    # GML
+g4 = nx.read_pajek("football.net")                # Pajek (.net OR .paj)
+g5 = nx.read_graphml("wikipedia.graphml")         # GraphML
+g6 = nx.read_gexf("network.gexf")                 # GEXF
+
+print(nx.info(g1))          # #nodes, #edges, avg degree, type
+nx.number_of_nodes(g1)      # node count
+nx.number_of_edges(g1)      # edge count
+nx.is_directed(g5)          # True/False — did it load as a DiGraph?
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ match the reader to the format</span>
+    <p style="margin:2px 0;">Edge-list → <code class="inline">read_edgelist</code>; adjacency-list → <code class="inline">read_adjlist</code>; <code class="inline">.gml</code> → <code class="inline">read_gml</code>; <code class="inline">.net</code>/<code class="inline">.paj</code> → <code class="inline">read_pajek</code>; <code class="inline">.graphml</code> → <code class="inline">read_graphml</code>; <code class="inline">.gexf</code> → <code class="inline">read_gexf</code>. <code class="inline">nx.is_directed(G)</code> returns a Boolean — a food-web GraphML loads directed (<code class="inline">True</code>), an air-traffic edge-list loads undirected (<code class="inline">False</code>).</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 21</div>
+    <h2>Analysing a network in NetworkX</h2>
+    <div class="lsub">the four measurements: degree distribution · density · clustering · diameter</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> The four structural measurements</h2>
+  <p>We'll compute all four on one tiny hand network — <b>Tom's 8-station relay</b> (nodes A–H; links <code class="inline">AB AC AD BC DE EF FG GH EG</code>) — so you can check every formula by hand, then see the NetworkX call.</p>
+
+  <div class="diagram">
+    <h4>the 8-station relay network (A–H, 9 links) — node labels show degree</h4>
+    <svg viewBox="0 0 420 200">
+      <g font-family="Kalam" font-size="12" fill="var(--ink)" stroke-linecap="round">
+        <!-- edges -->
+        <line x1="90" y1="55" x2="30" y2="30" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="90" y1="55" x2="30" y2="95" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="90" y1="55" x2="150" y2="100" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="30" y1="30" x2="30" y2="95" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="150" y1="100" x2="240" y2="100" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="240" y1="100" x2="320" y2="55" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="320" y1="55" x2="320" y2="150" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="320" y1="150" x2="390" y2="150" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="240" y1="100" x2="320" y2="150" stroke="var(--coral)" stroke-width="1.6"/>
+        <!-- nodes: degree3=blue, degree2=mint, degree1=pink; label shows name+degree -->
+        <circle cx="90" cy="55" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="79" y="59">A·3</text>
+        <circle cx="30" cy="30" r="14" fill="var(--mint)" stroke="var(--ink)" stroke-width="1.6"/><text x="20" y="34">B·2</text>
+        <circle cx="30" cy="95" r="14" fill="var(--mint)" stroke="var(--ink)" stroke-width="1.6"/><text x="20" y="99">C·2</text>
+        <circle cx="150" cy="100" r="14" fill="var(--mint)" stroke="var(--ink)" stroke-width="1.6"/><text x="140" y="104">D·2</text>
+        <circle cx="240" cy="100" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="230" y="104">E·3</text>
+        <circle cx="320" cy="55" r="14" fill="var(--mint)" stroke="var(--ink)" stroke-width="1.6"/><text x="310" y="59">F·2</text>
+        <circle cx="320" cy="150" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="310" y="154">G·3</text>
+        <circle cx="390" cy="150" r="14" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="381" y="154">H·1</text>
+      </g>
+    </svg>
+    <div class="cap">blue = degree 3 (A,E,G) · mint = degree 2 (B,C,D,F) · pink = degree 1 (H). The coral link is the E–G shortcut.</div>
+  </div>
+
+  <h3 class="sub">(a) Degree &amp; degree distribution</h3>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 degree &amp; degree distribution</span>
+    <p style="margin:2px 0;"><span class="def-term">Degree</span> of a node = how many edges touch it (its number of friends). <span class="def-term">Degree distribution</span> = for each possible degree <em>d</em>, how many nodes have exactly that degree. Plot degree (x) vs count (y).</p>
+  </div>
+  <div class="code">
+    <div class="fname"><span>degree_dist.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+
+nx.degree(G)                       # -&gt; dict {node: its degree}
+all_degrees = list(nx.degree(G).values())      # every node's degree
+unique_degrees = sorted(set(all_degrees))      # x-axis: distinct degrees
+counts = [all_degrees.count(d) for d in unique_degrees]  # y-axis: how many nodes
+
+plt.plot(unique_degrees, counts)   # (or plt.loglog(...) for a power law)
+plt.xlabel("degree"); plt.ylabel("number of nodes"); plt.show()
+</code></pre>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — degree distribution of the 8-station net</span>
+    <ol>
+      <li>Degrees: A=3, B=2, C=2, D=2, E=3, F=2, G=3, H=1.</li>
+      <li><code class="inline">unique_degrees</code> (x) = <b>[1, 2, 3]</b>.</li>
+      <li>Counts (y): degree 1 → 1 node (H); degree 2 → 4 nodes (B,C,D,F); degree 3 → 3 nodes (A,E,G). So <code class="inline">counts</code> = $\boxed{[1, 4, 3]}$.</li>
+    </ol>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ power-law degree distribution (what real networks show)</span>
+    <p style="margin:2px 0;">Most real networks are <mark class="mint">power-law</mark>: a <b>few hubs</b> with very high degree and a <b>long tail</b> of low-degree nodes. On <b>log–log axes</b> a power law looks like a roughly <b>straight line</b> (<code class="inline">plt.loglog</code>). Contrast a fully random <code class="inline">gnp</code> graph, whose degrees cluster around the average.</p>
+  </div>
+
+  <h3 class="sub">(b) Density — how full is the graph?</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">density</div>
+      <div class="eqn" style="margin:6px 0;">$$ \text{density} = \frac{\#\text{edges}}{\binom{n}{2}} = \frac{2m}{n(n-1)} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "what fraction of all <em>possible</em> edges are actually present." For a simple graph it lies in <b>[0, 1]</b>: <b>0</b> for an empty graph, <b>1</b> for a complete graph. (A multigraph — several edges between a pair — can exceed 1.)</div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — density of the 8-station net</span>
+    <p style="margin:2px 0;">8 nodes, 9 edges. Possible edges $\binom{8}{2}=\dfrac{8\cdot7}{2}=28$. Density $=\dfrac{9}{28}\approx \boxed{0.32}$ — a sparse graph. <span class="illus">(NetworkX: <code class="inline">nx.density(G)</code>. Karate club → 0.139.)</span></p>
+  </div>
+
+  <h3 class="sub">(c) Clustering coefficient — do a node's friends know each other?</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">clustering coefficient of node v</div>
+      <div class="eqn" style="margin:6px 0;">$$ C(v) = \frac{\#\text{links among } v\text{'s neighbours}}{\binom{\deg(v)}{2}} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "of all the pairs of my friends, what fraction are friends with <em>each other</em>." 1 = my friends form a clique; 0 = none of them know each other.</div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — clustering of station A</span>
+    <ol>
+      <li>A's neighbours = {B, C, D}, so possible links among them = $\binom{3}{2}=3$.</li>
+      <li>Of those, only <b>BC</b> exists (not BD, not CD).</li>
+      <li>$C(A)=\dfrac{1}{3}\approx \boxed{0.33}$. <span class="illus">NetworkX: <code class="inline">nx.clustering(G)</code> → dict; <code class="inline">nx.average_clustering(G)</code> → the graph average (karate → 0.57).</span></li>
+    </ol>
+  </div>
+
+  <h3 class="sub">(d) Diameter — how far apart are the farthest two nodes?</h3>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 diameter</span>
+    <p style="margin:2px 0;"><span class="def-term">Diameter</span> = the <b>maximum</b>, over all pairs of nodes, of the <b>shortest-path length</b> between them — i.e. the distance between the two most-distant nodes. <code class="inline">nx.diameter(G)</code>.</p>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — diameter of the 8-station net</span>
+    <p style="margin:2px 0;">The farthest pair is B–H (also C–H): the shortest route is <b>B→A→D→E→G→H</b>, length <b>5</b>, and nothing is farther. So <code class="inline">nx.diameter(G)</code> = $\boxed{5}$. It is <em>not</em> a link count (9) or a node count (8).</p>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ real networks have SMALL diameters</span>
+    <p style="margin:2px 0;">Despite millions of nodes, real networks stay "close": the many connections keep everyone within a few hops (the small-world effect, Week 11). Diameter does <b>not</b> grow in proportion to n.</p>
+  </div>
+
+  <h3 class="sub">(e) Connectivity</h3>
+  <p><code class="inline">nx.is_connected(G)</code> returns <code class="inline">True</code> when there's a path between <em>every</em> pair. Operationally: from any airport you can reach any other by a sequence of flights (transfers allowed). It does <b>not</b> mean a direct edge between every pair (that's complete) or equal degrees.</p>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 22</div>
+    <h2>Gephi — visual analysis</h2>
+    <div class="lsub">a point-and-click tool for people who aren't programmers</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Gephi: visualise and analyse without code</h2>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 Gephi</span>
+    <p style="margin:2px 0;"><span class="def-term">Gephi</span> is a free, open-source (Java) tool for <b>visualising and analysing</b> networks. NetworkX is more flexible for coding your own analysis; Gephi is far better for <em>visualisation</em> and for non-programmers. It opens most formats — its native one is <b>GEXF</b> (also CSV, GML, GraphML, Pajek).</p>
+  </div>
+  <ul class="notes">
+    <li><b>Layouts</b> rearrange nodes for readability (e.g. "No Overlap" spreads overlapping nodes). You can also <b>drag nodes by hand</b> — impossible in NetworkX without coding.</li>
+    <li><b>Ranking</b>: colour or size nodes by a property, e.g. make <b>high-degree nodes darker/bigger</b> — hubs pop out instantly.</li>
+    <li><b>Data Laboratory</b> tab: a spreadsheet of nodes/edges; computed metrics get added as columns and can be exported.</li>
+    <li><b>Preview</b> tab: a polished render you can export to SVG/PDF/PNG.</li>
+    <li><b>Built-in metrics</b> (one click each): average degree, density, diameter, modularity (communities), <b>PageRank</b>, connected components, clustering coefficient — the very measures we compute all course. Come back here as you learn each one.</li>
+  </ul>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 23–24</div>
+    <h2>Emergence of connectedness — the argument</h2>
+    <div class="lsub">the basket-of-balls intuition, then the avoid-probability maths</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Why a graph connects after only ~n·log n edges</h2>
+  <p>Back to the Week-1 puzzle, now made rigorous: take <em>n</em> nodes with no edges; add edges <b>one at a time, uniformly at random</b>. When does the graph become connected?</p>
+
+  <h3 class="sub">The intuition (why a permanent split is nearly impossible)</h3>
+  <div class="sketch-box tint-yellow">
+    <span class="label">🎯 two analogies</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>Blindfolded shooting:</b> fire bullets uniformly at random into a rectangle; one quadrant is ¼ the area. If you fire 100 shots, ~25 land in that quadrant. That <em>none</em> land there is wildly unlikely.</li>
+      <li><b>Basket of balls:</b> a basket has 10 black + 10 white balls; you draw blindfolded. Drawing 50 and getting <em>all black</em> is essentially impossible.</li>
+    </ul>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — the cross-cluster count</span>
+    <p style="margin:2px 0;">Suppose 100 people threatened to split into groups of 70 and 30 with no link across. Total possible edges $\binom{100}{2}=\dfrac{100\cdot99}{2}\approx \dfrac{100^2}{2}=5000$. <b>Across-group</b> edges $=70\times30=2100$ — <mark class="yellow">roughly half</mark> of all 5000 possible edges. For a clean split, random edge-placement must miss <em>every one</em> of those 2100 chances — as unlikely as drawing 2100 balls and all being "within" — so a lasting split is vanishing.</p>
+    <p class="small" style="margin:6px 0 0;">(For the 50-sensor version: $\binom{50}{2}=\dfrac{50\cdot49}{2}=1225$ total; a 30/20 split has $30\times20=600$ possible cross-links, ~half of 1225.)</p>
+  </div>
+
+  <h3 class="sub">The maths (tracking the last lonely node)</h3>
+  <p>Instead of "connected", ask the easier question: <em>when does no node stay <b>isolated</b> (degree 0)?</em> Two calculus limits power the argument:</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">two standard limits</div>
+      <div class="eqn" style="margin:6px 0;">$$ \Big(1+\tfrac{1}{n}\Big)^{n}\!\to e,\qquad \Big(1-\tfrac{1}{n}\Big)^{n}\!\to \tfrac{1}{e} $$</div>
+    </div>
+  </div>
+  <p>One new random edge picks 2 of the <em>n</em> nodes, so the chance it lands on a fixed node <em>v</em> is $2/n$; the chance it <b>avoids</b> <em>v</em> is $1-2/n$. Because <em>K</em> edges are placed independently, the avoid-chances <b>multiply</b>:</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">P(v still isolated after K edges)</div>
+      <div class="eqn" style="margin:6px 0;">$$ P(v\text{ lonely}) = \Big(1-\tfrac{2}{n}\Big)^{K} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "v stays lonely only if every one of the K edges avoided it — and independent avoid-probabilities multiply, giving $(1-2/n)^K$."</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example — plug in K = n, then K = n·log n</span>
+    <ol>
+      <li><b>K = n edges:</b> $\big(1-\tfrac{2}{n}\big)^{n} = \Big[\big(1-\tfrac{1}{n/2}\big)^{n/2}\Big]^{2} \to \big(\tfrac{1}{e}\big)^{2}=\tfrac{1}{e^{2}}\approx 0.135$ (≈0.13 for n=50). Still a real chance <em>v</em> is lonely — so n edges is <b>not enough</b>.</li>
+      <li><b>K = n·log n edges:</b> $\big(1-\tfrac{2}{n}\big)^{n\log n} = \Big[\big(1-\tfrac{1}{n/2}\big)^{n/2}\Big]^{2\log n}\to \big(\tfrac{1}{e}\big)^{2\log n}=\tfrac{1}{n^{2}} \to 0.$</li>
+      <li>So after ~n·log n edges the chance <em>any</em> node is isolated $\to 0$; with no isolated node (and a disconnected-but-isolate-free split being itself vanishingly unlikely) the graph is <b>connected with high probability</b>. $$ \boxed{\sim n\log n \text{ random edges} \Rightarrow \text{connected (w.h.p.)}} $$</li>
+    </ol>
+    <p class="small" style="margin:6px 0 0;">The key point is the probability <b>collapses to 0</b> as n grows; the exact exponent (≈1/n²) isn't what matters.</p>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ why "n·log n is almost as good as n"</span>
+    <p style="margin:2px 0;"><code class="inline">log n</code> grows <em>very</em> slowly — think "the number of digits in n". For a million nodes, log n ≈ 6. So n·log n is only a <b>small factor</b> above n — a <mark class="mint">near-linear</mark> number of links suffices, not quadratic. Far fewer than the $\binom{n}{2}$ possible edges.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 25</div>
+    <h2>Simulating it — <code>connectivity.py</code></h2>
+    <div class="lsub">add nodes → add random edges till connected → plot vs n·log n</div>
+  </div>
+
+  <h2 class="section" id="s6"><span class="num">6</span> The simulation that checks the theory</h2>
+  <div class="code">
+    <div class="fname"><span>connectivity.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx, random, numpy
+
+def add_nodes(n):
+    G = nx.Graph()
+    G.add_nodes_from(range(0, n))   # nodes 0..n-1, NO edges yet
+    return G
+
+def add_random_edge(G):
+    v1 = random.choice(list(G.nodes()))
+    v2 = random.choice(list(G.nodes()))
+    if v1 != v2:                    # skip self-loops (same node twice)
+        G.add_edge(v1, v2)
+    return G
+
+def create_instance(n):
+    G = add_nodes(n)
+    while nx.is_connected(G) == False:   # keep adding till connected
+        G = add_random_edge(G)
+    return G.number_of_edges()     # #edges at the moment it connected
+
+def create_average_instance(n):
+    L = []
+    for i in range(0, 4):          # repeat 4 times...
+        L.append(create_instance(n))
+    return numpy.average(L)         # ...average out the random spikes
+</code></pre>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the algorithm in words</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">add_nodes(n)</code>: empty graph + nodes 0…n−1 via <code class="inline">add_nodes_from(range(0,n))</code>. No edges → <code class="inline">is_connected</code> is <b>False</b>.</li>
+      <li><code class="inline">add_random_edge</code>: pick two random nodes; the <code class="inline">v1 != v2</code> guard prevents a self-loop when the same node is drawn twice.</li>
+      <li><code class="inline">create_instance</code>: loop <em>until</em> <code class="inline">nx.is_connected</code> becomes True, then return the edge count — <b>not</b> a fixed count, and <b>not</b> full linkage.</li>
+      <li><code class="inline">create_average_instance</code>: average over several runs — one random run is spiky.</li>
+    </ol>
+  </div>
+
+  <div class="worked">
+    <span class="tag">✍️ dry-run trace — <code>create_instance(4)</code> on a tiny run</span>
+    <table class="hand trace">
+      <thead><tr><th>step</th><th>pick (v1,v2)</th><th>edge added?</th><th>edges</th><th>is_connected?</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>— (add_nodes)</td><td>—</td><td>0</td><td>False → loop</td></tr>
+        <tr><td>1</td><td>(2, 2)</td><td>no (v1==v2)</td><td>0</td><td>False</td></tr>
+        <tr><td>2</td><td>(0, 3)</td><td>yes</td><td>1</td><td>False</td></tr>
+        <tr><td>3</td><td>(1, 3)</td><td>yes</td><td>2</td><td>False</td></tr>
+        <tr><td>4</td><td>(2, 0)</td><td>yes</td><td>3</td><td>True → stop, return 3</td></tr>
+      </tbody>
+    </table>
+    <p class="small" style="margin:6px 0 0;">Typical results: 10 nodes → ~12–16 edges; 20 → ~27; 30 → ~50. Plotting edges-to-connect vs n and overlaying <b>(n·log n)/2</b>, the two curves hug each other — confirming the order-n·log n claim (dividing by 2 doesn't change the <em>order</em>).</p>
+  </div>
+
+  <p>Complexity of one <code class="inline">create_instance(n)</code>: it adds ~n·log n edges, each followed by a connectivity check <span class="bigO">O(n+m)</span>, so a run is roughly <span class="bigO bad">O(n²·log n)</span> — fine for the small n we plot.</p>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ common bugs / gotchas</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Drop the <code class="inline">v1 != v2</code> guard → self-loops that never help connectivity (and can loop oddly).</li>
+      <li><code class="inline">random.choice</code> needs a <b>list</b>: use <code class="inline">list(G.nodes())</code>.</li>
+      <li>Plot a <em>single</em> instance and the curve is spiky — average over many runs (a random experiment gives a different answer each time).</li>
+      <li>After editing the file, <code class="inline">reload</code> it (IPython) before re-calling — a stale import runs old code.</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 26</div>
+    <h2>Summary — and the power of synthetic datasets</h2>
+    <div class="lsub">what this week bought us</div>
+  </div>
+
+  <h2 class="section" id="s7"><span class="num">7</span> Wrap-up</h2>
+  <ul class="notes">
+    <li><b>Datasets</b>: the internet age hands us huge network datasets; read them with the right NetworkX reader and measure <b>degree distribution, density, clustering, diameter, connectivity</b>. Real networks are <b>power-law</b> (hubs + long tail) with <b>small diameters</b>.</li>
+    <li><b>Gephi</b>: a powerful, code-free tool for visualising and analysing graphs.</li>
+    <li><b>Emergence of connectedness</b>: with only ~<b>n·log n</b> random edges a graph becomes connected — proven via the avoid-probability argument <em>and</em> confirmed by simulation.</li>
+    <li><span class="def-term">Synthetic datasets</span>: you can <em>synthesize</em> a graph of your choice (say 100 nodes) to observe a phenomenon, instead of hunting for real data — exactly what the <code class="inline">connectivity.py</code> experiment did.</li>
+  </ul>
+
+  <!-- ============ takeaway banner ============ -->
+  <div class="banner">
+    <h3>Read a real network, measure four things — degree distribution, density, clustering, diameter — and remember: ~n·log n random links already connect it.</h3>
+    <p>density = edges / C(n,2) ∈ [0,1] · clustering(v) = links-among-neighbours / C(deg,2) · diameter = longest shortest-path · P(node lonely after K edges) = (1−2/n)^K → 0 at K ≈ n·log n.</p>
+  </div>
+
+  <!-- ============ quiz ============ -->
+  <div class="quiz">
+    <ol>
+      <li>Which of {air-traffic, power grid, food web, co-authorship} must be <b>directed</b>, and why?
+        <div class="ans">The <b>food web</b> — predation is one-way (X preys on Y ≠ Y preys on X). The others are mutual/symmetric → undirected.</div></li>
+      <li>An air-traffic file has one route per line as a pair of codes (<code class="inline">DEL BOM</code>). Which reader?
+        <div class="ans"><code class="inline">nx.read_edgelist</code> — one edge (source, target) per row. (<code class="inline">read_adjlist</code> is node + neighbours; <code class="inline">read_gml</code>/<code class="inline">read_graphml</code> for those formats.)</div></li>
+      <li>Which formats can carry node/edge <b>attributes</b> (labels, colours)?
+        <div class="ans"><b>GML, GraphML, GEXF</b> (GraphML/GEXF are XML). Plain <b>edge-list</b> and <b>adjacency-list</b> cannot — the simplicity/flexibility trade-off.</div></li>
+      <li>8-station net (AB AC AD BC DE EF FG GH EG): with distinct degrees [1,2,3] on x, what are the y-counts?
+        <div class="ans"><b>[1, 4, 3]</b> — 1 node of degree 1 (H), 4 of degree 2 (B,C,D,F), 3 of degree 3 (A,E,G).</div></li>
+      <li>For that net, what does <code class="inline">nx.density</code> return, and its value for empty / complete graphs?
+        <div class="ans">$9/\binom{8}{2}=9/28\approx 0.32$. Empty → 0, complete → 1; a simple graph's density ∈ [0,1].</div></li>
+      <li>Station A links to B, C, D; only BC exists among them. A's clustering coefficient?
+        <div class="ans">$\dfrac{1}{\binom{3}{2}}=\dfrac{1}{3}\approx 0.33$ — links-present / links-possible among neighbours.</div></li>
+      <li>What is <code class="inline">nx.diameter</code> of the 8-station net, and what does it mean?
+        <div class="ans"><b>5</b> — the largest shortest-path length (B–H via B→A→D→E→G→H). Not the edge count or node count.</div></li>
+      <li>How many possible links in a 50-sensor mesh, and how many bridge a 30/20 split?
+        <div class="ans">$\binom{50}{2}=1225$ total; cross-links = $30\times20=600$ (~half). All 600 must be absent for a split → very unlikely.</div></li>
+      <li>P(one new link avoids a fixed sensor v), and P(v still lonely after K links)?
+        <div class="ans">Avoids with prob $1-\tfrac{2}{n}$; still lonely after K independent links with prob $\big(1-\tfrac{2}{n}\big)^{K}$ (probabilities multiply).</div></li>
+      <li>Why is "of order n·log n links" described as almost as good as n?
+        <div class="ans"><code class="inline">log n</code> grows very slowly (≈ number of digits in n), so n·log n is only a small factor above n — near-linear, not quadratic.</div></li>
+      <li>Right after <code class="inline">G = add_nodes(50)</code>, what is true?
+        <div class="ans">50 nodes, <b>0 edges</b>, and <code class="inline">nx.is_connected(G)</code> is <b>False</b> (an edgeless 50-node graph is disconnected).</div></li>
+      <li>Why the <code class="inline">if v1 != v2</code> check, and when does <code class="inline">create_instance</code>'s loop stop?
+        <div class="ans">It skips a <b>self-loop</b> when <code class="inline">random.choice</code> draws the same node twice. The loop stops the <b>instant</b> <code class="inline">nx.is_connected(G)</code> becomes True — not after a fixed count, not at full linkage.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 2 ✏️</div>
+  <a class="backtop" href="#top">↑ back to top</a>
+</div>
+
+</body>
+</html>

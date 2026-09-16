@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 1 · Introduction, Python &amp; NetworkX</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 1 — Introduction, Python &amp; NetworkX</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 1–13 · why a whole class hears one rumour, then the exact Python + NetworkX toolkit we build everything on.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky blue">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>A <b>social network</b> is just <b>dots joined by lines</b> — people joined by relationships. This week does two things. (1) It shows one <em>emergent</em> miracle: give 50 near-strangers just ~3 random friends each and the whole group becomes <b>connected</b> — one rumour reaches everyone. (2) It hands you the <b>tools</b> to see this yourself: enough <b>Python</b> (lists, dictionaries, <code class="inline">random</code>, plotting) and the <b>NetworkX</b> graph library to build, draw and measure networks. Everything in Weeks 2–12 is built on this toolkit — learn it cold.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 1</h3>
+    <ol>
+      <li><a href="#s1">The gossip puzzle — modelling people as a graph</a><br><span class="small">nodes, edges, the friendship network</span></li>
+      <li><a href="#s2">Answer to the puzzle — connectedness</a><br><span class="small">path, connected vs disconnected, why random friendships connect everyone</span></li>
+      <li><a href="#s3">Python — part 1</a><br><span class="small">variables, loops, <code class="inline">random</code>, lists, functions, the birthday paradox</span></li>
+      <li><a href="#s4">Python — part 2</a><br><span class="small">dictionaries, matplotlib plotting, numpy arrays</span></li>
+      <li><a href="#s5">NetworkX — part 1</a><br><span class="small">Graph, add_node/edge, draw, <code class="inline">order</code>/<code class="inline">size</code>, complete &amp; random graphs</span></li>
+      <li><a href="#s6">NetworkX — part 2</a><br><span class="small">weighted city graph, Graph vs DiGraph, connectivity, Dijkstra shortest paths, exceptions</span></li>
+      <li><a href="#s7">The Challenge</a><br><span class="small">why there are <em>more graphs than atoms in the universe</em></span></li>
+      <li><a href="#s8">Coming attractions — the 6 big ideas</a><br><span class="small">PageRank, search, link prediction, contagion, weak ties, marketing</span></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 1 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 1</div>
+    <h2>The gossip puzzle — people as a graph</h2>
+    <div class="lsub">a rumour, a classroom, and the jargon of the whole course</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> Modelling people as dots and lines</h2>
+  <p>The course opens with a scene: two students, one week into college, are amazed that <em>everyone</em> already knows a piece of gossip (Vardan and Simran are dating) — even though almost nobody has met more than a handful of classmates. How does a rumour reach all ~50 people when each person has spoken to only 3–4 others?</p>
+
+  <p>To reason about it, the instructor <b>models</b> the class. Draw each person as a dot; if two people are friends, join their dots with a line.</p>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the core vocabulary (memorise — used all course)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Node</span> (also <span class="def-term">vertex</span>) — a dot. Here, one person. Plural of vertex = <em>vertices</em>.</li>
+      <li><span class="def-term">Edge</span> (also <span class="def-term">link</span>) — a line joining two nodes. Here, a friendship.</li>
+      <li><span class="def-term">Graph</span> (also <span class="def-term">network</span>) — the whole picture: a set of nodes plus the edges between them.</li>
+      <li><span class="def-term">Friendship network</span> — the graph whose nodes are people and whose edges are their friendships.</li>
+    </ul>
+    <p class="small" style="margin:8px 0 0;">The course uses <b>node/vertex</b> and <b>edge/link</b> interchangeably, and <b>graph/network</b> interchangeably. A social network is literally a graph of people.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>a tiny friendship network</h4>
+      <svg viewBox="0 0 260 150">
+        <g font-family="Kalam" font-size="12" fill="var(--ink)">
+          <line x1="60" y1="40" x2="150" y2="40" stroke="var(--ink)" stroke-width="1.6"/>
+          <line x1="150" y1="40" x2="200" y2="110" stroke="var(--ink)" stroke-width="1.6"/>
+          <circle cx="60" cy="40" r="16" fill="var(--mint)" stroke="var(--ink)" stroke-width="1.6"/><text x="46" y="44">Rama</text>
+          <circle cx="150" cy="40" r="16" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="130" y="44">Krishna</text>
+          <circle cx="200" cy="110" r="16" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="182" y="114">Ramesh</text>
+        </g>
+      </svg>
+      <div class="cap">Rama–Krishna friends; Krishna–Ramesh friends; Rama–Ramesh <b>not</b> (no line).</div>
+    </div>
+    <div>
+      <p>In this picture Rama and Krishna are joined (an edge), Krishna and Ramesh are joined, but Rama and Ramesh are not — so we draw no line between them. Build this up for all 50 people and you get the class's friendship network.</p>
+      <p>A rumour can travel <b>only along edges</b>: from a person to their friends, then to their friends' friends, and so on. So the whole question — "can the news reach everyone?" — becomes a question about the <em>shape</em> of the graph.</p>
+    </div>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 2 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 2</div>
+    <h2>Answer to the puzzle — connectedness</h2>
+    <div class="lsub">path · connected vs disconnected · why a few random friendships suffice</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Paths, connectedness, and the emergent surprise</h2>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">📖 path &amp; connected</span>
+    <p style="margin:2px 0;"><span class="def-term">Path</span> — a sequence of edges leading from one node to another (A→C→F→B). <span class="def-term">Connected graph</span> — a graph in which <mark class="mint">there is a path between <em>every</em> pair of nodes</mark>; starting anywhere, you can reach everyone. <span class="def-term">Disconnected</span> — some pair has <em>no</em> path between them. A maximal connected piece is a <span class="def-term">component</span>.</p>
+  </div>
+
+  <p><b>The experiment.</b> Take 50 dots (people). For <em>each</em> person, pick <b>3</b> other people uniformly at random and declare them friends. Draw the resulting graph. Astonishingly, it comes out <b>connected</b> — every two people are joined by some path — even though each person knows only 3 others. Repeat the whole experiment <b>1000 times</b>: it is connected almost every single time.</p>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>connected (one blob) vs bifurcated (two islands)</h4>
+      <svg viewBox="0 0 300 160">
+        <g font-family="Kalam" font-size="11" fill="var(--ink)">
+          <text x="8" y="14" font-size="12">connected ✓</text>
+          <circle cx="30" cy="45" r="7" fill="var(--mint)" stroke="var(--ink)"/><circle cx="70" cy="30" r="7" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="95" cy="65" r="7" fill="var(--mint)" stroke="var(--ink)"/><circle cx="55" cy="75" r="7" fill="var(--mint)" stroke="var(--ink)"/>
+          <line x1="30" y1="45" x2="70" y2="30" stroke="var(--ink)"/><line x1="70" y1="30" x2="95" y2="65" stroke="var(--ink)"/>
+          <line x1="95" y1="65" x2="55" y2="75" stroke="var(--ink)"/><line x1="55" y1="75" x2="30" y2="45" stroke="var(--ink)"/>
+          <text x="175" y="14" font-size="12">disconnected ✗</text>
+          <circle cx="200" cy="40" r="7" fill="var(--pink)" stroke="var(--ink)"/><circle cx="235" cy="32" r="7" fill="var(--pink)" stroke="var(--ink)"/>
+          <line x1="200" y1="40" x2="235" y2="32" stroke="var(--ink)"/>
+          <circle cx="255" cy="95" r="7" fill="var(--blue)" stroke="var(--ink)"/><circle cx="290" cy="110" r="7" fill="var(--blue)" stroke="var(--ink)"/>
+          <line x1="255" y1="95" x2="290" y2="110" stroke="var(--ink)"/>
+          <path d="M175 60 Q220 80 175 120" fill="none" stroke="var(--coral)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <text x="150" y="150" fill="var(--coral)" font-size="10">no edge crosses the gap</text>
+        </g>
+      </svg>
+      <div class="cap">Left: a path joins every pair. Right: two groups with <b>no</b> crossing edge — the news cannot jump the gap.</div>
+    </div>
+    <div>
+      <p><b>Why so few friendships still connect everyone.</b> The only way the class could split is a <em>bifurcation</em>: two groups (say 25 &amp; 25) with friendships inside each but <b>not one edge crossing</b>. How likely is that? Between two groups of 25 there are <b>25 × 25 = 625</b> possible cross-friendships. For a clean split, <em>all 625 must be absent</em>. Even <b>one</b> of them appearing fuses the two islands into one.</p>
+      <p>With so many independent chances, the probability that <em>none</em> occurs is vanishingly small. So bifurcation is <mark>possible but wildly improbable</mark> — which is exactly why the random experiment almost always yields a connected graph.</p>
+    </div>
+  </div>
+
+  <div class="bubble"><span class="say">read it as:</span> "the class connects up not because everyone is popular, but because it is <em>nearly impossible</em> to keep two groups perfectly apart when everyone is free to befriend anyone." This is our first <b>emergent property</b> — order appearing from random choices.</div>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ don't confuse these</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>Connected ≠ complete.</b> Connected only needs a <em>path</em> between every pair, not a direct edge. A connected 36-person class can exist with ~50 edges, far below the maximum.</li>
+      <li><b>One isolated person breaks connectivity.</b> If a node has 0 edges, no path reaches it → the graph is disconnected, and the rumour reaches everyone <em>except</em> that person.</li>
+      <li>A disconnection isolates only the separated part; news still spreads freely <em>within</em> a connected piece.</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 3 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 3</div>
+    <h2>Python — part 1</h2>
+    <div class="lsub">the interactive shell · loops · the <code>random</code> library · lists · functions</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> Just enough Python to analyse networks</h2>
+  <p>You only need a <em>first course in programming</em>. The instructor works in <code class="inline">ipython</code> (an interactive Python shell where you type code and see results immediately). Variables need no declaration: <code class="inline">a = 2</code> makes an integer, <code class="inline">c = "Sudarshan"</code> makes a string. You can swap two variables in one line: <code class="inline">a, b = b, a</code>.</p>
+
+  <h3 class="sub">Loops and conditionals</h3>
+  <div class="code">
+    <div class="fname"><span>python_basics.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">for i in range(10):      # range(10) -&gt; 0,1,2,...,9  (10 excluded)
+    print(i)             # prints 0 through 9
+
+k = 10
+while k &lt;= 20:           # repeat while the condition holds
+    print(k)
+    k = k + 1            # increment; without this it loops forever
+
+if k &gt; 20:               # k is now 21, so this fires
+    print("k is greater than 20")
+
+if k &gt; 25:               # a SEPARATE if: 21 &gt; 25 is False...
+    print("bigger than 25")
+else:
+    print("the statement is false")   # ...so the else fires
+</code></pre>
+  </div>
+  <p class="small"><b>Key gotcha, used all course:</b> <code class="inline">range(n)</code> gives <code class="inline">0,1,…,n-1</code> — the top value <b>n</b> is <em>excluded</em>. So <code class="inline">range(10)</code> runs 10 times; <code class="inline">for i in range(k)</code> runs the body <b>k</b> times.</p>
+
+  <h3 class="sub">The <code>random</code> library — how we build random networks</h3>
+  <p>Load a library with <code class="inline">import random</code>, then call its functions with <code class="inline">random.&lt;name&gt;</code>. Four functions matter:</p>
+
+  <div class="code">
+    <div class="fname"><span>random_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import random
+
+random.randrange(1, 10)   # random INTEGER from 1..9  -> STOP (10) is EXCLUDED
+random.randint(1, 5)      # random INTEGER from 1..5  -> BOTH endpoints INCLUDED
+random.random()           # random FLOAT in [0, 1)    -> e.g. 0.7213...
+random.choice([100, 200, 300, 400, 500])   # one element picked from the list
+</code></pre>
+  </div>
+
+  <table class="hand">
+    <thead><tr><th>call</th><th>possible values</th><th>rule to remember</th></tr></thead>
+    <tbody>
+      <tr><td><code class="inline">random.randint(2, 5)</code></td><td>{2, 3, 4, 5}</td><td><b>both</b> endpoints included</td></tr>
+      <tr><td><code class="inline">random.randrange(2, 5)</code></td><td>{2, 3, 4}</td><td>start included, <b>stop excluded</b></td></tr>
+      <tr><td><code class="inline">random.random()</code></td><td>a float in [0, 1)</td><td>never invents integers only; gives decimals</td></tr>
+      <tr><td><code class="inline">random.choice(L)</code></td><td>one <em>existing</em> element of L</td><td>never an in-between value</td></tr>
+    </tbody>
+  </table>
+  <div class="bubble"><span class="say">read it as:</span> "<code class="inline">randint</code> is <b>int</b>-inclusive on both ends; <code class="inline">randrange</code> behaves like <code class="inline">range</code> — it <b>drops the last</b>." This start-included / stop-excluded contrast is a favourite exam trick.</div>
+
+  <h3 class="sub">Lists — Python's arrays</h3>
+  <div class="code">
+    <div class="fname"><span>lists_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">L = []              # empty list
+L.append(2)         # -&gt; [2]        add to the end
+L.append(10)        # -&gt; [2, 10]
+L.append("hi")      # lists can hold ANY type, even strings
+L.sort()            # sort in place (ascending)
+L.reverse()         # reverse in place (so sort+reverse = descending)
+L.remove(77)        # remove the FIRST occurrence of the value 77
+len(L)              # number of elements in L
+</code></pre>
+  </div>
+  <p class="small">Other in-place list methods the shell reveals with a <code class="inline">.</code>+Tab: <code class="inline">append, count, extend, index, insert, pop, remove</code>. A list appended with a whole dictionary counts that dictionary as a <b>single</b> element (see the quiz).</p>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example — the Birthday Paradox <span class="illus">(the instructor's own demo)</span></span>
+    <ol>
+      <li>Pick 60 people; give each a random birthday (a day-number 1–365):
+        <div class="code"><div class="fname"><span>birthday.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import random
+L = []
+for i in range(60):                 # 60 people
+    L.append(random.randint(1, 365))  # a birthday 1..365
+L.sort()
+print(L)   # look for two equal neighbours -&gt; a shared birthday</code></pre></div>
+      </li>
+      <li>Sort and scan for repeats. With 60 random birthdays you almost <em>always</em> find at least two people who share one.</li>
+      <li>With only 40 people it is rare; by ~60 it is near-certain. Walk into any 60-person classroom and two people share a birthday. $$ \boxed{\text{60 random birthdays} \Rightarrow \text{a collision, almost surely}} $$</li>
+    </ol>
+    <p class="small"><b>Why it matters here:</b> it is our second taste of an <em>emergent</em>, surprising-but-reliable pattern — and it drills the <code class="inline">for i in range(k): L.append(...)</code> idiom we use to build networks.</p>
+  </div>
+
+  <h3 class="sub">Functions — <code>def</code>, parameters, <code>return</code></h3>
+  <div class="code">
+    <div class="fname"><span>functions_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import random
+
+def sum3rand():                 # no parameters
+    a = random.random()
+    b = random.random()
+    c = random.random()
+    return a + b + c            # a value between 0 and 3
+
+def sumkrand(k):                # k is a PARAMETER
+    ans = 0
+    for i in range(k):          # run k times
+        ans = ans + random.random()
+    return ans                  # sum of k random numbers
+</code></pre>
+  </div>
+  <p class="small"><b>Workflow tips the course uses.</b> Write functions in a file, say <code class="inline">sudarshan.py</code>, then <code class="inline">import sudarshan</code> and call <code class="inline">sudarshan.sum3rand()</code>. After <em>editing</em> the file you must <code class="inline">reload(sudarshan)</code> (not <code class="inline">import</code> again) to pick up the changes. A triple-quoted string just under <code class="inline">def</code> is a <b>docstring</b> (help text) shown by <code class="inline">sudarshan.sum3rand?</code>. <span class="illus">(reload &amp; the trailing <code class="inline">?</code> help are IPython/Python-2 conveniences; in Python 3 use <code class="inline">importlib.reload</code> and <code class="inline">help(...)</code>.)</span></p>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 4 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 4</div>
+    <h2>Python — part 2</h2>
+    <div class="lsub">dictionaries · matplotlib plotting · numpy arrays</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Dictionaries, plotting, and numpy</h2>
+
+  <h3 class="sub">Dictionaries — store an attribute with each element</h3>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 dictionary</span>
+    <p style="margin:2px 0;">A <span class="def-term">dictionary</span> stores <b>key → value</b> pairs: each element (the <em>key</em>) carries an attribute (the <em>value</em>), e.g. a person's name → their age. It is stored internally as a <span class="def-term">hash table</span>, so a look-up is <span class="bigO good">O(1)</span> — it does <em>not</em> scan sequentially like a list <span class="bigO bad">O(n)</span>. That speed is why we use it for millions of entries.</p>
+  </div>
+
+  <div class="code">
+    <div class="fname"><span>dict_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">d = {"Annie": 25, "yoyo": 30, "sid": 19}   # key:value pairs
+
+d["Annie"]        # access BY KEY -&gt; 25     (NOT by position)
+d[0]              # ERROR: 0 is not a key; dicts have no index order
+
+d["Annie"] = 26   # UPDATE (same syntax as add)
+d["john"] = 40    # ADD a new pair (key not present -&gt; created)
+del d["john"]     # DELETE one pair by key
+d.clear()         # remove all pairs, keep the (empty) dict
+# del d           # remove the whole dictionary from memory
+
+d.keys()          # list of all keys
+d.values()        # list of all values
+d.items()         # list of (key, value) tuples
+for pair in d.items():
+    print(pair[0], pair[1])     # pair[0]=key, pair[1]=value
+
+squares = {x: x**2 for x in range(11)}         # {0:0, 1:1, ..., 10:100}
+evens   = {x: x**2 for x in range(11) if x%2==0}   # only even keys
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ dictionary gotchas</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>Order is not preserved</b> the way you inserted it — the dict stores keys by hash. Never rely on <code class="inline">d[0]</code> to mean "the first thing I added."</li>
+      <li>Accessing a <em>missing</em> key raises <code class="inline">KeyError</code>. Accessing by an integer position (<code class="inline">d[0]</code>) also fails unless <code class="inline">0</code> is literally a key.</li>
+      <li><code class="inline">**</code> is exponentiation: <code class="inline">x**2</code> = x². The instructor used <code class="inline">d.has_key("Annie")</code> (Python&nbsp;2) to test membership; in Python&nbsp;3 write <code class="inline">"Annie" in d</code>.</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">matplotlib — drawing plots</h3>
+  <div class="code">
+    <div class="fname"><span>plotting_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import matplotlib.pyplot as plt      # 'plt' is the standard short alias
+
+plt.plot([1, 2, 3, 4, 5])            # ONE list -&gt; taken as the y-values...
+plt.show()                           #  ...x defaults to 0,1,2,3,4 (indices)
+
+plt.plot([1,2,3,4,5], [1,4,9,16,25]) # TWO lists -&gt; explicit x and y
+plt.plot(x, y, "ro")                 # 'r'=red, 'o'=dots (no line)
+plt.plot(x, y, "b^-")                # blue triangles joined by a line
+plt.title("squares of the numbers")
+plt.xlabel("the values", fontsize=18, color="red")
+plt.ylabel("the squares")
+plt.axis([0, 6, 0, 30])              # [xmin, xmax, ymin, ymax]
+plt.plot(x, y, linewidth=3.0)        # thicker line (default 1.0)
+plt.grid(True)                       # background grid (default off)
+plt.scatter(x, y)                    # scatter plot
+plt.bar(x, y)                        # bar chart
+plt.show()                           # NOTHING renders until you call show()
+</code></pre>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the two rules that trip people up</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li><b>One list = y-values.</b> <code class="inline">plt.plot([300,600,900])</code> plots those as y, with x auto-assigned 0,1,2 (Python indices start at 0).</li>
+      <li><b>Nothing shows until <code class="inline">plt.show()</code>.</b> You must call it (again) after each plot to see the figure.</li>
+    </ol>
+  </div>
+
+  <h3 class="sub">numpy — element-wise math on arrays</h3>
+  <p>A plain Python list does <b>not</b> support element-wise math: <code class="inline">x ** 2</code> on a list raises <code class="inline">TypeError</code>. Convert it to a <span class="def-term">numpy array</span> first and the operation applies to every element:</p>
+  <div class="code">
+    <div class="fname"><span>numpy_demo.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import numpy as np
+
+x = [1, 2, 3]
+x ** 2              # TypeError: lists don't support element-wise power
+
+x = np.array([1, 2, 3])
+x ** 2              # -&gt; array([1, 4, 9])   element-wise, works!
+</code></pre>
+  </div>
+  <p class="small"><b>Exam rule:</b> element-wise operations (like <code class="inline">x**2</code>) work on a <code class="inline">numpy.array</code>, <b>not</b> on an ordinary list. That's why we convert before plotting curves like x², x³, x⁴.</p>
+
+  <div class="quiz">
+    <ol>
+      <li>What can <code class="inline">random.randrange(2, 5)</code> return, and how does it differ from <code class="inline">random.randint(2, 5)</code>?
+        <div class="ans"><code class="inline">randrange(2,5)</code> → {2,3,4} (stop excluded). <code class="inline">randint(2,5)</code> → {2,3,4,5} (both ends included).</div></li>
+      <li><code class="inline">x=[]; for i in range(8): x.append(random.randint(1,6)); x.sort(); x.append({"a":1,"b":2}); print(len(x))</code> — what prints?
+        <div class="ans"><b>9</b>. Eight integers are appended, then <em>one</em> dictionary is appended as a single element → 8+1 = 9 (the dict's 2 keys don't matter).</div></li>
+      <li>Why does <code class="inline">trucks = {"Delhi":25}; trucks[0]</code> raise <code class="inline">KeyError</code>?
+        <div class="ans">Dictionaries are accessed <b>by key</b>, not by position. <code class="inline">0</code> is not a key, so <code class="inline">KeyError</code>. You'd write <code class="inline">trucks["Delhi"]</code>.</div></li>
+      <li>Which of these need numpy: <code class="inline">plt.show()</code> to render? element-wise <code class="inline">x**2</code>?
+        <div class="ans"><code class="inline">plt.show()</code> is always required to display (matplotlib). Element-wise <code class="inline">x**2</code> needs a <b>numpy array</b>; a plain list raises <code class="inline">TypeError</code>.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 5 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 5</div>
+    <h2>NetworkX — part 1</h2>
+    <div class="lsub">build a graph · draw it · complete graphs · random graphs · <code>order</code> &amp; <code>size</code></div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> NetworkX: the graph toolkit</h2>
+  <p><span class="def-term">NetworkX</span> is a Python package for building and analysing graphs. The universal first line is <code class="inline">import networkx as nx</code> (the <code class="inline">as nx</code> gives it a short alias — the standard convention).</p>
+
+  <div class="code">
+    <div class="fname"><span>networkx_1.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()          # create an empty (undirected) graph
+
+G.add_node(1)           # add vertices one at a time
+G.add_node(2)
+G.add_node(3); G.add_node(4); G.add_node(5); G.add_node(6)
+G.nodes()               # -&gt; all the nodes just added
+
+G.add_edge(1, 2)        # add edges (creates endpoints if missing)
+G.add_edge(1, 3)
+G.add_edge(4, 6)
+G.add_edge(5, 4)
+G.add_edge(2, 3)
+G.edges()               # -&gt; all the edges
+
+nx.draw(G, with_labels=True)   # draw it; with_labels shows node numbers
+plt.show()                     # display the picture
+</code></pre>
+  </div>
+
+  <h3 class="sub">Built-in graph generators + the two measurements you'll use constantly</h3>
+  <div class="code">
+    <div class="fname"><span>networkx_1b.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">Z = nx.complete_graph(10)   # EVERY possible edge among 10 nodes
+Z.order()                   # number of NODES  -&gt; 10
+Z.size()                    # number of EDGES  -&gt; 45
+
+H = nx.complete_graph(100)  # all possible edges among 100 nodes
+
+G = nx.gnp_random_graph(20, 0.5)  # 20 nodes; each possible edge added
+                                  # independently with probability 0.5
+</code></pre>
+  </div>
+
+  <table class="hand">
+    <thead><tr><th>method</th><th>returns</th><th>memory hook</th></tr></thead>
+    <tbody>
+      <tr><td><code class="inline">G.order()</code></td><td>number of <b>nodes</b></td><td>"order" = how many people</td></tr>
+      <tr><td><code class="inline">G.size()</code></td><td>number of <b>edges</b></td><td>"size" = how many links</td></tr>
+      <tr><td><code class="inline">nx.complete_graph(n)</code></td><td>graph with <em>all</em> pairs joined</td><td>everyone friends with everyone</td></tr>
+      <tr><td><code class="inline">nx.gnp_random_graph(n, p)</code></td><td>n nodes; each edge present w.p. p</td><td>toss a coin per possible edge</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ order vs size — exam favourite</span>
+    <p style="margin:2px 0;">Watch the print order. <code class="inline">print(Z.size(), Z.order())</code> for <code class="inline">complete_graph(6)</code> prints <b>15 6</b> — <em>edges first, nodes second</em> — because you asked for <code class="inline">size()</code> then <code class="inline">order()</code>. Don't assume nodes come first.</p>
+  </div>
+
+  <h3 class="sub">The maths behind a complete graph</h3>
+  <p>A <span class="def-term">complete graph</span> on <em>n</em> nodes has every pair joined. The number of pairs (hence edges) is:</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">max edges on n nodes</div>
+      <div class="eqn" style="margin:6px 0;">$$ \binom{n}{2} = \frac{n(n-1)}{2} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "each of the <em>n</em> people could befriend the other <em>n−1</em>; that counts every friendship twice (A–B and B–A are the same edge), so divide by 2." For n = 10 → 45; for n = 6 → 15; for n = 36 → 630.</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example — 36-student batch</span>
+    <ol>
+      <li><b>Max possible friendships?</b> $\binom{36}{2} = \dfrac{36\times 35}{2} = \dfrac{1260}{2} = \boxed{630}$ edges.</li>
+      <li><b>Careful with the near-miss options:</b> 36×35 = 1260 <em>double-counts</em> ordered pairs; 36×36 counts impossible self-pairs; 35×34/2 wrongly uses 35 nodes.</li>
+    </ol>
+  </div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example — order÷size of a complete graph</span>
+    <ol>
+      <li>A 6-person team as a complete graph <code class="inline">T</code>: <code class="inline">T.order()</code> = 6, <code class="inline">T.size()</code> = $\binom{6}{2}$ = 15.</li>
+      <li>So <code class="inline">A = T.order()/T.size()</code> = 6/15 = $\boxed{2/5}$.</li>
+      <li>In general the ratio is $\dfrac{n}{n(n-1)/2} = \dfrac{2}{\,n-1\,}$; for n = 6 that's 2/5. ✓</li>
+    </ol>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>complete graph K₆ — all 15 edges</h4>
+      <svg viewBox="0 0 200 200">
+        <g stroke="var(--ink)" stroke-width="1">
+          <g id="k6pts"></g>
+        </g>
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <!-- 6 points on a circle, radius 70, centre 100,100 -->
+          <!-- edges (all pairs) -->
+          <line x1="170" y1="100" x2="135" y2="160.6" stroke="var(--ink)"/><line x1="170" y1="100" x2="65" y2="160.6" stroke="var(--ink)"/>
+          <line x1="170" y1="100" x2="30" y2="100" stroke="var(--ink)"/><line x1="170" y1="100" x2="65" y2="39.4" stroke="var(--ink)"/>
+          <line x1="170" y1="100" x2="135" y2="39.4" stroke="var(--ink)"/>
+          <line x1="135" y1="160.6" x2="65" y2="160.6" stroke="var(--ink)"/><line x1="135" y1="160.6" x2="30" y2="100" stroke="var(--ink)"/>
+          <line x1="135" y1="160.6" x2="65" y2="39.4" stroke="var(--ink)"/><line x1="135" y1="160.6" x2="135" y2="39.4" stroke="var(--ink)"/>
+          <line x1="65" y1="160.6" x2="30" y2="100" stroke="var(--ink)"/><line x1="65" y1="160.6" x2="65" y2="39.4" stroke="var(--ink)"/>
+          <line x1="65" y1="160.6" x2="135" y2="39.4" stroke="var(--ink)"/>
+          <line x1="30" y1="100" x2="65" y2="39.4" stroke="var(--ink)"/><line x1="30" y1="100" x2="135" y2="39.4" stroke="var(--ink)"/>
+          <line x1="65" y1="39.4" x2="135" y2="39.4" stroke="var(--ink)"/>
+          <circle cx="170" cy="100" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="135" cy="160.6" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="65" cy="160.6" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="30" cy="100" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="65" cy="39.4" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="135" cy="39.4" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+        </g>
+      </svg>
+      <div class="cap">6 nodes, every pair joined → 6·5/2 = <b>15</b> edges.</div>
+    </div>
+    <div class="diagram">
+      <h4>gnp_random_graph(8, p) — a coin per edge</h4>
+      <svg viewBox="0 0 200 200">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <line x1="170" y1="100" x2="65" y2="160.6" stroke="var(--ink)"/><line x1="135" y1="160.6" x2="30" y2="100" stroke="var(--ink)"/>
+          <line x1="65" y1="39.4" x2="135" y2="39.4" stroke="var(--ink)"/><line x1="30" y1="100" x2="65" y2="39.4" stroke="var(--ink)"/>
+          <line x1="170" y1="100" x2="135" y2="39.4" stroke="var(--ink)"/><line x1="65" y1="160.6" x2="65" y2="39.4" stroke="var(--ink)"/>
+          <circle cx="170" cy="100" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="135" cy="160.6" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="65" cy="160.6" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="30" cy="100" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="65" cy="39.4" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="135" cy="39.4" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="100" cy="30" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="100" cy="170" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+        </g>
+      </svg>
+      <div class="cap">Only <em>some</em> pairs joined — each edge added with probability p (a coin toss). Not complete.</div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ what <code>gnp_random_graph(n, p)</code> really does</span>
+    <p style="margin:2px 0;">For <em>every one</em> of the $\binom{n}{2}$ possible edges, flip a biased coin: include it with probability <em>p</em>, skip it with probability 1−p. So the edge count is <b>random</b> and only <em>averages</em> $p\binom{n}{2}$ — it is not fixed. For <code class="inline">nx.gnp_random_graph(36, 0.1)</code>: each of 630 edges is present independently with prob 0.1 (≈63 edges on average, but varies). Node degrees are not fixed either.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 6 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 6</div>
+    <h2>NetworkX — part 2</h2>
+    <div class="lsub">a weighted city network · Graph vs DiGraph · connectivity · Dijkstra · exception handling</div>
+  </div>
+
+  <h2 class="section" id="s6"><span class="num">6</span> A real model: cities, roads, and shortest routes</h2>
+  <p>Now we model something real: cities as nodes, roads as edges, and each road's <b>travel cost</b> as the edge's <span class="def-term">weight</span>. Because a road works both ways at equal cost, we use an <b>undirected</b> graph.</p>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 Graph vs DiGraph &amp; weighted edges</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">nx.Graph()</code> — <span class="def-term">undirected</span>: one edge serves <em>both</em> directions (A–B = B–A).</li>
+      <li><code class="inline">nx.DiGraph()</code> — <span class="def-term">directed</span>: an edge <code class="inline">u→v</code> does <b>not</b> imply <code class="inline">v→u</code> (used later for the web/PageRank).</li>
+      <li><span class="def-term">Weighted edge</span> — an edge carrying a number, e.g. <code class="inline">G.add_edge("Delhi","Jaipur", weight=300)</code>.</li>
+    </ul>
+  </div>
+
+  <div class="code">
+    <div class="fname"><span>cities_model.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import random
+import matplotlib.pyplot as plt
+
+G = nx.Graph()                          # undirected road network
+
+city_set = ["Delhi", "Jaipur", "Mumbai", "Ahmedabad", "Hyderabad",
+            "Chennai", "Bangalore", "Surat"]
+for each in city_set:                   # 'each' iterates over the list
+    G.add_node(each)                    # one node per city
+
+costs = []                              # candidate road costs 100,200,...,2000
+value = 100
+while value &lt;= 2000:
+    costs.append(value)
+    value = value + 100
+
+while G.number_of_edges() &lt; 16:         # keep adding until 16 edges exist
+    c1 = random.choice(list(G.nodes())) # pick two cities at random
+    c2 = random.choice(list(G.nodes()))
+    if c1 != c2 and G.has_edge(c1, c2) == 0:   # not same, not already joined
+        w = random.choice(costs)               # random road cost
+        G.add_edge(c1, c2, weight=w)            # weighted edge
+
+pos = nx.circular_layout(G)             # a tidy layout (also spring/spectral)
+nx.draw(G, pos, with_labels=True)
+nx.draw_networkx_edge_labels(G, pos)    # show the weights on edges
+plt.show()
+</code></pre>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the two guard conditions when adding a random edge</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">c1 != c2</code> — never join a city to itself (no self-loops).</li>
+      <li><code class="inline">G.has_edge(c1, c2) == 0</code> — don't duplicate an edge that already exists. (<code class="inline">has_edge</code> returns True/False; <code class="inline">== 0</code> means "no edge yet".)</li>
+    </ol>
+    <p class="small" style="margin:8px 0 0;">Layouts only change the <em>drawing</em>, not the graph: <code class="inline">nx.circular_layout</code>, <code class="inline">nx.spring_layout</code>, <code class="inline">nx.spectral_layout</code>.</p>
+  </div>
+
+  <h3 class="sub">Connectivity checks</h3>
+  <div class="code">
+    <div class="fname"><span>connectivity.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">nx.is_connected(G)          # True/False: is EVERY city reachable from every other?
+nx.has_path(G, "Delhi", "Mumbai")   # True/False: is there ANY route between these two?
+
+for u in G.nodes():
+    for v in G.nodes():
+        print(u, v, nx.has_path(G, u, v))   # reachability for every pair
+</code></pre>
+  </div>
+  <p class="small">The instructor observes: 8 cities with 16 edges → connected; drop to 10 edges → still connected; drop to 5 → now <em>disconnected</em> (some city stranded). Same lesson as the classroom: few edges already connect everyone, but too few leaves islands.</p>
+
+  <h3 class="sub">Dijkstra — cheapest routes on a weighted graph</h3>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 Dijkstra's algorithm (the two functions)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">nx.dijkstra_path(G, s, t)</code> → the cheapest route as a <b>list of nodes</b>, e.g. <code class="inline">["Delhi","Jaipur","Mumbai"]</code>.</li>
+      <li><code class="inline">nx.dijkstra_path_length(G, s, t)</code> → just the <b>total cost</b> (a number) of that cheapest route.</li>
+    </ul>
+    <p class="small" style="margin:8px 0 0;">Dijkstra minimises <em>total weight</em>, not the number of hops. Related: <code class="inline">single_source_dijkstra_path</code> (from one source to all) and <code class="inline">all_pairs_dijkstra_path</code>.</p>
+  </div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example — cheapest Delhi → Mumbai</span>
+    <p class="small">Roads: Delhi–Jaipur 300, Jaipur–Mumbai 1100, Delhi–Ahmedabad 900, Ahmedabad–Mumbai 600, Jaipur–Ahmedabad 650. (No direct Delhi–Mumbai road.)</p>
+    <table class="hand trace">
+      <thead><tr><th>candidate route</th><th>add up the weights</th><th>total</th></tr></thead>
+      <tbody>
+        <tr><td>Delhi → Jaipur → Mumbai</td><td>300 + 1100</td><td><b>1400</b> ✓ cheapest</td></tr>
+        <tr><td>Delhi → Ahmedabad → Mumbai</td><td>900 + 600</td><td>1500</td></tr>
+        <tr><td>Delhi → Jaipur → Ahmedabad → Mumbai</td><td>300 + 650 + 600</td><td>1550</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:6px 0 0;"><code class="inline">nx.dijkstra_path_length(G,"Delhi","Mumbai")</code> → <b>1400</b>;&nbsp; <code class="inline">nx.dijkstra_path(G,"Delhi","Mumbai")</code> → <b>["Delhi","Jaipur","Mumbai"]</b>. Note: the Ahmedabad route also has 2 hops but costs more, so Dijkstra rejects it — it minimises <em>cost</em>, not hops.</p>
+  </div>
+
+  <h3 class="sub">Exception handling — when there is no route</h3>
+  <p>If two cities are in different components, <code class="inline">dijkstra_path_length</code> <b>raises an exception</b> ("node not reachable") — it does <em>not</em> return 0. We catch it with <code class="inline">try/except</code> and substitute a big number as a stand-in for infinity:</p>
+  <div class="code">
+    <div class="fname"><span>safe_distance.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">try:
+    L = nx.dijkstra_path_length(G, "Delhi", "Mumbai")
+except:                       # runs only if the line above threw an error
+    L = 100000                # stand-in for "infinity" (no route exists)
+print(L)
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ common bugs in the routing code</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Calling <code class="inline">nx.dijkstra_path_length(s, t)</code> without <code class="inline">G</code> → <code class="inline">TypeError</code> (must pass the graph first).</li>
+      <li>Assuming "no path" returns 0 — it <b>raises</b>; you need <code class="inline">try/except</code> (or check <code class="inline">nx.has_path</code> first).</li>
+      <li>A list index like <code class="inline">cities[3]</code> on a 3-element list raises <code class="inline">IndexError</code> (valid indices are 0,1,2) → caught by <code class="inline">except</code>.</li>
+      <li>Forgetting <code class="inline">plt.show()</code> after each draw → nothing appears.</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">Putting it together — the "cost drops as roads are added" plot</h3>
+  <p>The lecture's finale ties everything together: start with two cities <em>not</em> connected, keep adding random edges, and watch the cheapest route between them <b>shrink</b>. Because the "path length" here is a travel <em>cost</em> (not a hop count, so it never reaches 1), we just loop a fixed number of steps and use <code class="inline">try/except</code> to catch the early "no route" case.</p>
+  <div class="code">
+    <div class="fname"><span>cost_vs_edges.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">x = []           # time step (how many roads added so far)
+y = []           # cheapest Delhi->Bangalore cost at that step
+for t in range(60):
+    add_random_edge(G, costs)          # add one random weighted road
+    try:
+        L = nx.dijkstra_path_length(G, "Delhi", "Bangalore")
+    except:
+        L = 10000                      # stand-in for "infinity" (still no route)
+    x.append(t)
+    y.append(L)
+plt.plot(x, y)
+plt.xlabel("roads added"); plt.ylabel("travel cost")
+plt.title("change in travelling cost as more roads are added")
+plt.show()      # cost falls from ~10000 (disconnected) to ~3000 after ~11 roads
+</code></pre>
+  </div>
+  <p class="small">The curve starts at the big "infinity" stand-in (the two cities are unreachable) and drops sharply once a connecting route appears — the same "few links suffice" lesson, now measured in cost.</p>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 7 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 7</div>
+    <h2>Social Networks: The Challenge</h2>
+    <div class="lsub">more graphs than atoms in the universe</div>
+  </div>
+
+  <h2 class="section" id="s7"><span class="num">7</span> Why studying networks is genuinely hard</h2>
+  <p>Here is the deep motivation. Fix <em>n</em> people. Every one of the $\binom{n}{2}$ possible edges is independently either <b>present</b> or <b>absent</b> — 2 choices each. So the number of <em>distinct</em> graphs you could draw is:</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">total labelled graphs on n nodes</div>
+      <div class="eqn" style="margin:6px 0;">$$ 2^{\binom{n}{2}} \;=\; 2^{\,n(n-1)/2} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "there are $\binom{n}{2}$ possible friendships; each is a yes/no coin, so multiply 2 by itself that many times." For n = 36 → $2^{630}$. For n = 50 → $2^{1225}$.</div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">🌌 the scale</span>
+    <p style="margin:2px 0;">The number of atoms in the universe is roughly $2^{200}$. But the graphs on just <b>50</b> people number $2^{\binom{50}{2}} = 2^{1225}$ — <mark class="yellow">unimaginably more than every atom in existence</mark>. Brute-force enumeration of social networks is hopeless.</p>
+    <p style="margin:8px 0 0;"><b>And yet</b> — this is the whole point of the course — real social networks reliably show <em>nice, predictable emergent properties</em> (like connecting from very few links). The mystery isn't that the space is huge; it's that <b>structure emerges anyway</b>, and we can study it.</p>
+  </div>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ don't over-read the challenge</span>
+    <p style="margin:2px 0;">"The space is astronomically large" does <b>not</b> mean "no regularities can be found." The opposite is true and is the course's thesis: strong regularities <em>do</em> emerge and can be predicted.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <!-- SECTION 8 -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 8–13</div>
+    <h2>Coming attractions — the six big ideas</h2>
+    <div class="lsub">a preview of what the rest of the course answers</div>
+  </div>
+
+  <h2 class="section" id="s8"><span class="num">8</span> The questions this course will answer</h2>
+  <p>Lectures 8–13 are a trailer: six problems, each solved later, each surprisingly simple in the end. Know them by name.</p>
+
+  <table class="hand">
+    <thead><tr><th>big idea</th><th>the question</th><th>the teaser answer</th></tr></thead>
+    <tbody>
+      <tr><td><b>Google PageRank</b><br><span class="small">(Lec 8)</span></td><td>Given a network of web pages linking to each other, which is the <em>most important</em>? Is importance just "most links"?</td><td>A seemingly obvious idea (importance flows from important endorsers) became a ~450-billion-dollar industry. Covered in the Link-Analysis chapter (Weeks 6, 8).</td></tr>
+      <tr><td><b>Searching a network</b><br><span class="small">(Lec 9)</span></td><td>In a network of ~1 billion nodes, can you find a target starting from a random node?</td><td>Yes — in only about <b>log n</b> steps (the instructor notes it's more precisely ~<b>log² n</b>; ~20 for a billion either way), via the <b>small-world</b> phenomenon. "log n = number of digits in n."</td></tr>
+      <tr><td><b>Link prediction</b><br><span class="small">(Lec 10)</span></td><td>Can you predict who will become your next friend?</td><td>Yes, remarkably well — it's the maths behind "People You May Know" (Facebook friend suggestions), not just "most common friends".</td></tr>
+      <tr><td><b>The contagions</b><br><span class="small">(Lec 11)</span></td><td>Is obesity contagious? Is happiness? Can a friend-of-a-friend you've never met affect you?</td><td>Yes — happiness/behaviours spread up to <b>2–3 levels</b> through the network (a well-established scientific finding).</td></tr>
+      <tr><td><b>Importance of acquaintances</b><br><span class="small">(Lec 12)</span></td><td>What kind of friends help you land a dream job?</td><td>Your <em>weak</em> ties — acquaintances, not close friends — the <b>Strength of Weak Ties</b> (Week 3). New jobs and even spouses often come via far-off contacts.</td></tr>
+      <tr><td><b>Marketing on networks</b><br><span class="small">(Lec 13)</span></td><td>How do you make a product or video go <em>viral</em>?</td><td>By understanding how information/belief <b>cascades</b> through a network (Week 7). Not TV ads — network structure.</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- ============ takeaway banner (exactly one) ============ -->
+  <div class="banner">
+    <h3>A social network is a graph of people; the surprise is that a few random links already make the whole thing connected.</h3>
+    <p>Model people as nodes and relationships as edges — then use Python + NetworkX (<code style="color:#fff">nx.Graph</code>, <code style="color:#fff">order/size</code>, <code style="color:#fff">complete_graph</code>, <code style="color:#fff">gnp_random_graph</code>, <code style="color:#fff">is_connected</code>, <code style="color:#fff">dijkstra_path</code>) to build and measure it. Max edges = n(n−1)/2; total graphs = 2^(n(n−1)/2) — more than the atoms in the universe.</p>
+  </div>
+
+  <!-- ============ final quiz ============ -->
+  <div class="quiz">
+    <ol>
+      <li>A rumour reaches all 36 students exactly when the acquaintance graph has which property?
+        <div class="ans"><b>Connected</b> — a path between every pair. (Not "complete" and not "min degree 3", which are sufficient-looking but unnecessary.)</div></li>
+      <li>Maximum number of edges among 36 students?
+        <div class="ans">$\binom{36}{2} = 36\cdot35/2 = \textbf{630}$.</div></li>
+      <li>Two groups of 18 with acquaintances only inside each — how many cross-group edges are possible, and why is a perfect split improbable?
+        <div class="ans"><b>18 × 18 = 324</b> possible cross-edges. All 324 must be absent for a clean split; even one present merges the groups — so with 324 independent chances, a perfect split is almost impossible.</div></li>
+      <li><code class="inline">T = nx.complete_graph(6); print(T.size(), T.order())</code> prints what?
+        <div class="ans"><b>15 6</b> — size() (edges = 15) is printed first, then order() (nodes = 6).</div></li>
+      <li>How many distinct acquaintance graphs are possible on 36 labelled students?
+        <div class="ans">$2^{630} = 2^{\,n(n-1)/2}$ — each of the 630 possible edges is independently present or absent.</div></li>
+      <li>What does <code class="inline">nx.gnp_random_graph(36, 0.1)</code> build?
+        <div class="ans">36 nodes; each of the 630 possible edges included <b>independently with probability 0.1</b> (a coin per edge). The edge count is random (≈63 on average), not fixed.</div></li>
+      <li><code class="inline">nx.dijkstra_path(G,"Delhi","Mumbai")</code> vs <code class="inline">nx.dijkstra_path_length(...)</code> — difference?
+        <div class="ans"><code class="inline">dijkstra_path</code> → the <b>node list</b> of the cheapest route <code class="inline">["Delhi","Jaipur","Mumbai"]</code>; <code class="inline">dijkstra_path_length</code> → the <b>cost</b> (1400).</div></li>
+      <li>Delhi and Mumbai fall in different components. What does <code class="inline">nx.dijkstra_path_length(G,"Delhi","Mumbai")</code> do, and how do you handle it?
+        <div class="ans">It <b>raises an exception</b> ("not reachable") — it does <em>not</em> return 0. Wrap it in <code class="inline">try/except</code> and set <code class="inline">L = 100000</code> as a stand-in for infinity (or check <code class="inline">nx.has_path</code> first).</div></li>
+      <li>One student, Ravi, ends up with zero acquaintances. What happens to the notice?
+        <div class="ans">The graph is <b>disconnected</b>; the notice reaches everyone <em>except</em> Ravi (an isolated node has no path to anyone).</div></li>
+      <li>Why is analysing social networks fundamentally hard, yet still possible?
+        <div class="ans">The number of possible graphs, $2^{n(n-1)/2}$, is astronomically larger than the atoms in the universe — so brute force is hopeless. But real networks show reliable <b>emergent properties</b> (e.g. connectedness from few links) that we <em>can</em> study.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 1 ✏️</div>
+  <a class="backtop" href="#top">↑ back to top</a>
+</div>
+
+</body>
+</html>

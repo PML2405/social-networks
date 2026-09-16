@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 4 · Homophily &amp; the Fatman Model</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 4 — Homophily, Selection &amp; Influence</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 41–53 · "birds of a feather" made precise — and a full NetworkX simulation (the Fatman model) of a city evolving under homophily, closure &amp; influence.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky mint">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Why does your parents' advice "watch your company" hold? Because traits — even <b>obesity</b> and <b>happiness</b> — spread through friendship networks like contagions (up to 3 levels out). Two forces shape who befriends whom: <b>selection</b> (you pick friends already like you) and <b>social influence</b> (you grow like the friends you pick). The tendency of similar people to link is <b>homophily</b>, which we <em>measure</em> as <code class="inline">1 − actual/expected</code> cross-group edges. Friendships also form through shared <b>foci</b> (clubs, gyms) — giving <b>triadic, foci &amp; membership closure</b>. Finally we build all of this into one running simulation: the <b>Fatman Evolutionary Model</b>.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 4</h3>
+    <ol>
+      <li><a href="#s1">Watch your company — contagion of obesity &amp; happiness</a></li>
+      <li><a href="#s2">Selection vs social influence</a><br><span class="small">the Wikipedia study, similarity measure</span></li>
+      <li><a href="#s3">Homophily — definition &amp; measurement</a><br><span class="small">1 − actual/expected, and its sign</span></li>
+      <li><a href="#s4">Three closures: triadic, foci, membership</a></li>
+      <li><a href="#s5">The Fatman Evolutionary Model (full code)</a><br><span class="small">build order · homophily · closure · influence · longitudinal data</span></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 41</div>
+    <h2>Should you watch your company?</h2>
+    <div class="lsub">obesity and happiness are contagious — up to three levels</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> Traits spread through the network</h2>
+  <p>"Tell me who your friends are and I'll tell you who you are." A 2007 study by <b>Christakis and Fowler</b> gave this teeth: tracking ~5000 people over ~12 years, they found <mark class="mint">obesity is contagious</mark> — if your friends become obese, your risk rises — and, even more strikingly, <b>happiness is contagious up to three levels out</b>: your happiness is linked to your friends', their friends', and <em>their</em> friends'.</p>
+  <div class="sketch-box tint-yellow">
+    <span class="label">📖 contagion in a social network</span>
+    <p style="margin:2px 0;">A <span class="def-term">contagion</span> is a trait/behaviour that spreads along friendship edges rather than staying with one person. It means we don't just <em>connect</em> — we <b>permeate</b> each other's states. Both obesity and happiness were shown to spread this way (happiness to 3 levels).</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 42–43</div>
+    <h2>Selection vs Social Influence</h2>
+    <div class="lsub">did you pick a similar friend, or grow similar after? — the Wikipedia study</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Two forces behind every friendship</h2>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 selection vs social influence</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Selection</span> — you befriend people <em>already similar</em> to you (similarity comes <b>first</b>). E.g. two French-speakers become friends; same-social-status people befriend; a class topper's friends are toppers.</li>
+      <li><span class="def-term">Social influence</span> — you become similar to friends <em>after</em> befriending them (friendship comes first). E.g. you start smoking / eating junk / partying because a friend does.</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">The similarity measure</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">similarity of two people</div>
+      <div class="eqn" style="margin:6px 0;">$$ \text{sim}(A,B)=\frac{|\,\text{interests}(A)\cap\text{interests}(B)\,|}{|\,\text{interests}(A)\cup\text{interests}(B)\,|} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "shared interests ÷ all distinct interests between them." (Same shape as neighbourhood overlap, but over interests/edited-pages, not friends.)</div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — Anita &amp; Bina</span>
+    <p style="margin:2px 0;">Anita = {chess, hiking, jazz}; Bina = {hiking, jazz, baking, cycling}. Shared = {hiking, jazz} = 2; union = {chess, hiking, jazz, baking, cycling} = 5. $$\text{sim}=\frac{2}{5}=\boxed{0.4}.$$</p>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>similarity of two Wikipedia editors around first contact</h4>
+      <svg viewBox="0 0 260 150">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <line x1="30" y1="130" x2="245" y2="130" stroke="var(--ink)" stroke-width="1.4"/>
+          <line x1="30" y1="130" x2="30" y2="15" stroke="var(--ink)" stroke-width="1.4"/>
+          <text x="95" y="146">time (t=0 = first talk)</text>
+          <text x="2" y="70" transform="rotate(-90 8,70)">similarity</text>
+          <!-- t=0 line -->
+          <line x1="135" y1="20" x2="135" y2="130" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="118" y="16" font-size="9">first talk</text>
+          <!-- selection curve (steep before) then influence (after) -->
+          <path d="M40 120 Q90 110 135 60 Q190 40 240 30" fill="none" stroke="var(--coral)" stroke-width="2.4"/>
+          <text x="50" y="100" fill="var(--coral)" font-size="9">selection</text>
+          <text x="175" y="60" fill="var(--coral)" font-size="9">influence</text>
+        </g>
+      </svg>
+      <div class="cap">Average similarity climbs <b>before</b> first contact (selection — similar people choose to interact) and climbs further <b>after</b> (influence). On Wikipedia the <b>pre-contact (selection) rise is steeper</b>.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">⚙️ how the Wikipedia study separates the two</span>
+        <p style="margin:2px 0;">Plot average editor-similarity vs time around their first talk-page conversation (t=0). The rise <b>before</b> t=0 = <b>selection</b>; the rise <b>after</b> = <b>influence</b>. On Wikipedia selection dominated; on <em>obesity</em> data the reverse held (more influence). So which force wins is <b>context-dependent</b>.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 44</div>
+    <h2>Homophily — definition &amp; measurement</h2>
+    <div class="lsub">a coin-toss baseline, then 1 − actual/expected</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> Measuring homophily</h2>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 homophily</span>
+    <p style="margin:2px 0;"><span class="def-term">Homophily</span> = "birds of a feather flock together" — similar people befriend one another more than chance predicts. First ask <em>does</em> the network show it (yes/no), then <em>how much</em>.</p>
+  </div>
+  <p><b>The chance baseline.</b> At a party of 50 teenagers + 50 middle-aged, picking a random friendship is like tossing two coins: two teens = ¼, two middle-aged = ¼, one of each (cross-group) = ½. So <b>half</b> the friendships should be cross-group by chance. If far fewer are cross-group → homophily.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">homophily measure</div>
+      <div class="eqn" style="margin:6px 0;">$$ H = 1 - \frac{\text{actual cross-group edges}}{\text{expected cross-group edges}} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "how far below chance is the number of cross-group friendships." <b>H &gt; 0</b> = homophily (fewer cross ties than chance); <b>H = 0</b> = chance-level/random mixing; <b>H &lt; 0</b> = <b>heterophily</b> (more cross ties than chance — e.g. an actors-vs-actresses party).</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked examples — homophily value</span>
+    <ol>
+      <li><b>Club of 20</b> (10 first-years + 10 final-years), 30 friendships, 9 cross-year. 50–50 split → expected cross = ½·30 = 15. $$H = 1 - \frac{9}{15} = 1 - 0.6 = \boxed{0.4}\ (\text{positive} \Rightarrow \text{homophily}).$$</li>
+      <li><b>Transcript's class of 10</b> (4 girls, 6 boys), 18 edges, 3 boy–girl. Expected cross = ½·18 = 9. $H = 1 - \frac{3}{9} = 1 - 0.33 = 0.67$ (strong homophily).</li>
+    </ol>
+    <p class="small" style="margin:6px 0 0;">The ½ is exact only for a 50–50 split; for other splits use the appropriate expected-cross fraction. The measure isn't limited to 50–50.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 45</div>
+    <h2>Three kinds of closure</h2>
+    <div class="lsub">triadic · foci · membership</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> How friendships (and memberships) form</h2>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>triadic · foci · membership closure</h4>
+      <svg viewBox="0 0 280 160">
+        <g font-family="Kalam" font-size="9.5" fill="var(--ink)">
+          <!-- triadic -->
+          <text x="6" y="14" font-size="10" font-weight="700">triadic</text>
+          <circle cx="45" cy="30" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="20" cy="70" r="9" fill="var(--mint)" stroke="var(--ink)"/><circle cx="70" cy="70" r="9" fill="var(--mint)" stroke="var(--ink)"/>
+          <line x1="45" y1="30" x2="20" y2="70" stroke="var(--ink)"/><line x1="45" y1="30" x2="70" y2="70" stroke="var(--ink)"/>
+          <line x1="20" y1="70" x2="70" y2="70" stroke="var(--coral)" stroke-dasharray="4 2"/>
+          <text x="6" y="92" font-size="8">common friend</text>
+          <!-- foci -->
+          <text x="105" y="14" font-size="10" font-weight="700">foci</text>
+          <rect x="120" y="22" width="34" height="16" rx="3" fill="var(--pink)" stroke="var(--ink)"/><text x="122" y="34" font-size="8">yoga</text>
+          <circle cx="112" cy="70" r="9" fill="var(--mint)" stroke="var(--ink)"/><circle cx="162" cy="70" r="9" fill="var(--mint)" stroke="var(--ink)"/>
+          <line x1="130" y1="38" x2="112" y2="70" stroke="var(--ink)"/><line x1="144" y1="38" x2="162" y2="70" stroke="var(--ink)"/>
+          <line x1="112" y1="70" x2="162" y2="70" stroke="var(--coral)" stroke-dasharray="4 2"/>
+          <text x="104" y="92" font-size="8">shared focus</text>
+          <!-- membership -->
+          <text x="200" y="14" font-size="10" font-weight="700">membership</text>
+          <circle cx="205" cy="35" r="9" fill="var(--mint)" stroke="var(--ink)"/><circle cx="250" cy="35" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <line x1="205" y1="35" x2="250" y2="35" stroke="var(--ink)"/>
+          <rect x="188" y="72" width="36" height="16" rx="3" fill="var(--pink)" stroke="var(--ink)"/><text x="190" y="84" font-size="7.5">music</text>
+          <line x1="205" y1="44" x2="206" y2="72" stroke="var(--ink)"/>
+          <line x1="250" y1="44" x2="220" y2="72" stroke="var(--coral)" stroke-dasharray="4 2"/>
+          <text x="188" y="104" font-size="8">friend joins my focus</text>
+        </g>
+      </svg>
+      <div class="cap">coral dashed = the new link formed.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">📖 the three closures</span>
+        <ul class="notes" style="margin:4px 0 0;">
+          <li><span class="def-term">Triadic closure</span> — two people with a <b>common friend</b> befriend each other.</li>
+          <li><span class="def-term">Foci closure</span> — two people meet through a <b>shared focus</b> (club, class, gym) and befriend.</li>
+          <li><span class="def-term">Membership closure</span> — you bring an existing <b>friend into a focus</b> you belong to (they become a member because you are).</li>
+        </ul>
+        <p class="small" style="margin:8px 0 0;">A <span class="def-term">focus</span> (plural <em>foci</em>) is a shared activity/place that draws people together.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">📈 quantifying closure pressure — the 1−(1−p)^k law</span>
+    <p style="margin:2px 0;">More common friends → more pressure to befriend. If a <em>single</em> common friend gives probability <em>p</em> of connecting, then <em>k</em> independent common friends all failing has probability $(1-p)^k$, so the chance they <b>do</b> connect is:</p>
+    <div class="eqn" style="margin:8px 0;">$$ T(k) = 1 - (1-p)^{k} $$</div>
+    <p style="margin:2px 0;">On real e-mail data this matches the (roughly linear, small) observed rise. We'll reuse this exact formula for all three closures in code.</p>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — closure probability</span>
+    <p style="margin:2px 0;">p = 0.1, k = 3 common neighbours: $1-(1-0.1)^3 = 1-0.9^3 = 1-0.729 = \boxed{0.271}$.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 46–53</div>
+    <h2>The Fatman Evolutionary Model</h2>
+    <div class="lsub">a city that evolves under homophily, closure &amp; social influence — in NetworkX</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Simulating a city</h2>
+  <p>We build a "city": <b>100 person nodes</b> (each with a random BMI) + <b>5 focus nodes</b> (gym, eat-out, movie, karate, yoga). Every node carries two attributes: <code class="inline">name</code> (the <em>BMI</em> for a person, or the <em>label</em> for a focus) and <code class="inline">type</code> (<code class="inline">'person'</code> or <code class="inline">'foci'</code>). Each person starts linked to exactly one random focus; foci never link to each other.</p>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ build order (memorise)</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li>Create the graph + add 100 person nodes.</li>
+      <li>Assign each a random BMI (<code class="inline">name</code>) and <code class="inline">type='person'</code>.</li>
+      <li>Add the 5 focus nodes.</li>
+      <li>Link each person to exactly one random focus.</li>
+      <li>Each round: apply <b>homophily → closure → change BMIs (social influence)</b>, and save a snapshot.</li>
+    </ol>
+  </div>
+
+  <div class="code">
+    <div class="fname"><span>fatman_build.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx, random, math
+
+def create_graph():
+    G = nx.Graph()
+    G.add_nodes_from(range(1, 101))            # 100 person nodes: 1..100
+    return G
+
+def assign_bmi(G):
+    for v in G.nodes():
+        G.node[v]['name'] = random.randint(15, 40)   # BMI 15..40 (stored in 'name')
+        G.node[v]['type'] = 'person'
+
+def add_foci_nodes(G):
+    i = G.number_of_nodes() + 1                # start numbering after the people
+    foci = ['gym', 'eat out', 'movie club', 'karate club', 'yoga club']
+    for j in range(0, 5):
+        G.add_node(i)
+        G.node[i]['name'] = foci[j]            # the focus label (stored in 'name')
+        G.node[i]['type'] = 'foci'
+        i = i + 1
+
+def add_foci_edges(G):
+    foci = [v for v in G.nodes() if G.node[v]['type'] == 'foci']
+    persons = [v for v in G.nodes() if G.node[v]['type'] == 'person']
+    for person in persons:
+        r = random.choice(foci)                # one random focus per person
+        G.add_edge(person, r)
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ why one attribute called <code>name</code> for both?</span>
+    <p style="margin:2px 0;">A person's key feature is its <b>BMI</b>; a focus's is its <b>label</b>. Storing both under <code class="inline">name</code> lets one function (labels, sizes, colours) work for either kind; <code class="inline">type</code> tells them apart. <span class="illus">(NetworkX 1.x uses <code class="inline">G.node[v]</code>; in 2.x it's <code class="inline">G.nodes[v]</code>.)</span></p>
+  </div>
+
+  <h3 class="sub">Homophily — closer BMIs, higher link probability</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">homophily link probability</div>
+      <div class="eqn" style="margin:6px 0;">$$ p = \frac{1}{\,|\,\text{BMI}_u-\text{BMI}_v\,| + 1000\,} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "the closer their BMIs, the higher the chance they befriend." The <b>+1000</b> does two jobs: (1) avoids divide-by-zero when BMIs are equal (gap 0), and (2) scales <em>all</em> probabilities down so edges accrue gradually.</div>
+  <div class="code">
+    <div class="fname"><span>fatman_homophily.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">def homophily(G):
+    pnodes = [v for v in G.nodes() if G.node[v]['type'] == 'person']
+    for u in pnodes:
+        for v in pnodes:
+            if u != v:
+                gap = abs(G.node[u]['name'] - G.node[v]['name'])   # BMI difference
+                p = 1.0 / (gap + 1000)          # closer BMI -> higher p
+                if random.random() < p:         # realise an event of probability p
+                    G.add_edge(u, v)
+</code></pre>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — p for BMIs 22 &amp; 27</span>
+    <p style="margin:2px 0;">gap = |22 − 27| = 5, so $p = \frac{1}{5+1000} = \frac{1}{1005}\approx \boxed{0.000995}$.</p>
+  </div>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the "draw and compare" trick — <code>if random.random() &lt; p</code></span>
+    <p style="margin:2px 0;"><code class="inline">random.random()</code> returns a uniform real in [0,1]. The chance it lands in [0, p) is <em>exactly p</em>, so <code class="inline">if random.random() &lt; p: do X</code> makes X happen with probability p — the standard way to simulate any probabilistic event.</p>
+  </div>
+
+  <h3 class="sub">Closure — the 1−(1−p)^k law, applied to shared neighbours</h3>
+  <div class="code">
+    <div class="fname"><span>fatman_closure.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">def cmn(u, v, G):                              # count common neighbours
+    nu = set(G.neighbors(u))
+    nv = set(G.neighbors(v))
+    return len(nu &amp; nv)                         # set intersection size
+
+def closure(G):
+    p = 0.01                                   # one common neighbour's contribution
+    array1 = []                                # decide ALL edges first (independence)
+    for u in G.nodes():
+        for v in G.nodes():
+            # at least one must be a person (two foci never share/close an edge)
+            if u != v and (G.node[u]['type'] == 'person' or G.node[v]['type'] == 'person'):
+                k = cmn(u, v, G)               # common neighbours
+                prob = 1 - math.pow(1 - p, k)  # 1-(1-p)^k
+                array1.append([u, v, prob])
+    for u, v, prob in array1:                  # now realise them
+        if random.uniform(0, 1) < prob:
+            G.add_edge(u, v)
+</code></pre>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ one formula, all three closures</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">k = len(set(G.neighbors(u)) &amp; set(G.neighbors(v)))</code> = <b>common neighbours</b>. A shared neighbour can be a <b>person</b> (→ triadic closure) or a <b>focus</b> (→ foci/membership closure) — the same $1-(1-p)^k$ handles all three.</li>
+      <li>The guard <code class="inline">type=='person' or ...</code> requires <b>at least one person</b>: two foci are never linked, so an edge between two foci is meaningless.</li>
+      <li>Edges are collected into <code class="inline">array1</code> first, then added — so each edge's decision is independent of edges added earlier in the same round.</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">Social influence — implemented indirectly via the foci</h3>
+  <div class="code">
+    <div class="fname"><span>fatman_influence.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">def change_bmi(G):
+    foci = [v for v in G.nodes() if G.node[v]['type'] == 'foci']
+    for f in foci:
+        if G.node[f]['name'] == 'eat out':
+            for nb in G.neighbors(f):
+                if G.node[nb]['name'] != 40:            # cap at 40
+                    G.node[nb]['name'] = G.node[nb]['name'] + 1   # gain weight
+        if G.node[f]['name'] == 'gym':
+            for nb in G.neighbors(f):
+                if G.node[nb]['name'] != 15:            # floor at 15
+                    G.node[nb]['name'] = G.node[nb]['name'] - 1   # lose weight
+</code></pre>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "each round, gym members lose 1 BMI (never below 15); eat-out members gain 1 BMI (never above 40)." Social influence emerges <b>indirectly</b>: membership closure pulls your friends into your gym, and then <em>they</em> start losing weight too — your habit spread to them without any direct "make obese people friends" rule.</div>
+
+  <h3 class="sub">The main loop + storing longitudinal data</h3>
+  <div class="code">
+    <div class="fname"><span>fatman_run.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">G = create_graph()
+assign_bmi(G)
+add_foci_nodes(G)
+add_foci_edges(G)
+nx.write_gml(G, 'evolution_0.gml')             # snapshot BEFORE evolving
+
+for t in range(0, 10):                         # 10 rounds
+    homophily(G)                               # 1) similar BMIs befriend
+    closure(G)                                 # 2) shared neighbours befriend
+    change_bmi(G)                              # 3) social influence via gym/eat-out
+    nx.write_gml(G, 'evolution_' + str(t + 1) + '.gml')   # save each round
+
+# later analysis: for each snapshot, H = nx.read_gml('evolution_i.gml');
+# density RISES steadily as homophily + closures keep adding edges.
+# obesity count = number of person nodes whose 'name' (BMI) == 40.
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ Fatman model — key facts &amp; gotchas</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Save with <code class="inline">nx.write_gml('evolution_t.gml')</code>, reload with <code class="inline">nx.read_gml</code>. Plotting <b>density across rounds → it rises</b> (edges keep being added).</li>
+      <li><b>Obesity</b> = count of person nodes with BMI (<code class="inline">name</code>) == 40; underweight = BMI == 15.</li>
+      <li>Social influence is <b>not</b> "add edges between obese people" — it's the gym/eat-out BMI change plus membership closure.</li>
+      <li>Assumption: only <em>new</em> edges appear (existing ones aren't deleted). Easy to extend.</li>
+    </ul>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>the Fatman city (persons blue/green/yellow, foci red)</h4>
+      <svg viewBox="0 0 280 150">
+        <g font-family="Kalam" font-size="9" fill="var(--ink)">
+          <rect x="30" y="20" width="34" height="16" rx="3" fill="var(--coral)" stroke="var(--ink)"/><text x="33" y="32" fill="#fff" font-size="8">gym</text>
+          <rect x="180" y="20" width="42" height="16" rx="3" fill="var(--coral)" stroke="var(--ink)"/><text x="183" y="32" fill="#fff" font-size="8">eat out</text>
+          <!-- gym members (green, losing weight) -->
+          <circle cx="20" cy="70" r="7" fill="var(--mint)" stroke="var(--ink)"/><circle cx="50" cy="85" r="7" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="75" cy="60" r="7" fill="var(--blue)" stroke="var(--ink)"/>
+          <line x1="47" y1="36" x2="20" y2="70" stroke="var(--ink)"/><line x1="47" y1="36" x2="50" y2="85" stroke="var(--ink)"/><line x1="47" y1="36" x2="75" y2="60" stroke="var(--ink)"/>
+          <line x1="50" y1="85" x2="75" y2="60" stroke="var(--ink)"/>
+          <!-- eat out members (yellow, gaining) -->
+          <circle cx="200" cy="70" r="9" fill="var(--yellow)" stroke="var(--ink)"/><circle cx="235" cy="85" r="9" fill="var(--yellow)" stroke="var(--ink)"/>
+          <circle cx="210" cy="115" r="7" fill="var(--blue)" stroke="var(--ink)"/>
+          <line x1="201" y1="36" x2="200" y2="70" stroke="var(--ink)"/><line x1="201" y1="36" x2="235" y2="85" stroke="var(--ink)"/><line x1="200" y1="70" x2="210" y2="115" stroke="var(--ink)"/>
+          <!-- a homophily bridge -->
+          <line x1="75" y1="60" x2="200" y2="70" stroke="var(--ink-soft)" stroke-dasharray="4 3"/>
+        </g>
+      </svg>
+      <div class="cap">green = losing weight (gym), yellow = obese (eat-out), blue = normal, red = foci. Dashed = a homophily edge across.</div>
+    </div>
+    <div>
+      <p>Over the rounds you watch homophily wire similar-BMI people together, closures thicken the clusters, and the gym/eat-out foci pull members' BMIs apart — so obesity visibly spreads through the friendship structure, exactly the contagion we started with.</p>
+    </div>
+  </div>
+
+
+  <!-- ============ takeaway banner ============ -->
+  <div class="banner">
+    <h3>Similar people befriend (selection/homophily) and friends grow similar (influence) — and you can simulate the whole thing.</h3>
+    <p>homophily H = 1 − actual/expected cross-group edges (H&gt;0 homophily, 0 random, &lt;0 heterophily) · similarity = shared/union · closure prob = 1−(1−p)^k · Fatman link p = 1/(|ΔBMI|+1000) with <code style="color:#fff">if random.random() &lt; p</code>.</p>
+  </div>
+
+  <!-- ============ quiz ============ -->
+  <div class="quiz">
+    <ol>
+      <li>"Birds of a feather flock together" names which phenomenon?
+        <div class="ans"><b>Homophily</b> — similar people tend to befriend one another.</div></li>
+      <li>Classify: two French-speakers befriend / you smoke after befriending a smoker / strangers meet at yoga / you bring a friend to your music club.
+        <div class="ans">Selection / social influence / foci closure / membership closure, respectively.</div></li>
+      <li>Similarity of Anita {chess,hiking,jazz} and Bina {hiking,jazz,baking,cycling}?
+        <div class="ans">shared/union = {hiking,jazz}/{chess,hiking,jazz,baking,cycling} = <b>2/5 = 0.4</b>.</div></li>
+      <li>Club of 20 (10+10), 30 friendships, 9 cross-year — homophily value?
+        <div class="ans">Expected cross = ½·30 = 15; H = 1 − 9/15 = <b>0.4</b> (positive → homophily).</div></li>
+      <li>What do H &gt; 0, H = 0, H &lt; 0 mean?
+        <div class="ans">Positive = homophily; 0 = chance-level (random) mixing; negative = <b>heterophily</b> (more cross-group ties than chance).</div></li>
+      <li>In the Wikipedia study, what separates selection from influence?
+        <div class="ans">Similarity rise <b>before</b> first contact = selection; rise <b>after</b> = influence. On Wikipedia the pre-contact (selection) rise was steeper.</div></li>
+      <li>Contagion findings (Christakis–Fowler)?
+        <div class="ans">Both obesity and happiness are contagious; <b>happiness spreads up to three levels</b> out.</div></li>
+      <li>How is a person node initialised in the Fatman model?
+        <div class="ans"><code class="inline">name = random.randint(15,40)</code> (its BMI) and <code class="inline">type = 'person'</code>.</div></li>
+      <li>Homophily <code class="inline">p = 1/(|ΔBMI|+1000)</code> for BMIs 22 &amp; 27 — value and why +1000?
+        <div class="ans">$p = 1/1005 ≈ 0.000995$. +1000 avoids divide-by-zero (equal BMIs) and scales all probabilities down (gradual growth).</div></li>
+      <li>Closure prob with p = 0.1 and k = 3 common neighbours?
+        <div class="ans">$1-(1-0.1)^3 = 1-0.729 = 0.271$.</div></li>
+      <li>Why must at least one of the two closure nodes be a person?
+        <div class="ans">Foci are never linked to each other, so an edge between two foci is meaningless — closure applies to person–person or person–foci pairs.</div></li>
+      <li>How is social influence implemented, and how does density change over rounds?
+        <div class="ans">Gym neighbours lose 1 BMI (floor 15), eat-out neighbours gain 1 BMI (cap 40); membership closure spreads it. Saved via <code class="inline">nx.write_gml</code>; <b>density rises</b> over rounds.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 4 ✏️</div>
+  <a class="backtop" href="#top">↑ back to top</a>
+</div>
+
+</body>
+</html>

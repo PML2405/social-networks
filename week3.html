@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 3 · Strong &amp; Weak Ties, Communities</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 3 — Strong &amp; Weak Ties, and Communities</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 27–40 · why your <em>acquaintances</em> land you jobs, the local structure of friendship, and two algorithms that find hidden communities.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky pink">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Granovetter's shock: most jobs come not from close friends but from <b>weak ties</b> (acquaintances), because a distant contact lives in a <em>different world</em> and carries news you don't already have. To make this precise we build a toolkit of <b>local</b> measures — <b>triadic closure, clustering coefficient, neighbourhood overlap, bridges/local bridges, embeddedness</b> — and see how they explain trust, brokerage (<b>structural holes</b>) and <b>social capital</b>. Then we zoom out: how do you split a graph into <b>communities</b>? Two algorithms — brute force and <b>Girvan–Newman</b> (edge betweenness) — with real NetworkX code.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 3</h3>
+    <ol>
+      <li><a href="#s1">The Strength of Weak Ties (Granovetter)</a><br><span class="small">why acquaintances matter for jobs</span></li>
+      <li><a href="#s2">Local structure: triadic closure, clustering, neighbourhood overlap</a></li>
+      <li><a href="#s3">Bridges, local bridges &amp; the Strong Triadic Closure argument</a></li>
+      <li><a href="#s4">Embeddedness, structural holes, social capital</a><br><span class="small">+ cell-phone validation &amp; passive engagement</span></li>
+      <li><a href="#s5">Communities &amp; betweenness</a><br><span class="small">brute force + Girvan–Newman code + Gephi</span></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 27–28</div>
+    <h2>The Strength of Weak Ties</h2>
+    <div class="lsub">opportunity knocks through someone you barely know</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> Why acquaintances land you jobs</h2>
+  <p>Ask 100 employed people "how did you hear about this job?" — more than 90% say it came from a <em>distant</em> contact, a friend-of-a-friend, an acquaintance — <b>not</b> a close friend. This feels backwards. The reason isn't secrecy; it's <b>information</b>.</p>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 strong tie vs weak tie</span>
+    <p style="margin:2px 0;">A <span class="def-term">tie</span> is a friendship. A <span class="def-term">strong tie</span> = a close, frequent friend. A <span class="def-term">weak tie</span> = an occasional, distant acquaintance. Granovetter's finding: <mark class="mint">weak ties are "strong" for spreading new information; strong ties are "weak" for it.</mark></p>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>you, four office friends, and E from another world</h4>
+      <svg viewBox="0 0 260 170">
+        <g font-family="Kalam" font-size="11" fill="var(--ink)">
+          <!-- me -->
+          <circle cx="70" cy="90" r="16" fill="var(--yellow)" stroke="var(--ink)" stroke-width="1.6"/><text x="58" y="94">you</text>
+          <!-- A B C D cluster (strong, interlinked) -->
+          <circle cx="30" cy="30" r="12" fill="var(--mint)" stroke="var(--ink)"/><text x="26" y="34">A</text>
+          <circle cx="90" cy="20" r="12" fill="var(--mint)" stroke="var(--ink)"/><text x="86" y="24">B</text>
+          <circle cx="140" cy="55" r="12" fill="var(--mint)" stroke="var(--ink)"/><text x="136" y="59">C</text>
+          <circle cx="120" cy="120" r="12" fill="var(--mint)" stroke="var(--ink)"/><text x="116" y="124">D</text>
+          <line x1="70" y1="90" x2="30" y2="30" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="70" y1="90" x2="90" y2="20" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="70" y1="90" x2="140" y2="55" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="70" y1="90" x2="120" y2="120" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="30" y1="30" x2="90" y2="20" stroke="var(--ink)"/><line x1="90" y1="20" x2="140" y2="55" stroke="var(--ink)"/>
+          <line x1="140" y1="55" x2="120" y2="120" stroke="var(--ink)"/><line x1="30" y1="30" x2="120" y2="120" stroke="var(--ink)"/>
+          <!-- E far away, weak dashed -->
+          <circle cx="225" cy="140" r="13" fill="var(--pink)" stroke="var(--ink)"/><text x="221" y="144">E</text>
+          <line x1="70" y1="90" x2="225" y2="140" stroke="var(--coral)" stroke-width="1.5" stroke-dasharray="5 3"/>
+        </g>
+      </svg>
+      <div class="cap">A,B,C,D (your office, strong solid ties) all know each other → they mostly know what you know. E (coral dashed weak tie) is from a different world → E brings <em>new</em> info.</div>
+    </div>
+    <div>
+      <p>Say A, B, C, D work where you work and all know each other; E works elsewhere and knows none of them. Whatever A–D hear, you probably already heard too (same circle). But <b>E</b> reaches a different world — a job opening you'd never otherwise learn of.</p>
+      <p>So a weak tie <b>expands your information sample space</b>. (Granovetter's 1969 paper was rejected; it finally published in <b>1973</b> and became famous.)</p>
+      <div class="sketch-box tint-pink" style="margin-top:10px;">
+        <span class="label">⚠️ the self-defeating twist</span>
+        <p style="margin:2px 0;">The moral is <b>not</b> "convert your acquaintances into close friends." If you keep an acquaintance <em>too</em> happy, they <em>become</em> a close friend — now inside your circle, sharing the same information you already have, so they stop being a source of <em>new</em> job leads. The real prescription is a <mark>large acquaintance circle</mark> (many weak ties), not a few strong ones.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 29</div>
+    <h2>Local structure of friendships</h2>
+    <div class="lsub">triadic closure · clustering coefficient · neighbourhood overlap</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Three local measures</h2>
+
+  <h3 class="sub">Triad &amp; triadic closure</h3>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>a triad closes into a triangle</h4>
+      <svg viewBox="0 0 260 120">
+        <g font-family="Kalam" font-size="11" fill="var(--ink)">
+          <circle cx="60" cy="30" r="14" fill="var(--yellow)" stroke="var(--ink)"/><text x="46" y="34">You</text>
+          <circle cx="25" cy="95" r="13" fill="var(--mint)" stroke="var(--ink)"/><text x="21" y="99">A</text>
+          <circle cx="110" cy="95" r="13" fill="var(--mint)" stroke="var(--ink)"/><text x="106" y="99">B</text>
+          <line x1="60" y1="30" x2="25" y2="95" stroke="var(--ink)" stroke-width="1.8"/>
+          <line x1="60" y1="30" x2="110" y2="95" stroke="var(--ink)" stroke-width="1.8"/>
+          <line x1="25" y1="95" x2="110" y2="95" stroke="var(--coral)" stroke-width="1.8" stroke-dasharray="5 3"/>
+          <text x="150" y="60" font-size="12">A &amp; B share a</text>
+          <text x="150" y="76" font-size="12">friend (You) →</text>
+          <text x="150" y="92" font-size="12">eventually A–B</text>
+          <text x="150" y="108" font-size="12">befriend (coral)</text>
+        </g>
+      </svg>
+      <div class="cap"><b>Triad</b>: You know A and B, but A–B don't know each other. <b>Triadic closure</b>: A and B eventually befriend, closing the triangle.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">📖 triad &amp; triadic closure</span>
+        <p style="margin:2px 0;">A <span class="def-term">triad</span> = one person connected to two others who aren't connected to each other. <span class="def-term">Triadic closure</span> = the tendency for those two friends-of-a-friend to eventually become friends (the triad closes into a triangle). A recurring engine all course.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">Clustering coefficient</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">clustering coefficient of node v</div>
+      <div class="eqn" style="margin:6px 0;">$$ C(v)=\frac{\#\text{friendships among }v\text{'s friends}}{\binom{\deg(v)}{2}} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "of all pairs of my friends, what fraction actually know each other." 1 = my friends form a clique; 0 = none know each other. (Research the instructor cites: people with <em>very low</em> clustering — friends from disconnected circles they can never gather together — were observed to be more prone to depression and even attempted suicide.)</div>
+  <div class="worked">
+    <span class="tag">✍️ worked examples — clustering coefficient</span>
+    <ol>
+      <li><b>Transcript's example:</b> you have 5 friends with <b>6</b> friendships among them. Possible = $\binom{5}{2}=10$, so $C=\frac{6}{10}=0.6$.</li>
+      <li><b>Assignment's example:</b> person P has 5 friends with exactly <b>4</b> friendships among them. $C=\frac{4}{\binom{5}{2}}=\frac{4}{10}=\boxed{0.4}$.</li>
+    </ol>
+  </div>
+
+  <h3 class="sub">Neighbourhood overlap</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">neighbourhood overlap of edge A–B</div>
+      <div class="eqn" style="margin:6px 0;">$$ \text{overlap}(A,B)=\frac{|\,N(A)\cap N(B)\,|}{|\,N(A)\cup N(B)\,|} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "of all the distinct friends A and B have between them, what fraction are <em>shared</em>." Analogy: redefining "rich" not as how much you earn but as how well you <em>spend</em> it — a ratio, not a raw count. Close to 1 = strongly-embedded strong tie; close to 0 = near a local bridge (weak tie).</div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ precision — exclude A and B themselves</span>
+    <p style="margin:2px 0;">When A and B are directly friends, remember that N(A) and N(B) here mean their <em>other</em> friends — <b>exclude A and B themselves</b> from both sets. Otherwise B (which sits in N(A)) and A (in N(B)) would inflate the union and shrink the overlap. In the worked example the sets {C,D,E} and {C,D,F} already exclude X and Y, so it's clean.</p>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — overlap of edge X–Y</span>
+    <p style="margin:2px 0;">X's friends = {C, D, E}; Y's friends = {C, D, F}. Common = {C,D} (2); union = {C,D,E,F} (4). $$\text{overlap}=\frac{2}{4}=\boxed{0.5}.$$</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 30–31</div>
+    <h2>Bridges, local bridges &amp; why they're weak</h2>
+    <div class="lsub">the Strong Triadic Closure argument + cell-phone validation</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> Bridges, local bridges, and the STC argument</h2>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 bridge vs local bridge</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Bridge</span> — an edge whose <b>removal disconnects</b> the graph (the only link between two parts).</li>
+      <li><span class="def-term">Local bridge</span> — the relaxed version: an edge with <b>no triad on it</b>, i.e. its two endpoints share <b>no common friend</b>.</li>
+    </ul>
+    <p style="margin:8px 0 0;"><b>Relationship:</b> <mark>every bridge is a local bridge, but not every local bridge is a bridge.</mark> (A bridge's endpoints can't have a common friend — that would give an alternate path — so it has no triad; but a local bridge needn't disconnect the graph.)</p>
+    <p style="margin:8px 0 0;" class="small"><b>The motivating picture:</b> recall the two-cluster classroom — 25 people on each side with <b>625</b> possible cross-cluster friendships (25×25), yet only <b>one</b> actual edge joining the sides. That lone edge is <em>obviously</em> a bridge and a weak tie: its endpoint B knows a whole island of people that A doesn't. Such an extreme structure is rare in real life, which is why we <em>relax</em> the definition to the <b>local</b> bridge.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>a local bridge A–B (no shared friend)</h4>
+      <svg viewBox="0 0 280 150">
+        <g font-family="Kalam" font-size="11" fill="var(--ink)">
+          <!-- left cluster around A -->
+          <circle cx="55" cy="75" r="14" fill="var(--yellow)" stroke="var(--ink)"/><text x="49" y="79">A</text>
+          <circle cx="20" cy="30" r="10" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="20" cy="120" r="10" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="70" cy="20" r="10" fill="var(--mint)" stroke="var(--ink)"/>
+          <line x1="55" y1="75" x2="20" y2="30" stroke="var(--ink)"/><line x1="55" y1="75" x2="20" y2="120" stroke="var(--ink)"/><line x1="55" y1="75" x2="70" y2="20" stroke="var(--ink)"/>
+          <line x1="20" y1="30" x2="70" y2="20" stroke="var(--ink)"/><line x1="20" y1="30" x2="20" y2="120" stroke="var(--ink)"/>
+          <!-- right cluster around B -->
+          <circle cx="225" cy="75" r="14" fill="var(--blue)" stroke="var(--ink)"/><text x="219" y="79">B</text>
+          <circle cx="260" cy="30" r="10" fill="var(--pink)" stroke="var(--ink)"/>
+          <circle cx="260" cy="120" r="10" fill="var(--pink)" stroke="var(--ink)"/>
+          <circle cx="210" cy="20" r="10" fill="var(--pink)" stroke="var(--ink)"/>
+          <line x1="225" y1="75" x2="260" y2="30" stroke="var(--ink)"/><line x1="225" y1="75" x2="260" y2="120" stroke="var(--ink)"/><line x1="225" y1="75" x2="210" y2="20" stroke="var(--ink)"/>
+          <line x1="260" y1="30" x2="210" y2="20" stroke="var(--ink)"/><line x1="260" y1="30" x2="260" y2="120" stroke="var(--ink)"/>
+          <!-- the local bridge -->
+          <line x1="55" y1="75" x2="225" y2="75" stroke="var(--coral)" stroke-width="2.4"/>
+          <text x="110" y="68" fill="var(--coral)" font-size="11">local bridge</text>
+        </g>
+      </svg>
+      <div class="cap">A and B each have many friends, but <b>none in common</b> → A–B is a local bridge, joining two worlds.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">⚙️ Strong Triadic Closure (STC) → a local bridge is weak</span>
+        <p style="margin:2px 0;"><b>STC property:</b> if a person has two <em>strong</em> ties, those two people become connected. Now suppose the local bridge A–B were <em>strong</em>, and A has any other strong tie Z. By STC, Z and B would connect — giving A and B a common friend Z, <mark>destroying the "no triad" property</mark>. Contradiction. So a local bridge <b>cannot be strong</b> → it must be a <b>weak tie</b>. This is Granovetter's structural argument.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">📞 validation on real cell-phone data (2007)</span>
+    <p style="margin:2px 0;">Granovetter (1960s) couldn't test his theory — no friendship data. In 2007 a cell-phone network (edge = a call; weight = minutes over 18 weeks; ~85% of nodes in one big component) let researchers check it. Result: edges with <b>low neighbourhood overlap</b> (near-local-bridges) carried <b>less</b> call time → they really are <b>weak ties</b>. Neighbourhood overlap is the continuous ("grey-scale") proxy for the binary local-bridge idea.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 32–34, 38</div>
+    <h2>Embeddedness, structural holes, social capital</h2>
+    <div class="lsub">trust, brokerage, and how social media really engages you</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Trust, brokerage &amp; the value of a network</h2>
+
+  <h3 class="sub">Embeddedness</h3>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">embeddedness of edge A–B</div>
+      <div class="eqn" style="margin:6px 0;">$$ \text{embeddedness}(A,B)=|\,N(A)\cap N(B)\,| $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "the raw <em>number</em> of common friends the two endpoints share" (the numerator of neighbourhood overlap, un-normalised). It's a property of an <b>edge</b>, not a node. Higher embeddedness → more <b>trust</b> (a stranger who shares 5 of your friends is unlikely to cheat you; and if two friends fall out, a <em>common friend</em> can be pulled in to enforce fairness — with no common friend, there's no one to appeal to). It's the same logic as a bank asking for a <b>guarantor/surety</b> before a loan: a third party makes default costlier and rarer.</div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — embeddedness of X–Y</span>
+    <p style="margin:2px 0;">X's friends {C,D,E}, Y's friends {C,D,F} → common {C,D} → embeddedness = $\boxed{2}$. (Same numerator as its neighbourhood overlap 2/4; overlap just divides by the union.)</p>
+  </div>
+
+  <h3 class="sub">Structural holes &amp; brokerage</h3>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>Ramya brokers a structural hole</h4>
+      <svg viewBox="0 0 290 150">
+        <g font-family="Kalam" font-size="10.5" fill="var(--ink)">
+          <!-- left community -->
+          <circle cx="40" cy="40" r="10" fill="var(--mint)" stroke="var(--ink)"/><circle cx="30" cy="90" r="10" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="75" cy="115" r="10" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="80" cy="65" r="13" fill="var(--yellow)" stroke="var(--ink)"/><text x="62" y="69" font-size="9">Sudarshan</text>
+          <line x1="80" y1="65" x2="40" y2="40" stroke="var(--ink)"/><line x1="80" y1="65" x2="30" y2="90" stroke="var(--ink)"/><line x1="80" y1="65" x2="75" y2="115" stroke="var(--ink)"/>
+          <line x1="40" y1="40" x2="30" y2="90" stroke="var(--ink)"/>
+          <!-- Ramya broker -->
+          <circle cx="160" cy="70" r="14" fill="var(--coral)" stroke="var(--ink)"/><text x="147" y="74" font-size="9">Ramya</text>
+          <line x1="80" y1="65" x2="160" y2="70" stroke="var(--coral)" stroke-width="2.4"/>
+          <!-- right community -->
+          <circle cx="245" cy="40" r="10" fill="var(--blue)" stroke="var(--ink)"/><circle cx="255" cy="90" r="10" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="210" cy="115" r="10" fill="var(--blue)" stroke="var(--ink)"/>
+          <line x1="160" y1="70" x2="245" y2="40" stroke="var(--ink)"/><line x1="160" y1="70" x2="255" y2="90" stroke="var(--ink)"/><line x1="160" y1="70" x2="210" y2="115" stroke="var(--ink)"/>
+          <line x1="245" y1="40" x2="255" y2="90" stroke="var(--ink)"/>
+        </g>
+      </svg>
+      <div class="cap">The gap between the two communities is a <b>structural hole</b>; the single low-embeddedness edge (coral) is spanned by Ramya, who <b>brokers</b> all traffic between them.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-blue">
+        <span class="label">📖 structural hole &amp; brokerage</span>
+        <p style="margin:2px 0;">A <span class="def-term">structural hole</span> is the gap between two otherwise-separate communities, spanned by a single low-embeddedness edge. The person on that edge is a <span class="def-term">broker</span>: everyone on one side who needs the other side must go <em>through</em> them. Ramya (a real-estate agent) monopolises access to her community, so she <b>profits</b> from the position. This is the network flip-side of weak ties: a low-embeddedness edge is bad for trust but great for brokerage.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">Social capital: closure vs brokerage</h3>
+  <table class="hand">
+    <thead><tr><th></th><th>Closure</th><th>Brokerage</th></tr></thead>
+    <tbody>
+      <tr><td><b>what</b></td><td>friends-of-friends becoming friends (triadic closure everywhere)</td><td>spanning a structural hole between separate groups</td></tr>
+      <tr><td><b>gives</b></td><td>high clustering, trust, mutual support</td><td>access, control, information advantage (Granovetter's weak ties)</td></tr>
+      <tr><td><b>too much?</b></td><td>100% closure = everyone on one team = <em>boring</em>: no distinct groups left to compete (you can't cheer for a side)</td><td>all brokerage, no closure = low trust</td></tr>
+    </tbody>
+  </table>
+  <div class="bubble"><span class="say">read it as:</span> "the network itself is <b>social capital</b> — a resource. Both closure and brokerage are valuable; the <em>ideal</em> mix (where to sprinkle friendships so a team performs best) is an <b>open research question</b>."</div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">📱 tie strength on social media &amp; passive engagement</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Facebook links come in three kinds: <span class="def-term">one-way</span> (you message, no reply), <span class="def-term">mutual/reciprocal</span> (real back-and-forth), and <span class="def-term">maintained relationships</span> — you never talk, but you follow their news feed and click "like". This last is <span class="def-term">passive engagement</span>.</li>
+      <li>Plotting all three vs network size: <b>maintained/passive is highest</b>. What keeps people glued to social media is quietly watching each other's lives, not conversing.</li>
+      <li>On Twitter, "strong ties" (having exchanged direct messages) <b>converge to ~50</b> no matter how many followers you have — a fixed <b>cognitive/time budget</b>. Celebrities with millions of followers still have few genuine strong ties.</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 35–37, 39</div>
+    <h2>Finding communities &amp; betweenness</h2>
+    <div class="lsub">brute force · Girvan–Newman · edge betweenness · Gephi</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Detecting communities</h2>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 community</span>
+    <p style="margin:2px 0;">A <span class="def-term">community</span> is a set of nodes with <mark class="blue">many links inside and few links across</mark> — high intra-community edge density, low inter-community density. It need not be a clique, need not be equal-sized, and nodes need not have equal degree. Splitting a graph into communities = a <span class="def-term">partition</span> of the vertex set.</p>
+  </div>
+
+  <h3 class="sub">Method 1 — brute force</h3>
+  <p>Try <em>every</em> way to split the nodes into two parts; score each by comparing edges <em>inside</em> the parts against edges <em>crossing</em> between them; keep the best.</p>
+  <div class="code">
+    <div class="fname"><span>brute_force_communities.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+from itertools import combinations
+
+def communities_brute(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    first = []                                  # all candidate "part 1" node-sets
+    for i in range(1, n//2 + 1):                # sizes 1..n/2 (avoid mirror dupes)
+        first.extend([list(x) for x in combinations(nodes, i)])
+    second = [list(set(nodes) - set(part)) for part in first]   # complements
+
+    ratios = []
+    for i in range(len(first)):
+        intra1 = G.subgraph(first[i]).number_of_edges()   # edges inside part 1
+        intra2 = G.subgraph(second[i]).number_of_edges()  # edges inside part 2
+        inter  = G.number_of_edges() - intra1 - intra2    # crossing edges
+        ratios.append(float(intra1 + intra2) / inter)     # higher = better split
+
+    best = ratios.index(max(ratios))            # index of the best split
+    return first[best], second[best]
+
+G = nx.barbell_graph(5, 0)                      # two 5-cliques joined by 1 edge
+print(communities_brute(G))     # -> ([0,1,2,3,4], [5,6,7,8,9])
+</code></pre>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the pieces</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">combinations([1,2,3,4], 2)</code> → all <b>6</b> unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; it's an iterator, so wrap in <code class="inline">list()</code>.</li>
+      <li><code class="inline">G.subgraph(nodes).number_of_edges()</code> = the <b>induced subgraph</b>'s edges — only edges with <em>both</em> endpoints inside the set → the <b>intra</b> count.</li>
+      <li>Sizes only go to <code class="inline">n//2</code>: a split of size k and its complement (n−k) are the <em>same</em> partition; <code class="inline">+1</code> because <code class="inline">range</code> excludes its stop.</li>
+      <li><code class="inline">extend</code> (not <code class="inline">append</code>) adds the list's <em>elements</em>, not the list as one item.</li>
+      <li><code class="inline">nx.barbell_graph(5, 0)</code> = two size-5 cliques joined by a single edge; obvious communities {0–4}, {5–9}.</li>
+    </ul>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ worked example — scoring a split</span>
+    <p style="margin:2px 0;">A candidate split has intra1 = 10, intra2 = 10, inter = 2. Then <code class="inline">ratio = (10+10)/2 = </code>$\boxed{10}$. High ratio = dense inside, sparse across → the brute force keeps the <b>maximum</b>-ratio split (via <code class="inline">max()</code> and its <code class="inline">index()</code>).</p>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ why brute force doesn't scale</span>
+    <p style="margin:2px 0;">The number of two-way splits grows like <span class="bigO bad">2^(n−1)</span> — for n=10 that's 2⁹=512; for n=50 it's ~2⁵⁰, hopeless. We need a smarter method.</p>
+  </div>
+
+  <h3 class="sub">Edge betweenness — the "highways" idea</h3>
+  <p>Think of the road network of a country with the names removed. Roads <em>within</em> a city are dense; <b>highways</b> between cities are few, and <em>every</em> cross-city trip funnels through them. Find and cut the highways → the cities (communities) fall apart. In a friendship graph the "highways" are the bridging edges — and we quantify "highway-ness" with <b>edge betweenness</b>.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">edge betweenness of edge e</div>
+      <div class="eqn" style="margin:6px 0;">$$ c_B(e)=\sum_{s,t}\frac{\sigma_{st}(e)}{\sigma_{st}} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "over every pair of nodes s, t, the <em>fraction</em> of shortest s–t paths that run through edge e, summed up." Here $\sigma_{st}$ = number of shortest s–t paths and $\sigma_{st}(e)$ = how many of them use e. Bridging edges score high because nearly all cross-community shortest paths funnel through them; edges deep inside a community have many alternative routes, so they score low.</div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>two communities joined by high-betweenness edges</h4>
+      <svg viewBox="0 0 290 150">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <!-- left clique -->
+          <circle cx="35" cy="40" r="9" fill="var(--mint)" stroke="var(--ink)"/><circle cx="75" cy="25" r="9" fill="var(--mint)" stroke="var(--ink)"/>
+          <circle cx="80" cy="80" r="9" fill="var(--mint)" stroke="var(--ink)"/><circle cx="35" cy="95" r="9" fill="var(--mint)" stroke="var(--ink)"/>
+          <line x1="35" y1="40" x2="75" y2="25" stroke="var(--ink)"/><line x1="75" y1="25" x2="80" y2="80" stroke="var(--ink)"/><line x1="80" y1="80" x2="35" y2="95" stroke="var(--ink)"/><line x1="35" y1="95" x2="35" y2="40" stroke="var(--ink)"/><line x1="35" y1="40" x2="80" y2="80" stroke="var(--ink)"/>
+          <!-- right clique -->
+          <circle cx="215" cy="40" r="9" fill="var(--blue)" stroke="var(--ink)"/><circle cx="255" cy="25" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="258" cy="80" r="9" fill="var(--blue)" stroke="var(--ink)"/><circle cx="215" cy="95" r="9" fill="var(--blue)" stroke="var(--ink)"/>
+          <line x1="215" y1="40" x2="255" y2="25" stroke="var(--ink)"/><line x1="255" y1="25" x2="258" y2="80" stroke="var(--ink)"/><line x1="258" y1="80" x2="215" y2="95" stroke="var(--ink)"/><line x1="215" y1="95" x2="215" y2="40" stroke="var(--ink)"/><line x1="215" y1="40" x2="258" y2="80" stroke="var(--ink)"/>
+          <!-- bridging edges -->
+          <line x1="80" y1="80" x2="215" y2="40" stroke="var(--coral)" stroke-width="2.6"/>
+          <line x1="80" y1="80" x2="215" y2="95" stroke="var(--coral)" stroke-width="2.6"/>
+          <text x="110" y="115" fill="var(--coral)" font-size="10">high betweenness → cut these</text>
+        </g>
+      </svg>
+      <div class="cap">Every path between the two clusters must use a coral edge → high betweenness. Remove them → two components = two communities.</div>
+    </div>
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">⚙️ Girvan–Newman, one round</span>
+        <ol class="notes" style="margin:4px 0 0;">
+          <li>Compute edge betweenness for <b>every</b> edge.</li>
+          <li>Remove the <b>single highest</b>-betweenness edge.</li>
+          <li>Check whether the graph split into more components.</li>
+          <li>If still connected, repeat; once it splits, return the components as communities.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">Method 2 — Girvan–Newman (the code)</h3>
+  <div class="code">
+    <div class="fname"><span>girvan_newman.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+
+def edge_to_remove(G):
+    dict1 = nx.edge_betweenness_centrality(G)    # {edge: betweenness}
+    lot = list(dict1.items())                    # [(edge, value), ...]
+    lot.sort(key=lambda x: x[1], reverse=True)   # highest betweenness first
+    return lot[0][0]                             # lot[0] = top tuple; [0] = its edge
+
+def girvan(G):
+    c = list(nx.connected_component_subgraphs(G))  # components as subgraphs
+    l = len(c)                                      # how many components
+    while l == 1:                                   # while still one piece...
+        G.remove_edge(*edge_to_remove(G))           # * unpacks (a, b)
+        c = list(nx.connected_component_subgraphs(G))
+        l = len(c)
+    return c                                        # the communities
+
+G = nx.barbell_graph(5, 0)
+for comp in girvan(G):
+    print(comp.nodes())      # -> [0,1,2,3,4] and [5,6,7,8,9]
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ code notes &amp; gotchas</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">nx.edge_betweenness_centrality(G)</code> returns a <b>dict</b> {edge: value}; <code class="inline">.items()</code> → (edge, value) tuples; sort with <code class="inline">key=lambda x: x[1], reverse=True</code>; <code class="inline">lot[0][0]</code> is the edge to drop.</li>
+      <li><code class="inline">G.remove_edge(*edge)</code> — the <code class="inline">*</code> unpacks the tuple <code class="inline">(a,b)</code> into two arguments; without it you'd pass one tuple and get an error.</li>
+      <li><code class="inline">nx.connected_component_subgraphs(G)</code> returns the components as subgraphs, so <code class="inline">len(...)</code> is the component count. <span class="illus">(Removed in NetworkX ≥2.4; modern equivalent: <code class="inline">[G.subgraph(c) for c in nx.connected_components(G)]</code>.)</span></li>
+      <li>Far faster than brute force — no enumerating 2^(n−1) splits. On the barbell both methods return {0–4},{5–9}; on Zachary karate, Girvan–Newman recovers the two real factions (~19 &amp; 15 nodes).</li>
+    </ul>
+  </div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">🎨 visualising communities in Gephi</span>
+    <p style="margin:2px 0;">Open the graph, run <b>Modularity</b> (a community-detection metric); the <b>resolution</b> slider controls how many communities (lower → more). Colour nodes by <b>modularity class</b>, use the <b>Force Atlas</b> layout to pull each community together, and size nodes by degree to spot hubs. On Zachary karate this cleanly shows the two factions.</p>
+  </div>
+
+
+  <!-- ============ takeaway banner ============ -->
+  <div class="banner">
+    <h3>Weak ties (low-overlap, local-bridge edges) carry new information and broker structural holes — and community structure hides in the high-betweenness "highway" edges.</h3>
+    <p>clustering(v) = friendships-among-friends / C(deg,2) · overlap = |common| / |union| · embeddedness = |common| · edge betweenness = Σ σ_st(e)/σ_st. Brute force is 2^(n−1); Girvan–Newman cuts high-betweenness edges until the graph splits.</p>
+  </div>
+
+  <!-- ============ quiz ============ -->
+  <div class="quiz">
+    <ol>
+      <li>Why do most job leads come through weak ties?
+        <div class="ans">A weak tie reaches a <b>different circle</b>, so it carries news your close friends (who share your circle) don't already have — novelty, not secrecy or numbers.</div></li>
+      <li>Match: triadic closure / local bridge / embeddedness / neighbourhood overlap.
+        <div class="ans">Triadic closure = two friends-of-a-friend becoming friends; local bridge = edge with no common-friend triad; embeddedness = # common friends of an edge; neighbourhood overlap = common ÷ union of the two friend sets.</div></li>
+      <li>P has 5 friends with 4 friendships among them — clustering coefficient?
+        <div class="ans">$4/\binom{5}{2}=4/10=0.40$.</div></li>
+      <li>X's friends {C,D,E}, Y's friends {C,D,F}: neighbourhood overlap and embeddedness of X–Y?
+        <div class="ans">Overlap = common/union = {C,D}/{C,D,E,F} = 2/4 = <b>0.5</b>. Embeddedness = |common| = <b>2</b>.</div></li>
+      <li>Bridge vs local bridge — which implies which?
+        <div class="ans"><b>Every bridge is a local bridge</b>, but not vice versa. Bridge = removal disconnects; local bridge = no triad on it.</div></li>
+      <li>Using Strong Triadic Closure, why is a local bridge a weak tie?
+        <div class="ans">If A–B were strong and A had another strong tie Z, STC forces Z–B → A,B gain a common friend, killing the "no triad" property. So a local bridge can't be strong → it's weak.</div></li>
+      <li>Sudarshan's only link to Ramya's separate community — what structure, who benefits?
+        <div class="ans">A <b>structural hole</b>; <b>Ramya</b> benefits — she <b>brokers</b> (monopolises) all access to her community.</div></li>
+      <li>Closure vs brokerage — and is 100% closure ideal?
+        <div class="ans">Closure = friends-of-friends linking (trust, clustering); brokerage = spanning a hole (access). Both matter; the optimal mix is an <b>open question</b>. 100% closure is "boring" — no separate groups to compete.</div></li>
+      <li><code class="inline">list(combinations([1,2,3,4], 2))</code> produces what?
+        <div class="ans">The <b>6</b> unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; not permutations.</div></li>
+      <li>Why does <code class="inline">G.subgraph(part).number_of_edges()</code> give intra-community edges?
+        <div class="ans"><code class="inline">subgraph</code> is the <b>induced</b> subgraph — it keeps only edges with <em>both</em> endpoints in the set, i.e. the edges inside that part.</div></li>
+      <li>Order one Girvan–Newman round: (i) remove highest-betweenness edge, (ii) compute all edge betweenness, (iii) check components, (iv) repeat/return.
+        <div class="ans"><b>ii → i → iii → iv</b>: compute betweenness, remove the top edge, test connectivity, repeat while connected then return the components.</div></li>
+      <li>Define edge betweenness.
+        <div class="ans">Over all pairs s,t, the fraction of shortest s–t paths through e, summed: $\sum_{s,t}\sigma_{st}(e)/\sigma_{st}$. Bridging edges score high.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 3 ✏️</div>
+  <a class="backtop" href="#top">↑ back to top</a>
+</div>
+
+</body>
+</html>
