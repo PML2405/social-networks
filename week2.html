@@ -270,8 +270,8 @@
   <table class="hand">
     <thead><tr><th>network</th><th>node / edge</th><th>the surprise</th></tr></thead>
     <tbody>
-      <tr><td><b>Ingredients</b></td><td>ingredient / "appear together in a popular dish"</td><td>Strong <b>communities</b> — clusters of ingredients densely linked inside, sparse across (e.g. sweet vs savoury).</td></tr>
-      <tr><td><b>Synonymy</b></td><td>word / "are synonyms" (from a thesaurus)</td><td>The graph is <b>connected</b> — so there's a synonym-path from <em>love</em> to <em>hate</em>! Synonymy looks symmetric but is <b>not transitive</b>: A≈B and B≈C need not make A≈C (meaning degrades along the chain).</td></tr>
+      <tr><td><b>Ingredients</b></td><td>ingredient / "appear together in a <em>popular</em> dish"</td><td>Strong <b>communities</b> (e.g. sweet vs savoury). The "popular" qualifier matters: without it <em>some</em> dish links almost any pair and the graph goes nearly complete. E.g. salt–sugar co-occur in many dishes → edge; chili-powder–sugar rarely (bar chili-chocolate) → no edge.</td></tr>
+      <tr><td><b>Synonymy</b></td><td>word / "are synonyms" (from a thesaurus)</td><td>It has one giant/large <b>connected component</b> — so there's a synonym-path from <em>love</em> to <em>hate</em>! Synonymy looks symmetric but is <b>not transitive</b>: A≈B and B≈C need not make A≈C (meaning degrades along the chain).</td></tr>
       <tr><td><b>Web graph</b></td><td>web page / hyperlink (one page points to another)</td><td>Looks useless, but the link structure hides the answer to "which page is most important?" → <b>Google / PageRank</b> (Week 6).</td></tr>
       <tr><td><b>Social</b> (Facebook, LinkedIn…)</td><td>person / friendship</td><td>Structure predicts <em>who your next friend will be</em> → <b>link prediction</b> ("People You May Know").</td></tr>
     </tbody>
@@ -355,6 +355,14 @@ nx.is_directed(g5)          # True/False — did it load as a DiGraph?
   <div class="sketch-box tint-pink">
     <span class="label">⚠️ match the reader to the format</span>
     <p style="margin:2px 0;">Edge-list → <code class="inline">read_edgelist</code>; adjacency-list → <code class="inline">read_adjlist</code>; <code class="inline">.gml</code> → <code class="inline">read_gml</code>; <code class="inline">.net</code>/<code class="inline">.paj</code> → <code class="inline">read_pajek</code>; <code class="inline">.graphml</code> → <code class="inline">read_graphml</code>; <code class="inline">.gexf</code> → <code class="inline">read_gexf</code>. <code class="inline">nx.is_directed(G)</code> returns a Boolean — a food-web GraphML loads directed (<code class="inline">True</code>), an air-traffic edge-list loads undirected (<code class="inline">False</code>).</p>
+    <ul class="notes" style="margin:6px 0 0;">
+      <li><code class="inline">read_pajek</code> can load a graph as a <b>MultiGraph/MultiDiGraph</b> (allows several edges between a pair): e.g. a football <code class="inline">.net</code> loads as a <em>multi-digraph</em>, karate <code class="inline">.paj</code> as a 34-node/78-edge <em>multigraph</em>.</li>
+      <li><code class="inline">nx.info(G)</code> on a <b>directed</b> graph reports average <b>in-degree</b> and <b>out-degree</b> separately (not a single average degree).</li>
+    </ul>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ visualising a graph in NetworkX</span>
+    <p style="margin:2px 0;">Once loaded, draw it with <code class="inline">nx.draw(G)</code> then <code class="inline">plt.show()</code> (a directed graph renders with <b>arrowheads</b>). Tidy the layout with <code class="inline">nx.draw_circular(G)</code>, or pass a layout: <code class="inline">nx.spring_layout</code>, <code class="inline">nx.spectral_layout</code>. Add node labels with <code class="inline">nx.draw(G, with_labels=True)</code>.</p>
   </div>
 
 
@@ -616,7 +624,36 @@ def create_average_instance(n):
     <p class="small" style="margin:6px 0 0;">Typical results: 10 nodes → ~12–16 edges; 20 → ~27; 30 → ~50. Plotting edges-to-connect vs n and overlaying <b>(n·log n)/2</b>, the two curves hug each other — confirming the order-n·log n claim (dividing by 2 doesn't change the <em>order</em>).</p>
   </div>
 
-  <p>Complexity of one <code class="inline">create_instance(n)</code>: it adds ~n·log n edges, each followed by a connectivity check <span class="bigO">O(n+m)</span>, so a run is roughly <span class="bigO bad">O(n²·log n)</span> — fine for the small n we plot.</p>
+  <p>Complexity of one <code class="inline">create_instance(n)</code>: it adds ~n·log n edges, each followed by a connectivity check <span class="bigO">O(n+m)</span> where m grows to ~n·log n, so a run is roughly <span class="bigO bad">O(n²·log²n)</span> — fine for the small n we plot.</p>
+  <p>The lecture wraps this in a <code class="inline">plot_connectivity()</code> routine and overlays the theoretical curve:</p>
+  <div class="code">
+    <div class="fname"><span>connectivity.py — plot vs n·log n</span><span class="lang">python</span></div>
+<pre><code class="language-python">import matplotlib.pyplot as plt, numpy
+
+def add_till_connectivity(G):              # keep adding till connected
+    while nx.is_connected(G) == False:
+        G = add_random_edge(G)
+    return G                               # create_instance uses this + returns G.number_of_edges()
+
+x, y = [], []
+i = 10
+while i &lt;= 400:                            # graph sizes 10, 20, ..., 400
+    x.append(i)
+    y.append(create_average_instance(i))   # edges-to-connect, averaged over many runs
+    i = i + 10
+plt.plot(x, y)                             # the measured curve
+
+x1, y1 = [], []
+i = 10
+while i &lt;= 400:
+    x1.append(i)
+    y1.append(i * numpy.log(i) / 2)        # numpy.log = NATURAL log (base e)
+    i = i + 10
+plt.plot(x1, y1)                           # overlay (n·log n)/2
+plt.xlabel("number of nodes"); plt.ylabel("edges to connect"); plt.show()
+</code></pre>
+  </div>
+  <p class="small">Plain <code class="inline">n·log n</code> <em>overshoots</em> the data — the two lines only hug once you plot <b>(n·log n)/2</b> (dividing by 2 doesn't change the <em>order</em>). Note <code class="inline">numpy.log</code> is the <b>natural</b> log, which is why this ties back to the <em>e</em>-based avoid-probability maths above.</p>
 
   <div class="sketch-box tint-pink">
     <span class="label">⚠️ common bugs / gotchas</span>

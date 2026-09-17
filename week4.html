@@ -259,7 +259,8 @@
   <h2 class="section" id="s1"><span class="num">1</span> Traits spread through the network</h2>
   <p>"Tell me who your friends are and I'll tell you who you are." A 2007 study by <b>Christakis and Fowler</b> gave this teeth: tracking ~5000 people over ~12 years, they found <mark class="mint">obesity is contagious</mark> — if your friends become obese, your risk rises — and, even more strikingly, <b>happiness is contagious up to three levels out</b>: your happiness is linked to your friends', their friends', and <em>their</em> friends'.</p>
   <div class="sketch-box tint-yellow">
-    <span class="label">📖 contagion in a social network</span>
+    <span class="label">📖 contagion &amp; longitudinal study</span>
+    <p style="margin:2px 0;" class="small">A <span class="def-term">longitudinal study</span> = one that tracks the same people <em>over many years</em>; here ~5000 people over ~12 years — that time depth is what lets it show a trait spreading <em>through</em> the network rather than just co-occurring.</p>
     <p style="margin:2px 0;">A <span class="def-term">contagion</span> is a trait/behaviour that spreads along friendship edges rather than staying with one person. It means we don't just <em>connect</em> — we <b>permeate</b> each other's states. Both obesity and happiness were shown to spread this way (happiness to 3 levels).</p>
   </div>
 
@@ -530,7 +531,13 @@ def closure(G):
   <div class="sketch-box tint-mint">
     <span class="label">⚙️ one formula, all three closures</span>
     <ul class="notes" style="margin:4px 0 0;">
-      <li><code class="inline">k = len(set(G.neighbors(u)) &amp; set(G.neighbors(v)))</code> = <b>common neighbours</b>. A shared neighbour can be a <b>person</b> (→ triadic closure) or a <b>focus</b> (→ foci/membership closure) — the same $1-(1-p)^k$ handles all three.</li>
+      <li><code class="inline">k = len(set(G.neighbors(u)) &amp; set(G.neighbors(v)))</code> = <b>common neighbours</b>; the same $1-(1-p)^k$ handles all three cases, distinguished by the <em>pair's types</em>:
+        <ul style="margin:4px 0 0;">
+          <li><b>person–person</b>, common neighbour is a <b>person</b> → <b>triadic</b> closure;</li>
+          <li><b>person–person</b>, common neighbour is a <b>focus</b> → <b>foci</b> closure (they met there);</li>
+          <li><b>person–focus</b>, common neighbours are <b>persons</b> → <b>membership</b> closure (a person joins a focus because friends belong).</li>
+        </ul>
+      </li>
       <li>The guard <code class="inline">type=='person' or ...</code> requires <b>at least one person</b>: two foci are never linked, so an edge between two foci is meaningless.</li>
       <li>Edges are collected into <code class="inline">array1</code> first, then added — so each edge's decision is independent of edges added earlier in the same round.</li>
     </ul>
@@ -553,6 +560,11 @@ def closure(G):
 </code></pre>
   </div>
   <div class="bubble"><span class="say">read it as:</span> "each round, gym members lose 1 BMI (never below 15); eat-out members gain 1 BMI (never above 40)." Social influence emerges <b>indirectly</b>: membership closure pulls your friends into your gym, and then <em>they</em> start losing weight too — your habit spread to them without any direct "make obese people friends" rule.</div>
+  <p class="small"><b>Note:</b> social influence has several causes; this model captures just one — <b>shared context</b> (two people at the same focus influence each other). The BMI change is applied to a focus's neighbours each round.</p>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ a real debugging lesson from the screencast</span>
+    <p style="margin:2px 0;">After <code class="inline">change_bmi</code> mutates BMIs each round, the <b>colour, size and label arrays go stale</b> — you must <em>recompute</em> them inside <code class="inline">visualize(G)</code> every round, not reuse the ones built once at the start (a classic bug). To watch the evolution the screencast also swaps <code class="inline">plt.show()</code> for <code class="inline">plt.savefig('evolution.jpg')</code> + a <code class="inline">time.sleep(1)</code> so the image updates like an animation.</p>
+  </div>
 
   <h3 class="sub">The main loop + storing longitudinal data</h3>
   <div class="code">
@@ -586,7 +598,7 @@ for t in range(0, 10):                         # 10 rounds
 
   <div class="two-col">
     <div class="diagram">
-      <h4>the Fatman city (persons blue/green/yellow, foci red)</h4>
+      <h4>the Fatman city (node colour set by BMI value; foci red)</h4>
       <svg viewBox="0 0 280 150">
         <g font-family="Kalam" font-size="9" fill="var(--ink)">
           <rect x="30" y="20" width="34" height="16" rx="3" fill="var(--coral)" stroke="var(--ink)"/><text x="33" y="32" fill="#fff" font-size="8">gym</text>
@@ -604,7 +616,7 @@ for t in range(0, 10):                         # 10 rounds
           <line x1="75" y1="60" x2="200" y2="70" stroke="var(--ink-soft)" stroke-dasharray="4 3"/>
         </g>
       </svg>
-      <div class="cap">green = losing weight (gym), yellow = obese (eat-out), blue = normal, red = foci. Dashed = a homophily edge across.</div>
+      <div class="cap">Colour is by <b>BMI value</b> (not by focus): green = BMI 15 (underweight), yellow = BMI 40 (obese), blue = in-between; foci red. Node <b>size</b> ∝ BMI (×20). Gym/eat-out change BMI over rounds, which then changes the colour.</div>
     </div>
     <div>
       <p>Over the rounds you watch homophily wire similar-BMI people together, closures thicken the clusters, and the gym/eat-out foci pull members' BMIs apart — so obesity visibly spreads through the friendship structure, exactly the contagion we started with.</p>

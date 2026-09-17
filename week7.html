@@ -366,6 +366,7 @@
         <span class="label">⚙️ key people &amp; community density</span>
         <ul class="notes" style="margin:4px 0 0;">
           <li>A cascade fills the community it starts in but often <b>can't cross a weak tie</b> into another (the far endpoint has too many old-behaviour friends).</li>
+          <li><span class="def-term">Starting trouble (first-mover risk):</span> the hard part of diffusion is the <em>beginning</em> — the first person to adopt a new thing, while everyone else is on the old one, takes a risk (like being the first to sit in a time machine). Once a few adopt, the rest follows easily.</li>
           <li><span class="def-term">Key people</span>: instead of advertising to everyone, seed a few <b>well-connected</b> nodes so the idea ripples out (<b>viral marketing</b> — convince the "head of the family," or put a celebrity on the box).</li>
           <li><span class="def-term">Community density</span> = edges / C(n,2). <mark class="mint">Higher density → harder to inject a new idea</mark> (a tight bundle of sticks won't break) — tightly-knit friends resist.</li>
         </ul>
@@ -385,8 +386,10 @@
   <div class="sketch-box tint-blue">
     <span class="label">📖 cluster of density D · complete cascade</span>
     <ul class="notes" style="margin:4px 0 0;">
+      <li>A <span class="def-term">cascade</span> = the whole trajectory of a diffusion — the set of nodes the new action spreads to as it branches through the network.</li>
       <li>A <span class="def-term">cluster of density D</span>: <em>every</em> node in it has at least a fraction <b>D</b> of its neighbours <em>inside</em> the cluster.</li>
       <li>A <span class="def-term">complete cascade</span>: every node in the network eventually adopts the new action A.</li>
+      <li><b>Assumption:</b> the theorem assumes a <em>uniform</em> threshold q for every node.</li>
     </ul>
   </div>
   <div class="eq-card">
@@ -415,9 +418,10 @@
     <p style="margin:2px 0;">In a protest/revolt, each person has an <span class="def-term">intrinsic threshold</span> = the minimum number of participants (<b>including themselves</b>) that must be in before they'll join. You know your own threshold and your <em>friends'</em> — but not the whole network's.</p>
   </div>
   <div class="worked">
-    <span class="tag">✍️ worked example — a protest that never starts</span>
-    <p style="margin:2px 0;">Three people with thresholds u=2, v=3, w=4 — but w has only <b>2</b> friends. w can never reach 4 → <b>w won't join</b>. v sees w won't join, so v's threshold of 3 fails → <b>v drops out</b>. Then u (needs 2) sees neither will join → <b>u drops out</b>. No protest — even though one was in principle possible. <mark>Incomplete knowledge of others' thresholds stalls a feasible protest.</mark></p>
-    <p class="small" style="margin:6px 0 0;">This is why firms limit cross-group communication ("divide and conquer") — isolated clusters can't coordinate a revolt.</p>
+    <span class="tag">✍️ worked example — the two ways a protest fails</span>
+    <p style="margin:2px 0;"><b>Case 1 — an unreachable threshold cascades (a path u–v–w).</b> Thresholds u=2, v=3, w=4, but w has only <b>2</b> friends → w can see at most itself + 2 = 3 people &lt; 4, so <b>w can never join</b>. v (needs 3) sees w is out → v <b>drops</b>; then u (needs 2) sees both are out → u <b>drops</b>. No protest — and here it was <em>genuinely infeasible</em> (no group satisfies everyone). Each node reasons this out from full knowledge of its friends.</p>
+    <p style="margin:8px 0 0;"><b>Case 2 — a feasible protest stalled by <mark>incomplete knowledge</mark> (a cycle u–v–w–x).</b> Now everyone's threshold is 3 and any three neighbours could protest — a protest <em>is</em> feasible. But u can't see the whole network (it doesn't know x, nor whether v and w know each other's thresholds), so u can't be sure enough will join and <b>dares not start</b>; by symmetry nobody does. Rewire so u, v, w all mutually see each other's thresholds and the protest <em>does</em> happen.</p>
+    <p class="small" style="margin:6px 0 0;">So a protest can fail two ways: it's structurally impossible (Case 1), or it's possible but <b>network invisibility</b> stops it (Case 2). This is why firms limit cross-group communication ("divide and conquer") — isolated clusters can't see that everyone else is also ready to revolt.</p>
   </div>
 
 
@@ -498,6 +502,7 @@ complete = terminate_1('A', G)                 # 1 = COMPLETE cascade (every nod
       <li>Adopt A when <code class="inline">a·num_A &gt;= b·num_B</code> (weighted payoffs, not a bare count).</li>
       <li>The <b>100-round cap</b> stops runs where nodes flip forever (no convergence). Reaching 100 rounds ≠ a complete cascade.</li>
     </ol>
+    <p class="small" style="margin:8px 0 0;"><b>Worked step (a=3, b=2):</b> node 2 has B-neighbours {1,8,0,5} (num_B=4) and A-neighbours {7,3} (num_A=2). payoff_A = 3·2 = 6, payoff_B = 2·4 = 8. Since 8 &gt; 6, node 2 <b>stays B</b> — this is why a low-payoff new action dies out at first.</p>
   </div>
 
   <h3 class="sub">The four big ideas (same shell, different setup)</h3>
@@ -515,6 +520,7 @@ complete = terminate_1('A', G)                 # 1 = COMPLETE cascade (every nod
     <ul class="notes" style="margin:4px 0 0;">
       <li>Decisions are <b>synchronous</b>: <code class="inline">recalculate_options</code> computes everyone's next action from the <em>current</em> snapshot, then <code class="inline">reset_node_attributes</code> applies them together.</li>
       <li>Reuse the <b>saved</b> graph (<code class="inline">write_gml</code>/<code class="inline">read_gml</code>) across all four experiments so differences are due to the change tested, not a fresh random graph.</li>
+      <li>Idea 1 holds <b>b fixed at 5</b> and raises a from 6→10 (so you're isolating the payoff, not the seeds). Idea 2 tries every seed <em>pair</em> with a nested <code class="inline">for u in G.nodes / for v in G.nodes</code> guarded by <code class="inline">if u &lt; v</code> to avoid duplicate/reversed pairs — only a few pairs give a complete cascade.</li>
       <li>Idea 3's graph: two 10-node communities built as separate random graphs (each edge with prob 0.5, like a mini Erdős–Rényi), joined by a <em>single</em> link (e.g. <code class="inline">G.add_edge(5, 15)</code>) — then saved for reuse.</li>
       <li>Idea 4's cluster: node 8 has 6 neighbours, 4 inside → 0.67 &gt; 1−q = 0.6, so the cluster is impenetrable. Seeds are always chosen <em>outside</em> nodes 7–11, and the cascade never reaches them.</li>
     </ul>

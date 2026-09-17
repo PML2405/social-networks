@@ -402,6 +402,15 @@ for i in range(5000):        # many rounds; recompute unsatisfied each time
       <li>An <b>empty</b> cell (type 0) is skipped — it can never be "unsatisfied".</li>
       <li><b>Recompute</b> <code class="inline">empty_cells</code> and <code class="inline">unsatisfied</code> each round; a move invalidates them.</li>
       <li>Convergence time depends on N, t, and the random start; a bigger t or grid needs many more iterations (and t too high never converges).</li>
+      <li><b>Boundary of the rule:</b> "content" = <em>at least t</em> same-type neighbours, so unsatisfied ⇔ <code class="inline">same &lt; t</code> (a cell with exactly t=3 same-type neighbours <em>stays</em>). The lecture's spoken code once wrote <code class="inline">&lt;= t</code>, but the "at least t" definition (and the assignment) use strict <code class="inline">&lt; t</code>.</li>
+    </ul>
+  </div>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the full screencast structure (what my streamlined code folds together)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Because <code class="inline">grid_2d_graph</code> labels nodes as <code class="inline">(row,col)</code> tuples, the lecture relabels them 0…N²−1 (<code class="inline">i*N + j</code>) and draws with an explicit <code class="inline">pos</code> dict; a <code class="inline">display_graph</code> function colours each type via <code class="inline">nx.draw_networkx_nodes(...)</code>.</li>
+      <li>It builds a <code class="inline">get_boundary_nodes</code> list (a node <code class="inline">(u,v)</code> is boundary iff <code class="inline">u==0 or u==N-1 or v==0 or v==N-1</code>) and its complement <code class="inline">internal = set(G.nodes()) - set(boundary)</code>, then dispatches to <code class="inline">get_neighbours_internal</code> (the 8 offsets: 4 orthogonal + 4 diagonal) vs <code class="inline">get_neighbours_boundary</code> (8 special cases). <b>Adding the diagonal edges to G (as we did) makes <code class="inline">G.neighbors</code> return the right 3/5/8 automatically — the same thing, less code.</b></li>
+      <li>Two versions of the move rule exist: the unsatisfied node moves to a <b>random</b> empty cell (what we implement) <em>or</em> to an empty cell where it <em>would</em> be satisfied. And note: mathematically <em>why</em> segregation emerges from the threshold is still an <b>open problem</b>.</li>
     </ul>
   </div>
 
@@ -455,7 +464,7 @@ for i in range(5000):        # many rounds; recompute unsatisfied each time
   </div>
   <ul class="notes">
     <li><b>+ + −</b> (2 pos): X is friends with Y and Z, but Y and Z are enemies — X is in a bind (the "Rama &amp; Krishna" problem). Resolves by Y–Z befriending (→ +++) or X dropping one tie (→ +−−).</li>
-    <li><b>− − −</b> (0 pos): three mutual enemies is unstable, because <b>an enemy's enemy is a friend</b> — two of them bond over their common foe, forming a +. (When two people "sweat/struggle together" against a shared rival, they ally.)</li>
+    <li><b>− − −</b> (0 pos): three mutual enemies is unstable, because <b>an enemy's enemy is a friend</b> — two of them bond over their common foe, forming a +. (When two people "sweat/struggle together" against a shared rival, they ally — the shared complaining, or <span class="def-term">cribbing</span>, cements the bond.)</li>
   </ul>
 
 
@@ -595,7 +604,8 @@ while unstable != 0:
     <span class="label">⚠️ repair notes</span>
     <ul class="notes" style="margin:4px 0 0;">
       <li><b>2-positive</b> triangle: flipping <em>any</em> of its 3 edges gives an odd count (1 or 3) → stable. <b>0-positive</b>: making any edge <code class="inline">+</code> gives 1-positive → stable.</li>
-      <li>Fixing one triangle changes <b>adjacent</b> triangles, so the unstable count <b>fluctuates</b> (can rise before it falls) — but always converges to 0.</li>
+      <li>Fixing one triangle changes <b>adjacent</b> triangles, so the unstable count <b>fluctuates</b> (can rise before it falls) — but always converges to 0. To see this, append <code class="inline">unstable</code> to a list each round and <code class="inline">plt.plot</code> it: e.g. n=5 → C(5,3)=10 triangles (4 stable, 6 unstable) converges fast; n=8 shows the count jumping 26→28→… before hitting 0.</li>
+      <li>Screencast extras: nodes are given country names via <code class="inline">nx.relabel_nodes(mapping, G)</code>, drawn with <code class="inline">nx.circular_layout</code> + <code class="inline">nx.get_edge_attributes(G,'sign')</code> so the "+/−" show on edges.</li>
     </ul>
   </div>
 
