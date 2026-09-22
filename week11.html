@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 11 · The Small-World Effect</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 11 — The Small-World Effect</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 143–153 · six degrees of separation, Milgram's letters, the Watts–Strogatz model (homophily + weak ties), decentralized search and Kleinberg's magic exponent — then we build a small-world network in NetworkX.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky blue">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Take any two people on Earth — they're joined by a chain of only about <b>six</b> acquaintances. <span class="def-term">Milgram</span> showed this in 1967 with forwarded letters ("six degrees of separation"). It feels impossible for 6-billion-plus people, but it isn't: with ~100 friends each, friends-of-friends explode as $100^{\text{hops}}$ and cover the world in ~10 steps. <b>Watts &amp; Strogatz (1998)</b> explained the structure: most of your ties are local (<mark>homophily</mark> — a grid/ring of near neighbours), plus a <em>few</em> long-range <mark>weak ties</mark>. Add just a handful of long links to a ring and its diameter collapses. Even more striking, Milgram's forwarding is a <b>decentralized (myopic) search</b>: nobody sees the whole graph, yet greedily passing "toward" the target still finds a short path — and <b>Kleinberg</b> showed it works best when long links follow $1/d^{\,k}$ with $k$ = the grid's dimension ($k=2$ for a plane).</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 11</h3>
+    <ol>
+      <li><a href="#s1">Is the world connected? — the six-degrees question</a></li>
+      <li><a href="#s2">Milgram's experiment &amp; why 6 isn't crazy</a></li>
+      <li><a href="#s3">The reason: homophily + weak ties (Watts–Strogatz)</a></li>
+      <li><a href="#s4">Decentralized search &amp; Kleinberg's exponent</a></li>
+      <li><a href="#s5">Coding a small-world network</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 143</div>
+    <h2>Is the world connected?</h2>
+    <div class="lsub">Ram in Delhi wants to reach Jennifer in Los Angeles</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> The friendship graph of the world</h2>
+  <p>Back in 1970 (no internet), <b>Ram</b> in Delhi wants to reach <b>Jennifer</b> in Los Angeles, whom he doesn't know. He can't contact her directly, but maybe he knows someone who knows someone… who knows Jennifer. Model the whole world as a graph: nodes = people, an edge between two people if they know each other — the <span class="def-term">friendship graph of the world</span>.</p>
+  <p>Two questions follow: <b>(1)</b> Is this graph even <b>connected</b> (is there a path between any two people)? <b>(2)</b> If so, how <b>long</b> is that path on average? The surprising answers: yes, it's connected — and any two people are separated by only about <mark class="yellow">six hops</mark>.</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the chain</span>
+    <p style="margin:2px 0;">Ram → Mike (London) → Peter (Boston, originally from LA) → Monica (LA, Jennifer's friend) → Jennifer. Nobody knew Jennifer directly, yet each person forwarded to someone <em>likely closer</em> to her — and a short chain appeared. That "few hops" number, observed across the whole world, is the <span class="def-term">small-world effect</span>.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>What two questions define the "small-world" problem in graph terms?
+        <div class="ans">(1) Is the world's friendship graph <b>connected</b> (a path between any two people)? (2) If so, what is the average <b>distance</b> (number of hops) between two people?</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 144</div>
+    <h2>Milgram's experiment &amp; why 6 isn't crazy</h2>
+    <div class="lsub">forwarded letters, and exponential reach</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Six degrees of separation</h2>
+  <p>In <b>1967</b>, <span class="def-term">Milgram</span> ran the actual experiment. He gave a letter to a random person $P_1$, who had to get it to a random target $P_2$ (whose address was written on it) — but <b>not by mailing it directly</b>. $P_1$ had to hand it to <em>an acquaintance</em> they thought was closer to $P_2$; that person did the same, and so on. Surprisingly, most letters arrived — in about <b>six steps on average</b>. Published in <i>Psychology Today</i>, this became <span class="def-term">six degrees of separation</span>.</p>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">🤔 counterintuitive… at first</span>
+    <p style="margin:2px 0;">Over 6 billion people, yet only 6 hops apart? That sounds impossible — one number is huge, the other tiny. The world is <b>big</b> (billions of people) but <b>small</b> (six people connect any two).</p>
+  </div>
+  <div class="worked">
+    <span class="tag">✍️ why 6 is actually reasonable <span class="illus">(exponential reach, lecture 144)</span></span>
+    <ol>
+      <li>Say you have <b>100</b> friends (level 1).</li>
+      <li>Each of them has 100 friends → level 2 has $100^2 = 10{,}000$.</li>
+      <li>Level 3 has $100^3$, … level $i$ has $100^{\,i}$.</li>
+      <li>By level 10 that's $100^{10}$ — far more than the world's population. $$ \boxed{\text{friends-of-friends grow exponentially — 10 hops blankets the planet}} $$</li>
+    </ol>
+    <p class="small" style="margin-top:6px;">So a small hop-count reaching everyone is <em>not</em> paradoxical — exponential growth exhausts billions in a single-digit number of levels.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>What was the rule Milgram's participants had to follow, and what did he find?
+        <div class="ans">Forward the letter only to a personal acquaintance you believe is closer to the target (never mail it directly). Most letters reached the target in about <b>6</b> hops on average — "six degrees of separation."</div></li>
+      <li>Why isn't "6 hops among billions" a contradiction?
+        <div class="ans">Because reach grows <em>exponentially</em>: with 100 friends each, level $i$ has $100^i$ people, so ~10 levels already exceed the world population. Short chains can still cover everyone.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 145–146</div>
+    <h2>The reason: homophily + weak ties</h2>
+    <div class="lsub">the Watts–Strogatz model — a lattice with a few long links</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> A grid, rewired</h2>
+  <p>In <b>1998</b>, <span class="def-term">Watts and Strogatz</span> redid the experiment on email networks and gave the reason. Two ingredients we've already met:</p>
+  <div class="two-col">
+    <div>
+      <div class="sketch-box tint-mint">
+        <span class="label">📖 the two ingredients</span>
+        <ul class="notes" style="margin:4px 0 0;">
+          <li><span class="def-term">Homophily</span> — you mostly befriend people <b>near</b> you (same locality, school, club). Picture people on a <b>grid/ring</b>, each linked to close neighbours.</li>
+          <li><span class="def-term">Weak ties</span> — a <em>few</em> of your friends are <b>far away</b> (another city, country, continent). These long-range links are the shortcuts.</li>
+        </ul>
+      </div>
+      <p class="small">Most of your edges stay inside your "territory" (homophily); a couple jump outside it (weak ties). Those couple of long jumps are what make the world small.</p>
+    </div>
+    <div class="diagram">
+      <h4>ring lattice + weak-tie shortcuts</h4>
+      <svg viewBox="0 0 170 170">
+        <g font-family="Kalam" font-size="9" fill="var(--ink)">
+          <circle cx="85" cy="85" r="62" fill="none" stroke="none"/>
+          <!-- 12 nodes on a ring -->
+          <g id="nodes">
+          </g>
+          <!-- draw ring nodes + local edges manually -->
+          <!-- positions for 12 nodes -->
+          <!-- node coords computed: r=62 center 85,85 -->
+          <circle cx="147" cy="85" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="139" cy="116" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="116" cy="139" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="85" cy="147" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="54" cy="139" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="31" cy="116" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="23" cy="85" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="31" cy="54" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="54" cy="31" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="85" cy="23" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="116" cy="31" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <circle cx="139" cy="54" r="6" fill="var(--blue)" stroke="var(--ink)"/>
+          <!-- ring edges -->
+          <polygon points="147,85 139,116 116,139 85,147 54,139 31,116 23,85 31,54 54,31 85,23 116,31 139,54" fill="none" stroke="var(--ink-soft)" stroke-width="1.2"/>
+          <!-- weak ties (chords) -->
+          <path d="M147 85 L54 139" stroke="var(--coral)" stroke-width="1.8" fill="none"/>
+          <path d="M85 23 L31 116" stroke="var(--coral)" stroke-width="1.8" fill="none"/>
+        </g>
+      </svg>
+      <div class="cap">grey ring = local (homophily) ties; coral chords = a few long-range weak ties.</div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">⚙️ the Watts–Strogatz generative model</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li>Put all nodes on a <b>cycle (ring)</b>; connect each to its nearest few neighbours (a lattice) — pure homophily.</li>
+      <li><span class="def-term">Randomly rewire</span> a small fraction (say ~1%) of edges: pick an edge, remove it, and reconnect it to a random node — creating a long-range "teleportation" shortcut.</li>
+    </ol>
+    <p class="small" style="margin:6px 0 0;">The result has the <span class="def-term">small-world property</span>: high local clustering <em>and</em> tiny distances between any two nodes. Nobody literally "rewires" in real life — it just captures the fact that each of us has a couple of far-away friends.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>What two ingredients did Watts &amp; Strogatz identify, and which one creates the shortcuts?
+        <div class="ans"><b>Homophily</b> (mostly local, near-neighbour ties) and <b>weak ties</b> (a few long-range links). The <em>weak ties</em> are the shortcuts that shrink distances.</div></li>
+      <li>Describe the Watts–Strogatz generative model in one line.
+        <div class="ans">Start from a ring lattice (each node linked to nearby neighbours), then randomly rewire a small fraction of edges into long-range links — yielding short paths plus high clustering.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 147–149</div>
+    <h2>Decentralized search &amp; Kleinberg's exponent</h2>
+    <div class="lsub">finding a short path with only local knowledge</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Search with no map</h2>
+  <p>The most fascinating part of Milgram's experiment isn't that a short path <em>exists</em> — it's that people <b>found</b> it without a map. Each holder of the letter knows only their own friends, not the global graph, yet by passing it to whoever seems "closest" to the target, the letter arrives. That's a <span class="def-term">decentralized search</span> — no central authority, just local decisions.</p>
+  <div class="sketch-box tint-mint">
+    <span class="label">📖 what makes it remarkable</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>It's a <b>search algorithm</b> running on the friendship graph.</li>
+      <li>It's <b>local (greedy)</b>: each person only forwards to their best-looking neighbour — no one has the global picture.</li>
+      <li>Yet the collective, cooperative effort delivers the letter in ~6 hops. (Because it's short-sighted, it's also called <b>myopic search</b> — coded next week.)</li>
+    </ul>
+  </div>
+
+  <h3 class="sub">Kleinberg's magic exponent</h3>
+  <p>Does decentralized search <em>always</em> work well? It depends on <b>how</b> the long-range links are distributed. Model a person's chance of having a far friend $v$ at grid-distance $d$ as proportional to $1/d^{\,k}$, and tune the exponent $k$.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">probability of a long-range link at distance d</div>
+      <div class="eqn" style="margin:6px 0;">$$ P(u \sim v)\;\propto\;\frac{1}{d(u,v)^{\,k}} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "the farther a node is, the less likely it's your friend — and $k$ controls how fast that drops." $k=0$ → all distances equally likely (links go anywhere — you overshoot the target); large $k$ → almost no long links (you crawl neighbour-by-neighbour). There's a sweet spot in between.</div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">🚌 the bus-route / metro intuition</span>
+    <p style="margin:2px 0;">Plan a city's transit: you can't run a line between every pair of the 100 stops. If your lines are all <b>super-long express</b> hops ($k$ too small), you shoot past your stop and must backtrack. If they're all <b>tiny local</b> hops ($k$ too big), you change trains endlessly. The efficient design has routes at <em>every scale</em> — some short, some medium, some long — so you can always halve your remaining distance.</p>
+  </div>
+  <div class="sketch-box tint-blue">
+    <span class="label">🏁 the result</span>
+    <p style="margin:2px 0;">Plot the myopic-search path length against $k$ and it bottoms out at a special value: <mark>$k = 2$ for a 2-D grid</mark> (and $k = 1$ for a 1-D line) — in general, $k$ equal to the <b>dimension</b> of the space. At that exponent, decentralized search is fastest (paths $\sim \log$-scale). This is Kleinberg's theorem; the full proof is optional but the take-away is: navigability needs long links spread across all distance-scales.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why is Milgram's experiment described as a "decentralized" (local) search?
+        <div class="ans">No participant knows the entire friendship graph — each only knows their own acquaintances and greedily forwards to the one seeming closest to the target. Short paths emerge from purely local decisions, with no central coordinator.</div></li>
+      <li>If long links follow $P\propto 1/d^{k}$, what value of $k$ makes decentralized search most efficient on a 2-D grid, and what goes wrong for $k$ too small or too large?
+        <div class="ans">$k = 2$ (the grid's dimension). Too small ($k\to0$): links are uniformly long, so you overshoot and backtrack. Too large: almost no long links, so you inch along locally. $k=2$ balances links across all scales for fastest navigation.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 150–153</div>
+    <h2>Coding a small-world network</h2>
+    <div class="lsub">a ring, homophily ties, and a few weak ties in NetworkX</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Building it in NetworkX</h2>
+  <p>Now construct a 1-D small-world network: a <b>ring</b> of nodes with local (homophily) edges, plus a handful of random long-range <b>weak ties</b>. Start with the nodes:</p>
+  <div class="code">
+    <div class="fname"><span>ring.py — base</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()
+G.add_nodes_from(range(50))     # 50 nodes labelled 0..49
+nx.draw(G)
+plt.show()
+</code></pre>
+  </div>
+
+  <p><b>Homophily edges:</b> connect each node to <b>2 neighbours on each side</b> of the ring. The subtlety is <em>wrap-around</em> — node 49's "right neighbour" is node 0.</p>
+  <div class="code">
+    <div class="fname"><span>homophily edges</span><span class="lang">python</span></div>
+<pre><code class="language-python">def add_homophily_edges(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    for i in range(n):
+        # left neighbours i-1, i-2 wrap automatically (Python negative indexing)
+        G.add_edge(nodes[i], nodes[i - 1])
+        G.add_edge(nodes[i], nodes[i - 2])
+        # right neighbours i+1, i+2 must be wrapped by hand
+        for step in (1, 2):
+            target = i + step
+            if target > n - 1:      # went past the last node → wrap to the front
+                target = target - n
+            G.add_edge(nodes[i], nodes[target])
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ the wrap-around bug (the one the professor hit live)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>Left</b> indices <code class="inline">i-1</code>, <code class="inline">i-2</code> are safe — Python's negative indexing already wraps (<code class="inline">nodes[-1]</code> is the last node).</li>
+      <li><b>Right</b> indices <code class="inline">i+1</code>, <code class="inline">i+2</code> can exceed <code class="inline">n-1</code> and cause an <code class="inline">IndexError</code>. Fix: if <code class="inline">target &gt; n-1</code>, set <code class="inline">target = target - n</code> (so $n\to0$, $n{+}1\to1$).</li>
+      <li>Define <code class="inline">n = G.number_of_nodes()</code> before using it — forgetting this throws "name n is not defined."</li>
+    </ul>
+  </div>
+
+  <p><b>Weak ties:</b> add long-range links by picking two <em>distinct</em> random nodes and joining them. Calling it once adds one weak tie.</p>
+  <div class="code">
+    <div class="fname"><span>weak ties</span><span class="lang">python</span></div>
+<pre><code class="language-python">import random
+
+def add_long_link(G):                       # one weak tie
+    v1 = random.choice(list(G.nodes()))
+    v2 = random.choice(list(G.nodes()))
+    while v1 == v2:                          # avoid a self-loop
+        v2 = random.choice(list(G.nodes()))
+    G.add_edge(v1, v2)
+
+G = nx.Graph()
+G.add_nodes_from(range(100))
+add_homophily_edges(G)
+for _ in range(10):                         # add 10 weak ties
+    add_long_link(G)
+</code></pre>
+  </div>
+  <p>Building the ring is <span class="bigO">O(n)</span> (a constant number of edges per node); each weak tie is <span class="bigO">O(1)</span>. Note the professor's simplification: instead of true rewiring (delete one edge, add one), he just <b>adds</b> weak ties — on a big graph the edge count barely changes, but the diameter still plummets (that experiment opens Week 12).</p>
+
+  <div class="quiz">
+    <ol>
+      <li>Why do the left-neighbour indices <code class="inline">i-1</code>, <code class="inline">i-2</code> need no wrap-around fix, but <code class="inline">i+1</code>, <code class="inline">i+2</code> do?
+        <div class="ans">Python's negative indexing already wraps (<code class="inline">nodes[-1]</code> is the last node), so the left side is fine. Positive indices past <code class="inline">n-1</code> run off the end and raise <code class="inline">IndexError</code>, so you must wrap them with <code class="inline">target = target - n</code>.</div></li>
+      <li>In <code class="inline">add_long_link</code>, what is the <code class="inline">while v1 == v2</code> loop for?
+        <div class="ans">To guarantee the two randomly chosen endpoints are different, so you never add a self-loop (an edge from a node to itself).</div></li>
+      <li>The professor adds weak ties instead of true rewiring. Why is that an acceptable shortcut?
+        <div class="ans">True rewiring deletes one edge and adds one; just adding a weak tie changes the edge count only slightly on a large graph, yet still injects the long-range shortcuts that shrink the diameter — the effect we care about.</div></li>
+    </ol>
+  </div>
+
+  <div class="banner">
+    <h3>The world is huge yet tiny: mostly-local ties plus a few long-range weak ties give short paths that even a blind, greedy search can find.</h3>
+    <p>Next week: watch the diameter collapse as weak ties are added, and code the myopic search itself.</p>
+  </div>
+
+  <div class="signoff">— end of Week 11 · Six degrees, Watts–Strogatz &amp; decentralized search ✏️</div>
+  <a class="backtop" href="#top">↑ back to contents</a>
+
+
+</div>
+
+</body>
+</html>

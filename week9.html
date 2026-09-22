@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 9 · Power Laws &amp; Rich-Get-Richer</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 9 — Power Laws &amp; the Rich-Get-Richer Phenomenon</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 115–127 · why real networks are <em>not</em> bell curves, the preferential-attachment (Barabási–Albert) model behind them, its code, Erdős–Rényi random graphs, attack survivability, and the long tail.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky pink">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Heights, IQ, exam marks all pile up into a <b>bell curve</b> (a normal distribution) — because they're <em>sums of random effects</em> (the Central Limit Theorem). But when scientists finally measured huge real networks in the late 1990s, degree did <b>not</b> form a bell curve — it <b>dropped off like $1/k^{2}$</b>: a few nodes with enormous degree (<b>hubs</b>) and a huge crowd with tiny degree. That's a <b>power law</b>. Why? <mark>Preferential attachment</mark>: new nodes prefer to link to already-popular nodes, so the <b>rich get richer</b> — the <b>Barabási–Albert</b> model. We code it, contrast it with a purely random <b>Erdős–Rényi</b> graph (which stays a bell curve), and see the consequence for robustness: power-law networks shrug off <b>random</b> failures but shatter under a <b>targeted</b> attack on their hubs. Finally, the same maths gives the <b>long tail</b> — why niche products can out-sell the bestsellers combined.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 9</h3>
+    <ol>
+      <li><a href="#s1">Two shapes: the bell curve vs the drop</a></li>
+      <li><a href="#s2">Why a bell curve? — the Central Limit Theorem</a></li>
+      <li><a href="#s3">Detecting a power law — the log-log litmus test</a></li>
+      <li><a href="#s4">Preferential attachment — the rich get richer</a></li>
+      <li><a href="#s5">Coding the Barabási–Albert model</a></li>
+      <li><a href="#s6">Erdős–Rényi — a truly random graph</a></li>
+      <li><a href="#s7">Attack survivability — random vs targeted removal</a></li>
+      <li><a href="#s8">A possible reason + the long tail (Zipf)</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 115–117</div>
+    <h2>Two shapes: the bell curve vs the drop</h2>
+    <div class="lsub">normal distributions everywhere — then a surprise in real networks</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> The bell curve, and then the surprise</h2>
+  <p>Walk a town and record every adult's <b>height</b>; plot height (x) against the percentage of people at that height (y). You get a hump: very few short, very few very tall (above 7 ft), most bunched around 5.3–5.4 ft. That shape — low on both sides, a peak in the middle — is the <span class="def-term">normal distribution</span>, a.k.a. the <span class="def-term">bell curve</span>. IQ, weight, and many natural quantities look the same.</p>
+  <p>Now do it for a <b>network</b>: plot the <span class="def-term">degree distribution</span> — degree $k$ on x, the percentage of nodes with that degree on y. For a random graph $G(1000,\,0.1)$ (1000 nodes, each possible edge added with probability 0.1) you again get a bell curve, peaking around degree <b>100</b> = $n\cdot p = 1000\times 0.1$. No surprise.</p>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>bell curve vs power law</h4>
+      <svg viewBox="0 0 270 140">
+        <g font-family="Kalam" font-size="11" fill="var(--ink)">
+          <line x1="20" y1="115" x2="255" y2="115" stroke="var(--ink)" stroke-width="1.4"/>
+          <line x1="20" y1="115" x2="20" y2="15" stroke="var(--ink)" stroke-width="1.4"/>
+          <!-- bell -->
+          <path d="M28 113 Q70 110 95 55 Q110 22 125 55 Q150 110 175 113" fill="none" stroke="#2E7D53" stroke-width="2.4"/>
+          <text x="96" y="45" fill="#2E7D53">normal</text>
+          <!-- power law -->
+          <path d="M28 22 C40 70 60 100 110 108 C160 113 210 114 250 114" fill="none" stroke="var(--coral)" stroke-width="2.4"/>
+          <text x="150" y="40" fill="var(--coral)">power law</text>
+          <text x="150" y="53" fill="var(--coral)" font-size="10">(long tail →)</text>
+          <text x="120" y="130">degree k →</text>
+          <text x="24" y="18" transform="rotate(-90 24 18)"></text>
+        </g>
+      </svg>
+      <div class="cap">both plot degree (x) vs % of nodes (y). The power law <b>drops</b> then <b>extends</b> far right — high-degree hubs exist.</div>
+    </div>
+    <div>
+      <p>The shock came when networks got big enough to measure (WWW, phone calls, downloads). Plot the <b>in-degree</b> of web pages and you do <em>not</em> get a bell — you get a <b>drop</b> shaped like $1/k^{2}$: lots of pages with few in-links, and a long tail of a few pages with <em>enormous</em> in-degree.</p>
+      <div class="sketch-box tint-pink" style="margin-top:6px;">
+        <span class="label">📖 power law</span>
+        <p style="margin:2px 0;">A <span class="def-term">power-law distribution</span> is one where $f(k)\propto 1/k^{\alpha}$ — it drops steeply but never quite hits zero, so <mark>very-high-degree nodes (hubs) genuinely exist.</mark> The bell curve has no such tail.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">🌍 power laws are everywhere</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>WWW</b> — page in-degree $\sim 1/k^{2}$.</li>
+      <li><b>Phone calls</b> — call-duration counts drop off with a long tail of very long calls.</li>
+      <li><b>Song downloads</b> — a few songs downloaded a huge number of times.</li>
+    </ul>
+    <p class="small" style="margin:6px 0 0;">Dozens of real datasets show it. The exponent isn't always 2 — it's typically between <b>2 and 3</b>.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>A random graph $G(1000,0.1)$ has its degree distribution peak at roughly what degree, and why?
+        <div class="ans">Around <b>100</b> = $n\cdot p$. Each node has 999 possible neighbours, each attached with probability 0.1, so the expected degree is ≈ 100 and the distribution bunches (bell-shaped) around it.</div></li>
+      <li>What single feature separates a power-law degree distribution from a normal one?
+        <div class="ans">The <b>long tail</b>: a power law keeps a small but non-zero fraction of nodes at very high degree (hubs). A normal distribution effectively has none — nothing far from the mean.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 116</div>
+    <h2>Why a bell curve? — the Central Limit Theorem</h2>
+    <div class="lsub">a sum of random things is (almost always) normal</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Sums of random variables → normal</h2>
+  <p>Before asking why networks are <em>weird</em>, understand why the bell curve is so <em>common</em>. Have 10 people each pick a random number from 1–100, then <b>add</b> the picks. Each single pick is uniform (any value 1–100 equally likely), but the <b>sum</b> is not:</p>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(10 random numbers, lecture 116)</span></span>
+    <ol>
+      <li>Minimum sum = all pick 1 → $10$. Maximum = all pick 100 → $1000$.</li>
+      <li>To hit the sum <b>10</b>, every one of the 10 people must roll a 1 — extremely unlikely. Same for hitting 1000.</li>
+      <li>A middling sum like <b>~550</b> can happen in astronomically many ways, so it's far more likely.</li>
+      <li>Plot the sum's distribution → a bell curve peaking around <b>550</b>. $$ \boxed{\text{sum of random variables} \Rightarrow \text{normal distribution}} $$</li>
+    </ol>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> this is the <b>Central Limit Theorem</b> — "whenever your quantity is the <em>sum</em> of many independent random pieces, its distribution is a bell curve." Height = sum of many genetic + environmental effects; that's why it's normal. A power law, by contrast, is <em>not</em> a simple sum — something else is generating it.</div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why is a sum of 10 uniform picks peaked in the middle rather than flat?
+        <div class="ans">There are vastly more combinations that add to a middling total (~550) than to the extremes (10 or 1000), which each require every pick to be identical. More ways → higher probability → a central peak.</div></li>
+      <li>Height follows a bell curve; page in-degree follows a power law. What does that tell you about how each is generated?
+        <div class="ans">Height is a <em>sum</em> of many independent small factors (CLT → normal). In-degree is <em>not</em> a simple sum — it's produced by a growth process (preferential attachment) that concentrates links on a few nodes, giving a power law.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 118</div>
+    <h2>Detecting a power law — the log-log litmus test</h2>
+    <div class="lsub">take logs, and a power law becomes a straight line</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> The log-log straight line</h2>
+  <p>Given a network, how do you <em>prove</em> it's power-law (and find the exponent)? Eyeballing the drop isn't enough — many curves drop. The trick is to take logarithms.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">take log of both sides of f(k)=1/kᵅ</div>
+      <div class="eqn" style="margin:6px 0;">$$ \log f(k) = \log\!\frac{1}{k^{\alpha}} = -\alpha\,\log k $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> set $y=\log f(k)$ and $x=\log k$; then $y=-\alpha\,x$ — the equation of a <b>straight line</b> through the origin with slope $-\alpha$. So if you replot the data on <b>log axes</b> and it lines up straight, it's a power law, and the slope hands you the exponent.</div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">🧪 the litmus test</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li>Plot the degree distribution on ordinary axes — you see a drop, but it "could be anything".</li>
+      <li>Redraw it as a <span class="def-term">log-log plot</span>: $\log f(k)$ on y, $\log k$ on x.</li>
+      <li><mark class="mint">A straight line ⇒ power law.</mark> Its slope (in magnitude) is the exponent $\alpha$ (often 2–3).</li>
+    </ol>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>On a log-log plot your degree data forms a straight line of slope $-2.5$. What do you conclude?
+        <div class="ans">The distribution is a power law $f(k)\propto k^{-2.5}$ — exponent $\alpha = 2.5$. The straight line on log axes is the signature; the slope magnitude is the exponent.</div></li>
+      <li>Why isn't "the ordinary plot looks like a drop" enough to claim a power law?
+        <div class="ans">Many different functions produce a drop (exponential, etc.). Only $1/k^{\alpha}$ becomes a <em>straight line</em> under log-log, so that transform is the decisive test.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 119–120</div>
+    <h2>Preferential attachment — the rich get richer</h2>
+    <div class="lsub">new nodes prefer popular nodes, and a power law emerges</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Attach in proportion to degree</h2>
+  <p>What <em>process</em> produces a power law? The leading hypothesis is <span class="def-term">preferential attachment</span>. Picture a classroom: start with 3 mutual friends. Every new arrival makes friends with a fixed number of existing people (say 2), but not at random — <mark>they're more likely to befriend someone who already has many friends</mark> (a popular person is more visible).</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">probability a newcomer links to node i</div>
+      <div class="eqn" style="margin:6px 0;">$$ P(\text{link to } i) = \frac{\deg(i)}{\sum_{j}\deg(j)} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "you attach to a node with probability equal to <b>its degree divided by the total degree</b> of everyone." A node with degree 4 is twice as likely to be chosen as a node with degree 2.</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(the classroom, lecture 119)</span></span>
+    <ol>
+      <li>Start: a, b, c, d with degrees $3, 2, 3, 2$ → total degree $10$. New person <b>e</b> attaches to each with probability $\tfrac{3}{10},\tfrac{2}{10},\tfrac{3}{10},\tfrac{2}{10}$ (sums to 1).</li>
+      <li>Say e links to a and c. Update: a and c rise to degree 4; total degree becomes $14$.</li>
+      <li>Next person <b>f</b> now sees $\tfrac{4}{14}$ for a, $\tfrac{2}{14}$ for b, $\tfrac{4}{14}$ for c, … — the already-popular a and c are even more attractive.</li>
+      <li>Continue to 1000 nodes → the degree distribution is a <b>power law</b>. $$ \boxed{\text{high-degree nodes attract even more edges — rich get richer}} $$</li>
+    </ol>
+  </div>
+  <div class="sketch-box tint-yellow">
+    <span class="label">💡 the punchline</span>
+    <p style="margin:2px 0;">A network that <b>grows</b> node-by-node while <b>respecting existing degrees</b> naturally develops <mark class="yellow">hubs</mark> and a power-law tail. This is the <span class="def-term">rich-get-richer phenomenon</span> (also called the <b>Matthew effect</b>). It's a <em>hypothesis</em> for why power laws appear — well-supported, not proven.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Total degree in a network is 20. Node X has degree 5. What's the chance a newcomer links to X (per edge it forms)?
+        <div class="ans">$\deg(X)/\sum\deg = 5/20 = \mathbf{0.25}$. Attachment probability is proportional to current degree.</div></li>
+      <li>Why does preferential attachment produce hubs, whereas linking uniformly at random would not?
+        <div class="ans">Under preferential attachment a node's chance of gaining an edge grows with the degree it already has — a positive feedback loop that lets a few nodes run away to very high degree. Uniform random linking gives every node the same chance, so no runaway hubs (→ bell curve).</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 121–122</div>
+    <h2>Coding the Barabási–Albert model</h2>
+    <div class="lsub">grow a network by preferential attachment, in NetworkX</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Implementing rich-get-richer (BA model)</h2>
+  <p>The <span class="def-term">Barabási–Albert (BA) model</span> is exactly preferential attachment made into an algorithm. Parameters: <code class="inline">n</code> = total nodes, <code class="inline">m0</code> = size of the tiny starting network, <code class="inline">m</code> = how many existing nodes each newcomer links to (with $m \le m_0$; the code uses $m=m_0-1$).</p>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the algorithm, in words</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li>Start with an initial network of $m_0$ nodes where <b>every node has ≥1 edge</b> (a path graph works).</li>
+      <li>Add nodes one at a time until there are $n$. For each new node, compute each existing node's probability $=\deg/\!\sum\deg$.</li>
+      <li>Pick $m$ <b>distinct</b> targets using those probabilities and link to them.</li>
+    </ol>
+  </div>
+
+  <h3 class="sub">The clever bit — choosing by "cumulative windows"</h3>
+  <p>How do you pick a node <em>with probability proportional to its share</em>? Lay the probabilities end-to-end on the number line $[0,1]$ as windows, roll a random $r\in[0,1]$, and see which window it lands in — a bigger share = a wider window = more likely to be hit (a <b>roulette wheel</b>).</p>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(cumulative windows, lecture 121)</span></span>
+    <ol>
+      <li>Three nodes with probabilities $0.2, 0.3, 0.5$. Cumulative list: $[0.2,\; 0.5,\; 1.0]$.</li>
+      <li>Windows: node&nbsp;1 owns $(0,0.2]$, node&nbsp;2 owns $(0.2,0.5]$, node&nbsp;3 owns $(0.5,1.0]$.</li>
+      <li>Roll $r=0.4$ → it's $>0.2$ and $\le 0.5$ → falls in node&nbsp;2's window → pick <b>node 2</b>.</li>
+      <li>Node 3's window is widest (0.5), so it's picked most often — exactly proportional to probability. ✔</li>
+    </ol>
+  </div>
+
+  <div class="code">
+    <div class="fname"><span>barabasi_albert.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import random
+import matplotlib.pyplot as plt
+
+def barabasi(G, n, m0):
+    m = m0 - 1                                   # edges each new node brings
+    for i in range(m0 + 1, n + 1):               # add nodes one at a time
+        G.add_node(i)
+
+        # --- pre-processing: probability of each node = its share of total degree ---
+        degrees = dict(nx.degree(G))             # {node: degree}
+        total = float(sum(degrees.values()))
+        node_prob = {v: degrees[v] / total for v in G.nodes()}
+
+        # cumulative "windows" over [0,1], kept in order (list of [node, cum_prob])
+        cum, running = [], 0.0
+        for v, p in node_prob.items():
+            running += p
+            cum.append([v, running])
+
+        # --- choose m DISTINCT existing nodes by their windows (roulette wheel) ---
+        target_nodes, edges_added = [], 0
+        while edges_added &lt; m:
+            r = random.uniform(0, 1)
+            prev, k = 0.0, 0
+            while not (r &gt; prev and r &lt;= cum[k][1]):   # find the window holding r
+                prev = cum[k][1]
+                k += 1
+            target = cum[k][0]
+            if target in target_nodes:           # already linked → try again
+                continue
+            target_nodes.append(target)
+            G.add_edge(i, target)
+            edges_added += 1
+    return G
+
+G = nx.path_graph(4)          # initial network: m0 = 4, every node has an edge
+barabasi(G, 1000, 4)          # grow to 1000 nodes
+</code></pre>
+  </div>
+  <p class="small">In the screencast the professor takes <code class="inline">n</code> from the user (<code class="inline">raw_input</code>/<code class="inline">input</code>) and picks $m_0$ as a <b>random integer in $[2,\,n/5]$</b> (so $n{=}100\Rightarrow m_0\in[2,20]$) — though he notes you can just fix $m_0=4$, as above. He also reuses a <code class="inline">display_graph(G, i, ne)</code> helper each iteration to watch the network grow: it lays nodes out with <code class="inline">nx.circular_layout</code> and calls <code class="inline">nx.draw_networkx_nodes</code>/<code class="inline">draw_networkx_edges</code> separately so the <b>new</b> node/edges show green (dotted) and the existing ones red.</p>
+  <p>Plot the resulting degree distribution (count nodes at each degree) — for large <code class="inline">n</code> it's a power law; on a log-log plot it's a straight line. Complexity: for each of $n$ new nodes we rebuild probabilities in <span class="bigO">O(n)</span> and scan windows, so the whole build is about <span class="bigO">O(n²)</span>.</p>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ common bugs</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><b>Duplicate edges.</b> Without the <code class="inline">target_nodes</code> check, the same node can be picked twice, so a newcomer ends up with <em>fewer</em> than $m$ distinct neighbours. Always skip &amp; retry.</li>
+      <li><b>Zero-degree start.</b> If a starting node has degree 0 its probability is 0 and it can never be chosen (and $\sum\deg$ could be 0 → division error). Use a <code class="inline">path_graph</code> so every node begins with an edge.</li>
+      <li><b>Window off-by-one.</b> The condition must be $\text{prev} &lt; r \le \text{cum}[k]$ — get the boundary wrong and you pick the neighbour on the edge of the window.</li>
+      <li>Recompute probabilities <em>every</em> round — degrees change as you add edges, so a stale probability table breaks the "rich get richer" feedback.</li>
+    </ul>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>In the roulette-wheel method, why is a high-probability node chosen more often?
+        <div class="ans">Its cumulative window on $[0,1]$ is wider, so a uniform random $r$ is more likely to land inside it. Window width = the node's probability.</div></li>
+      <li>You run BA but forget to track already-chosen targets. What symptom appears?
+        <div class="ans">Some new nodes get fewer than $m$ edges, because the same target can be selected repeatedly and the duplicate is silently dropped — distorting the degree distribution.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 123–124</div>
+    <h2>Erdős–Rényi — a truly random graph</h2>
+    <div class="lsub">flip a coin for every possible edge → a bell curve, not a power law</div>
+  </div>
+
+  <h2 class="section" id="s6"><span class="num">6</span> The G(n, p) random graph</h2>
+  <p>The <span class="def-term">Erdős–Rényi model</span> $G(n,p)$ is the "no preference" baseline: take $n$ nodes and, for every one of the $\binom{n}{2}$ possible pairs, add an edge with probability $p$ (toss a biased coin). Higher $p$ ⇒ more edges; $p=0$ ⇒ no edges, $p=1$ ⇒ complete graph.</p>
+  <div class="code">
+    <div class="fname"><span>erdos_renyi.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import random
+
+def erdos_renyi(G, p):
+    for i in G.nodes():
+        for j in G.nodes():
+            if i != j:                     # no self-loops
+                r = random.random()        # uniform in [0,1)
+                if r &lt;= p:
+                    G.add_edge(i, j)       # (i,j) == (j,i) in an undirected graph
+    return G
+
+G = nx.Graph()
+n = int(raw_input("n: "))                  # Python 3: input(...)
+p = float(raw_input("p: "))
+G.add_nodes_from(range(n))                 # n isolated nodes to start
+erdos_renyi(G, p)
+</code></pre>
+  </div>
+  <p>Its degree distribution is a <b>bell curve</b> (each node's degree is a sum of $n-1$ independent coin flips — CLT again — with mean $(n-1)p$). No preferential attachment ⇒ no hubs ⇒ no power law. Building it touches every ordered pair, so it's <span class="bigO">O(n²)</span>.</p>
+  <p class="small">Two handy shortcuts from the screencast: NetworkX has a <b>built-in</b> <code class="inline">nx.erdos_renyi_graph(n, p)</code> that returns a random graph directly (the professor uses it to make the random network for the attack test below), and he reuses a <code class="inline">plot_degree_distribution(G)</code> helper — take all degrees via <code class="inline">nx.degree(G).values()</code>, form the <b>sorted list of unique degrees</b>, then for each one <code class="inline">all_degrees.count(k)</code> gives the y-value (number of nodes at degree $k$).</p>
+
+  <table class="hand">
+    <thead><tr><th></th><th>Barabási–Albert (BA)</th><th>Erdős–Rényi $G(n,p)$</th></tr></thead>
+    <tbody>
+      <tr><td><b>how edges form</b></td><td>growth + preferential attachment (∝ degree)</td><td>each pair independently, fixed prob $p$</td></tr>
+      <tr><td><b>hubs?</b></td><td>yes — a few very-high-degree nodes</td><td>no — degrees cluster near the mean</td></tr>
+      <tr><td><b>degree distribution</b></td><td><b>power law</b> ($1/k^{\alpha}$)</td><td><b>normal</b> (bell curve)</td></tr>
+      <tr><td><b>models…</b></td><td>real-world networks (WWW, social)</td><td>a pure-chance null model</td></tr>
+    </tbody>
+  </table>
+
+  <div class="quiz">
+    <ol>
+      <li>Why does $G(n,p)$ give a bell curve while BA gives a power law?
+        <div class="ans">In $G(n,p)$ each node's degree is a sum of independent coin flips (CLT ⇒ normal, no preference). BA keeps feeding edges to already-popular nodes, creating a heavy tail of hubs (power law).</div></li>
+      <li>In $G(100, 0.5)$, roughly what is a typical node's degree?
+        <div class="ans">About $(n-1)p = 99\times 0.5 \approx 50$. Degrees bunch around this mean.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 125</div>
+    <h2>Attack survivability — random vs targeted removal</h2>
+    <div class="lsub">why hubs make a network robust to accidents but fragile to attack</div>
+  </div>
+
+  <h2 class="section" id="s7"><span class="num">7</span> Knock out nodes until it breaks</h2>
+  <p>Take a network and delete nodes until it becomes <b>disconnected</b>, counting how many deletions it takes. Two strategies: remove nodes <b>randomly</b> (a <span class="def-term">failure</span>), or remove the <b>highest-degree</b> node each time (a targeted <span class="def-term">attack</span>).</p>
+  <div class="code">
+    <div class="fname"><span>attack_survivability.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+import random
+
+def remove_random_node(G):
+    G.remove_node(random.choice(list(G.nodes())))
+    return G
+
+def remove_high_degree_node(G):
+    deg = dict(G.degree())                              # {node: degree}
+    nodes = sorted(deg.items(), key=lambda x: x[1], reverse=True)
+    G.remove_node(nodes[0][0])                          # the top-degree node
+    return G
+
+G = nx.read_edgelist("email.txt")     # a real-world (power-law) network
+print(nx.info(G))                     # ~1000+ nodes, ~5000+ edges
+
+# strategy 1: random failure
+G1, removed_random = G.copy(), 0
+while nx.is_connected(G1):
+    G1 = remove_random_node(G1); removed_random += 1
+
+# strategy 2: targeted attack on hubs
+G2, removed_targeted = G.copy(), 0
+while nx.is_connected(G2):
+    G2 = remove_high_degree_node(G2); removed_targeted += 1
+
+print(removed_random, removed_targeted)
+</code></pre>
+  </div>
+  <div class="two-col">
+    <div class="sketch-box tint-blue">
+      <span class="label">📊 real-world (power-law) network</span>
+      <ul class="notes" style="margin:4px 0 0;">
+        <li>Targeted (remove hubs): disconnects in ≈ <b>1</b> removal.</li>
+        <li>Random: needs ≈ <b>13–17</b> removals.</li>
+      </ul>
+      <p class="small" style="margin:6px 0 0;">The hubs hold the whole thing together — pull one and it falls apart.</p>
+    </div>
+    <div class="sketch-box tint-mint">
+      <span class="label">📊 random $G(n,p)$ network (1000 nodes)</span>
+      <ul class="notes" style="margin:4px 0 0;">
+        <li>Random removal: ≈ <b>985</b> nodes.</li>
+        <li>Targeted removal: ≈ <b>928</b> nodes.</li>
+      </ul>
+      <p class="small" style="margin:6px 0 0;">Barely different — there are <b>no hubs</b>, so no node is special.</p>
+    </div>
+  </div>
+  <div class="banner">
+    <h3>Power-law networks are robust to random failure but fragile to a targeted attack on their hubs.</h3>
+    <p>An attacker who knows the degrees (e.g. seeding a virus) hits the hubs; random damage mostly wastes itself on low-degree nodes.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why does targeted removal shatter a real network in ~1 step but random removal doesn't?
+        <div class="ans">Real networks are held together by a few high-degree hubs. Removing a hub cuts many connections at once (fast disconnection); a random node is almost always low-degree and its loss barely matters.</div></li>
+      <li>On a random $G(n,p)$ graph, random and targeted removal need roughly the same number of deletions. What does that reveal?
+        <div class="ans">That $G(n,p)$ has <b>no hubs</b> — degrees are all near the mean, so no single node is critical. "Targeting the highest degree" isn't meaningfully better than picking at random.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 126–127</div>
+    <h2>A possible reason + the long tail</h2>
+    <div class="lsub">how the rich got rich in the first place, and why niche beats the bestseller</div>
+  </div>
+
+  <h2 class="section" id="s8"><span class="num">8</span> Path dependence, and the long tail</h2>
+  <p>Preferential attachment says the rich get richer — but how did a node get rich <em>first</em>? If you "rewound history," would Harry Potter still be the bestseller, would the same songs still win? A famous experiment tested this.</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">🎵 the parallel-worlds music experiment</span>
+    <p style="margin:2px 0;">Put the same <b>48 songs</b> on several separate download portals (<span class="def-term">parallel worlds</span>), each seen by a <em>different</em> random crowd, and <b>show each song's download count</b>. Result: <mark>a different song won in each world.</mark> Early, essentially random, popularity got <b>displayed</b>, which biased newcomers toward it, which raised its count further — a feedback loop. In a control world where counts were <em>hidden</em>, the winners changed again.</p>
+  </div>
+  <p>So success is partly <b>luck amplified by visibility</b> (path dependence). The professor's <b>Quora</b> example: the top-upvoted answer is shown first, gets more views, gets more upvotes — even a genuinely better late answer stays buried. Two honest <b>open questions</b> remain: (1) is rich-get-richer really <em>why</em> power laws appear (still a hypothesis)? (2) how do you subtract out popularity-noise to recover an item's <em>true</em> quality?</p>
+
+  <h3 class="sub">The long tail (and Zipf's law)</h3>
+  <p>Rank products by popularity (x) and plot sales (y): a power-law drop. Why does a bookstore stock 5000 titles instead of just the 10% bestsellers? Because of the <span class="def-term">long tail</span>.</p>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(head vs tail, lecture 127)</span></span>
+    <ol>
+      <li>Total sales = area under the rank-vs-sales curve.</li>
+      <li>The <b>head</b> (top few bestsellers) is tall but narrow — often only ~<b>20%</b> of total sales.</li>
+      <li>The <b>tail</b> (the many niche titles) is short but very long — often ~<b>80%</b> of total sales.</li>
+      <li>So discarding the niche 90% would throw away most of the revenue. $$ \boxed{\text{the long tail can outweigh the bestsellers combined}} $$</li>
+    </ol>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "popular products are few but loud; niche products are many but quiet — and together the quiet many can dominate." The same shape appears in YouTube views, and in <b>Zipf's law</b>: the $k$-th most frequent English word appears with frequency $\propto 1/k$ ("the" tops it). The long, low tail holds a huge share of the total.</div>
+  <p class="small">One more subtlety the professor stresses: the <b>shape</b> is preserved over time even as individual items move along it. Every bestseller has a <b>shelf life</b> — after its months at the head it slides down into the niche tail (becoming a "classic"), while fresh hits keep entering the head. The exact analogy holds for network nodes: a popular node need not stay popular; it too can drift toward the low-degree tail with time.</p>
+
+  <div class="quiz">
+    <ol>
+      <li>What is the "long tail," and why can't a big store stock only bestsellers?
+        <div class="ans">The long, low part of a popularity curve — the many niche items each selling a little. Summed, that tail can be ~80% of total sales, so dropping it (keeping only the ~20% head) would lose most of the revenue.</div></li>
+      <li>The music experiment gave different winners in each parallel world. What does that show about "the rich get richer"?
+        <div class="ans">Which item becomes a hit is partly <b>luck amplified by displayed popularity</b> (path dependence) — not purely intrinsic quality. Showing early counts biases later choosers, so different worlds crown different winners.</div></li>
+      <li>State Zipf's law for word frequency.
+        <div class="ans">The frequency of the $k$-th most common word is proportional to $1/k$ — the most frequent word ("the") is used about twice as often as the 2nd, three times the 3rd, and so on. It's a power law with exponent 1.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 9 · Power laws, preferential attachment &amp; the long tail ✏️</div>
+  <a class="backtop" href="#top">↑ back to contents</a>
+
+
+</div>
+
+</body>
+</html>

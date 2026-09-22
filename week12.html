@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 12 · How to Go Viral (Cores &amp; Cascades)</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 12 — How to Go Viral: Search, Cores &amp; Cascades</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 154–166 · watch a ring's diameter collapse, code myopic (decentralized) search, then find the network's most influential spreaders with k-shell decomposition — and the surprise: pseudo-cores work as well as the core.</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky pink">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Add just a few <b>weak ties</b> to a ring and its diameter <b>plummets</b> — the small world, in a plot. Then code <b>myopic search</b>: a greedy, purely local walk that forwards toward whichever neighbour looks closest to the target (using only the ring, blind to others' long links). It isn't optimal, but its path length grows only <mark>logarithmically</mark> with network size. The week's real question: to make a meme go <b>viral</b>, which nodes should you seed? Not the highest-degree ones — the <b>core</b>. We find it with <b>k-shell decomposition</b> (peel off low-degree nodes bucket by bucket; the last bucket is the core), simulate spread with the <b>independent cascade model</b>, and discover that <mark>coreness predicts influence better than degree, closeness, or betweenness</mark>. Final twist: cascade capacity <b>plateaus</b> across the inner shells, so a big band of easier-to-reach <b>pseudo-cores</b> spreads a meme just as well as the hard-to-reach celebrities at the very centre.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 12</h3>
+    <ol>
+      <li><a href="#s1">Weak ties collapse the diameter</a></li>
+      <li><a href="#s2">Myopic (decentralized) search — the code</a></li>
+      <li><a href="#s3">Myopic vs optimal &amp; its time complexity</a></li>
+      <li><a href="#s4">Going viral: quality, structure, key nodes</a></li>
+      <li><a href="#s5">The core, k-cores &amp; k-shell decomposition</a></li>
+      <li><a href="#s6">The independent cascade model</a></li>
+      <li><a href="#s7">Coreness predicts influence · pseudo-cores</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 154</div>
+    <h2>Weak ties collapse the diameter</h2>
+    <div class="lsub">the small world, plotted</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> Watch the diameter fall</h2>
+  <p>Recall the <span class="def-term">diameter</span> of a graph: the <b>longest shortest-path</b> — over all pairs of nodes, take the shortest distance between them, and report the maximum. Start with last week's ring of 100 nodes (each linked to 2 neighbours per side); its diameter is 25 (you leap 2 nodes per hop, so ~50/2 = 25 hops across). Now add weak ties one at a time and re-measure.</p>
+  <div class="code">
+    <div class="fname"><span>diameter_vs_weakties.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">x, y = [], []
+x.append(0)
+y.append(nx.diameter(G))          # diameter with 0 weak ties
+
+for t in range(1, 101):           # add up to 100 weak ties
+    add_long_link(G)              # (from Week 11)
+    x.append(t)
+    y.append(nx.diameter(G))
+
+plt.xlabel("number of weak ties added")
+plt.ylabel("diameter")
+plt.plot(x, y)
+plt.show()
+</code></pre>
+  </div>
+  <div class="sketch-box tint-yellow">
+    <span class="label">💡 what the curve shows</span>
+    <p style="margin:2px 0;">The drop is <b>not linear</b> — it's steep then flattening. Diameter <b>25 → 18</b> after just 1–2 weak ties, then down to <b>3–4</b> after ~80 ties. <mark class="yellow">A handful of long-range shortcuts is enough to make a big network small.</mark> (Since we only <em>add</em> edges and the ring is already connected, the graph stays connected, so the diameter is always a finite positive number.)</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Define the diameter of a graph.
+        <div class="ans">The largest of all pairwise shortest-path distances: for every pair of nodes take their shortest distance, then take the maximum. It's the "longest shortest path."</div></li>
+      <li>Why does a ring's diameter fall so fast when you add weak ties?
+        <div class="ans">Each long-range weak tie is a shortcut that lets paths jump across the ring instead of walking around it, so a few of them slash the worst-case distance. The reduction is sharply non-linear — the first few ties help the most.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 155–156</div>
+    <h2>Myopic (decentralized) search — the code</h2>
+    <div class="lsub">a greedy local walk toward the target</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Search that only sees its neighbours</h2>
+  <p>Milgram's letter-forwarding is <span class="def-term">myopic search</span> ("myopia" = short-sightedness): from the node currently holding the letter, look at its neighbours, estimate each one's distance to the target, and forward to the closest. Crucially, <mark>when you judge a neighbour's distance you use only the ring (homophily) structure — you don't know your neighbours' long-range ties.</mark></p>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the trick: two graphs</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">G</code> — the <b>full</b> small-world graph (ring + weak ties); you actually <em>move</em> along its edges.</li>
+      <li><code class="inline">H = G.copy()</code> built with <b>homophily only</b> (the ring, no weak ties); you use it to <b>estimate distances</b>, because a searcher doesn't know others' shortcuts.</li>
+    </ul>
+  </div>
+  <div class="code">
+    <div class="fname"><span>myopic_search.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+
+def find_best_neighbor(G, H, current, target):
+    best, best_dist = None, G.number_of_nodes()   # sentinel: bigger than any real distance
+    for nb in G.neighbors(current):               # move along the FULL graph...
+        # ...but judge distance on the ring H (ignore long-range ties)
+        d = len(nx.shortest_path(H, nb, target)) - 1
+        if d &lt; best_dist:
+            best_dist = d
+            best = nb
+    return best
+
+def myopic_search(G, H, u, v):
+    path = [u]
+    current = u
+    while current != v:
+        current = find_best_neighbor(G, H, current, v)
+        path.append(current)
+    return path
+</code></pre>
+  </div>
+  <p><code class="inline">nx.shortest_path(H, a, b)</code> returns the node list of a shortest path in <code class="inline">H</code>; its length minus 1 is the hop-distance. <code class="inline">find_best_neighbor</code> is the standard "track-the-minimum" pattern (start high, keep the smallest). The optimal path, for comparison, is just <code class="inline">nx.shortest_path(G, u, v)</code> on the <em>full</em> graph — which needs global knowledge.</p>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(10-node ring, lecture 155)</span></span>
+    <ol>
+      <li>10 nodes in a ring, each linked to 1 left + 1 right neighbour, plus weak ties 10–6, 1–8, 4–8. Source = node 1, target = node 6.</li>
+      <li>Node 1's neighbours are 10, 2, 8. Ring-distances to 6: node 2 → 4, node 10 → 4, node 8 → 2. Closest is <b>8</b>, so forward to 8.</li>
+      <li>From 8, evaluate <em>all</em> its neighbours' ring-distances to 6: node 9 → 3, node 1 → 5, node 4 → 2, node 7 → <b>1</b> (closest) → forward to 7.</li>
+      <li>7's neighbour is the target 6 → deliver. Myopic path = 1→8→7→6, length <b>3</b>.</li>
+      <li>But the true optimal path is 1→10→6 (via the 10–6 weak tie), length <b>2</b>. $$ \boxed{\text{myopic is good, but not optimal}} $$</li>
+    </ol>
+    <p class="small" style="margin-top:6px;">Myopic loses because node 1 can't "see" that its neighbour 10 has a shortcut straight to 6 — it only knows ring-distances. With just local knowledge, a length-3 path is still a fine result.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why does myopic search estimate distances on <code class="inline">H</code> (the ring) rather than on <code class="inline">G</code> (the full graph)?
+        <div class="ans">Because a real searcher knows their own long-range ties but <em>not</em> their neighbours'. Judging distance on the homophily ring models that local-only knowledge; moving still happens on the full graph <code class="inline">G</code>.</div></li>
+      <li>Is myopic search optimal? Explain with the example.
+        <div class="ans">No. On the 10-node ring it found 1→8→7→6 (length 3), while the true shortest path was 1→10→6 (length 2) via a weak tie node 1 couldn't see. Greedy local choices don't guarantee the global optimum.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 157–158</div>
+    <h2>Myopic vs optimal &amp; its time complexity</h2>
+    <div class="lsub">how good, and how fast, is decentralized search?</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> Measuring the search</h2>
+  <p><b>Myopic vs optimal.</b> On a 100-node ring with 10 weak ties, compare the two on the 51 <span class="def-term">diametrically-opposite pairs</span> $(0,50),(1,51),\dots,(50,99)$ — the hardest cases. Plotting both path lengths: myopic (red) is usually longer than optimal (blue), but on ~11 of the pairs it happens to match. So myopic ≈ optimal often, and never terrible.</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">📊 time complexity of myopic search</span>
+    <p style="margin:2px 0;">Now vary the network size $n = 100, 200, \dots, 1000$ (keeping weak ties at <b>10% of nodes</b>), and average the myopic path length over the diametrically-opposite pairs. Plotting average path length vs $n$, the professor asks which growth rate it matches — $O(n)$, $O(n^2)$, $O(n/2)$, $O(\log n)$ or $O(\log^2 n)$? The answer: it's <b>not linear</b> — <mark class="mint">it grows logarithmically.</mark> (e.g. 100 nodes → ~13 steps, 200 → ~19.) That's why the world feels small even as it grows: local greedy search scales like $\log n$, not $n$.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why pick diametrically-opposite node pairs to test the search?
+        <div class="ans">They're the farthest-apart pairs on the ring, so they're the hardest cases — the sternest test of whether local search still finds short paths.</div></li>
+      <li>How does myopic-search path length scale with network size $n$, and why does that matter?
+        <div class="ans">Logarithmically in $n$ (not linearly). It means even huge networks stay navigable with purely local decisions — the essence of "small world."</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 159–161</div>
+    <h2>Going viral: quality, structure, key nodes</h2>
+    <div class="lsub">what you can and can't control to make a meme spread</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Three levers for going viral</h2>
+  <p>An <span class="def-term">internet meme</span> is anything that spreads online — image, video, text. Like a disease, some memes go <b>viral</b> (Gangnam Style, Nyan Cat); most don't (billions of memes, limited attention). Today anyone can go viral just by uploading — the professor's example is <b>Justin Bieber</b>: as an 11–12-year-old he and his mother posted his school-singing clips on YouTube; the views and likes grew, a producer noticed the talent and pulled him into the industry. This is exactly the Week-7 cascade question ("will my friend's sports shoes catch on?"). What can you tune?</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 three levers</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li><b>The content's quality</b> — novelty, music, whatever makes it worth sharing. You control this.</li>
+      <li><b>The network structure</b> — how people are wired on Facebook/Twitter. Same for everyone; you <em>can't</em> change it.</li>
+      <li><b>Which people you seed</b> — infect the right <span class="def-term">key nodes</span>. If Amitabh Bachchan or a public figure re-shares your post, it explodes. This is the lever we can pull cleverly.</li>
+    </ol>
+  </div>
+  <p>So: <em>which</em> nodes are the "key" ones? Candidate measures — highest <b>degree</b> (most friends)? highest <b>closeness</b> (structurally near everyone)? highest <b>betweenness</b> (bridges between communities)? or something else? That's the question the rest of the week answers.</p>
+
+  <div class="quiz">
+    <ol>
+      <li>Of the three levers for going viral, which can you actually manipulate, and which is fixed?
+        <div class="ans">You can control the <b>content quality</b> and <b>which nodes you seed</b>. The <b>network structure</b> is the same for everyone and can't be changed.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 162–163</div>
+    <h2>The core, k-cores &amp; k-shell decomposition</h2>
+    <div class="lsub">peeling a network to find its influential centre</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> Finding the core</h2>
+  <p>Real networks have a <span class="def-term">core-periphery structure</span>: a small, densely-interconnected <b>core</b> (well-resourced, highly-connected people) plus a large <b>periphery</b> on the boundary. Seed one core node and it quickly infects the whole (tightly-knit) core, which is connected to everyone — so the meme reaches the periphery too. So: <b>infect the core.</b> But how do you <em>find</em> it? Start with a clean definition:</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 k-core</span>
+    <p style="margin:2px 0;">A <span class="def-term">k-core</span> is a subgraph in which <b>every node has degree ≥ k</b> (counting only edges inside the subgraph). So the 1-core needs every node to have ≥1 neighbour, the 2-core ≥2, and so on. Higher $k$ ⇒ deeper, denser core.</p>
+  </div>
+
+  <h3 class="sub">K-shell decomposition — peel the onion</h3>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the algorithm</span>
+    <ol class="notes" style="margin:4px 0 0;">
+      <li><b>Bucket 1:</b> repeatedly remove every node of degree ≤ 1 (removing a node deletes its edges, which can drop other nodes to degree 1 — keep going) until no node has degree ≤ 1. Those removed form <b>shell 1</b>.</li>
+      <li><b>Bucket 2:</b> now repeatedly remove nodes of degree ≤ 2 until none remain → <b>shell 2</b>.</li>
+      <li>Continue with 3, 4, … until the network is empty.</li>
+      <li>The <span class="def-term">core</span> = the <b>last</b> (innermost) shell removed. A node's <span class="def-term">core number</span> is the shell it was peeled in.</li>
+    </ol>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "peel off the flimsiest nodes first, then the next-flimsiest, until only the tough centre is left." Careful: a bucket is a <em>shell</em>, not the whole k-core. The actual <b>k-core</b> is the union of shell $k$ and all deeper shells: $\;\text{k-core}=\bigcup_{j\ge k}\text{bucket}_j\;$ (anything with degree ≥ 3 trivially has degree ≥ 2, so it sits in every lower core too).</p></div>
+
+  <div class="code">
+    <div class="fname"><span>k_shell_decomposition.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import networkx as nx
+
+def find_low_degree(H, it):
+    return [v for v in H.nodes() if H.degree(v) &lt;= it]
+
+def k_shell_decomposition(G):
+    H = G.copy()
+    buckets = []          # buckets[k-1] will be shell k
+    it = 1                # current degree threshold
+    tmp = []              # shell being filled
+    while True:
+        low = find_low_degree(H, it)
+        if low:                       # nodes of degree <= it still exist
+            for v in low:
+                H.remove_node(v)      # removing a node also drops its edges
+                tmp.append(v)
+            if H.number_of_nodes() == 0:   # network emptied → close last shell
+                buckets.append(tmp)
+                break
+        else:                         # no degree<=it nodes left: close this shell
+            buckets.append(tmp)
+            tmp = []
+            it += 1
+    return buckets                    # buckets[-1] is the CORE
+</code></pre>
+  </div>
+  <p class="small">NetworkX gives this for free: <code class="inline">nx.core_number(G)</code> returns each node's core number directly.</p>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(peeling a labelled network, lecture 163)</span></span>
+    <ol>
+      <li><b>Shell 1:</b> first peel the degree-1 nodes (say 14, 12, 11); removing them drops others to degree 1, so keep peeling — more nodes (2, 4, 8, 6, 7, 9, 17, 3) then 1 and 5 leave — until no node has degree ≤ 1.</li>
+      <li><b>Shell 2:</b> now peel degree-≤2 nodes (say 11, 12, then 10 once its neighbours are gone).</li>
+      <li><b>Shell 3 (the core):</b> whatever survives to the end — the innermost, most tightly-knit nodes.</li>
+      <li>Each node's <b>core number</b> = the shell it was peeled in; the last shell is the network's core. $$ \boxed{\text{peel degree} \le 1,\ \text{then} \le 2,\ \dots\ \text{— the survivors are the core}} $$</li>
+    </ol>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ common bugs</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>Work on a <b>copy</b> (<code class="inline">H = G.copy()</code>) — you're destroying the graph as you peel, and you'll still want the original.</li>
+      <li>Check degrees on <code class="inline">H</code>, not <code class="inline">G</code> — after peeling, <code class="inline">H</code> has fewer nodes/edges; using <code class="inline">G</code> reads stale degrees.</li>
+      <li>Don't loop forever: add the <b>terminating check</b> — when <code class="inline">H.number_of_nodes() == 0</code>, append the final shell and <code class="inline">break</code>.</li>
+      <li>When a peel drops a node <em>below</em> the current threshold, it goes in the <b>current</b> bucket (that's why the test is degree ≤ it, not exactly it).</li>
+    </ul>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>What is a k-core, and where is a network's "core" in a k-shell decomposition?
+        <div class="ans">A k-core is a subgraph where every node has degree ≥ k. The core is the <b>innermost (last) shell</b> peeled off — the nodes with the highest core number.</div></li>
+      <li>Bucket 3 of the decomposition holds some nodes. Are those the entire 3-core?
+        <div class="ans">No — bucket 3 is just shell 3. The 3-core is the <em>union</em> of shell 3 and every deeper shell ($\bigcup_{j\ge3}\text{bucket}_j$), since deeper-shell nodes also satisfy degree ≥ 3.</div></li>
+      <li>Why must k-shell decomposition read degrees from the shrinking copy <code class="inline">H</code>?
+        <div class="ans">Because peeling removes nodes and edges; a node's <em>current</em> degree (which decides when it's peeled) only makes sense on the reduced graph <code class="inline">H</code>, not on the original <code class="inline">G</code>.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURE 164</div>
+    <h2>The independent cascade model</h2>
+    <div class="lsub">simulating a meme spreading from a seed set</div>
+  </div>
+
+  <h2 class="section" id="s6"><span class="num">6</span> Measuring influence by simulation</h2>
+  <p>To measure how good a seed set is, simulate the spread with the <span class="def-term">independent cascade model</span> — a close cousin of SIR. Seed nodes are infected at $t=0$. Each newly-infected node gets <b>one</b> chance to infect each not-yet-infected neighbour, independently, with probability $p$. When no new node is infected in a round, stop. The <span class="def-term">influential power</span> of the seed set = the final number of infected nodes.</p>
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ three lists drive it</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><code class="inline">seed</code> — the initially infected nodes (fixed).</li>
+      <li><code class="inline">just_infected</code> — nodes infected in the <em>latest</em> round (only these get to spread next).</li>
+      <li><code class="inline">infected</code> — everyone infected so far. Stop when <code class="inline">just_infected</code> is empty; return <code class="inline">infected</code>.</li>
+    </ul>
+  </div>
+  <div class="code">
+    <div class="fname"><span>independent_cascade.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import random
+
+def independent_cascade(G, seed, p=0.5):
+    just_infected = list(seed)
+    infected      = list(seed)
+    while just_infected:                 # stop when no new infections
+        tmp = []                         # nodes infected in THIS round
+        for u in just_infected:
+            for x in G.neighbors(u):
+                if x not in infected and x not in tmp:   # not already caught / queued
+                    if random.random() &lt; p:              # infect with probability p
+                        tmp.append(x)
+        infected += tmp
+        just_infected = tmp
+    return infected            # len(infected) = influential power of `seed`
+</code></pre>
+  </div>
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ why the double guard <code class="inline">x not in infected and x not in tmp</code></span>
+    <p style="margin:2px 0;">Because it's a graph, not a tree, one susceptible node can be a neighbour of <em>two</em> just-infected nodes. Without the <code class="inline">x not in tmp</code> check you'd add it twice (duplicate). And <code class="inline">x not in infected</code> stops re-infecting someone already caught — a node gets only one chance to be infected, and infectors get only one chance to spread.</p>
+  </div>
+  <p class="small">It's essentially SIR (susceptible → infected → recovered), and the professor's school analogy fits: infected students spread on their first day but get <em>no</em> further chance the next day.</p>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(one cascade run, seed = {12, 10}, p = 0.5)</span></span>
+    <ol>
+      <li><b>t=0:</b> nodes 12 and 10 infected.</li>
+      <li><b>Round 1:</b> node 12 infects neighbour 14; node 10 infects neighbour 5. Now 12 and 10 are spent (they get no further turn).</li>
+      <li><b>Round 2:</b> 14 infects 13; 5 infects 7.</li>
+      <li><b>Round 3:</b> 13 and 7 infect no one → <code class="inline">just_infected</code> is empty → <b>stop</b>. Total infected = {12,10,14,5,13,7} → influential power = <b>6</b>. $$ \boxed{\text{influential power of a seed set} = \text{final } |\text{infected}|} $$</li>
+    </ol>
+    <p class="small" style="margin-top:6px;">To rank seed <em>sets</em>: seeding {1, 6, 10} might end with 6 infected (power 6), while {2, 16, 17} ends with 8 (power 8) — so the second set is more influential. Trying <em>all</em> seed sets is exact but very slow, which is why the coreness shortcut (§7) matters.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>In the independent cascade model, when does the process stop, and what is the influential power of the seed set?
+        <div class="ans">It stops when a round produces no new infections (<code class="inline">just_infected</code> is empty). The influential power is the <b>total number of infected nodes</b> at the end (<code class="inline">len(infected)</code>).</div></li>
+      <li>Why is it called <em>independent</em> cascade?
+        <div class="ans">Because each edge's success in passing the infection is decided by its own independent coin flip — whether one edge transmits has no effect on whether another does.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 165–166</div>
+    <h2>Coreness predicts influence · pseudo-cores</h2>
+    <div class="lsub">which centrality wins, and the easier way to go viral</div>
+  </div>
+
+  <h2 class="section" id="s7"><span class="num">7</span> The winning measure — and a shortcut</h2>
+  <p>Now the payoff experiment. For each node, rank it by four <span class="def-term">centrality measures</span> and by actual influence:</p>
+  <ul class="notes">
+    <li><b>degree</b> — <code class="inline">G.degree(v)</code></li>
+    <li><b>closeness</b> — <code class="inline">nx.closeness_centrality(G, v)</code> (how near it is to everyone)</li>
+    <li><b>betweenness</b> — <code class="inline">nx.betweenness_centrality(G)</code> (how much it bridges communities)</li>
+    <li><b>coreness</b> — <code class="inline">nx.core_number(G)</code> (its k-shell number)</li>
+    <li><b>influence</b> — average final cascade size when that node is the seed (run <code class="inline">independent_cascade</code> ~1000 times and average, since it's random)</li>
+  </ul>
+  <p class="small">A caveat when you reproduce this: degree, closeness and coreness are exactly repeatable, but <code class="inline">nx.betweenness_centrality</code> uses a randomized (sampling) algorithm, so its values — and thus its ranking — can shift slightly between runs.</p>
+  <div class="banner">
+    <h3>Of degree, closeness and betweenness, it is <em>coreness</em> that best matches a node's real influence.</h3>
+    <p>A node deep in the core (high core number) is the best spreader — even a very high-degree node can have low influence if it sits near the periphery.</p>
+  </div>
+
+  <h3 class="sub">Pseudo-cores — the practical twist</h3>
+  <p>Core nodes are the best seeds — but they're the <b>hardest to reach</b> (celebrities, public figures; convincing them costs money you may not have). So examine the <span class="def-term">cascade capacity</span> of each shell: seed from shell 1, measure the final infected count; then shell 2, shell 3, … up to the innermost core.</p>
+  <div class="two-col">
+    <div class="diagram">
+      <h4>cascade capacity vs shell</h4>
+      <svg viewBox="0 0 220 130">
+        <g font-family="Kalam" font-size="10" fill="var(--ink)">
+          <line x1="24" y1="108" x2="205" y2="108" stroke="var(--ink)" stroke-width="1.3"/>
+          <line x1="24" y1="108" x2="24" y2="14" stroke="var(--ink)" stroke-width="1.3"/>
+          <!-- rising then plateau -->
+          <path d="M28 100 C60 92 80 40 120 30 C150 24 185 25 200 25" fill="none" stroke="var(--coral)" stroke-width="2.3"/>
+          <!-- plateau marker -->
+          <line x1="120" y1="30" x2="120" y2="108" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="96" y="122">pseudo-core band</text>
+          <text x="70" y="24" fill="var(--coral)">plateau</text>
+          <text x="120" y="122" >→ core</text>
+          <text x="120" y="14" transform="rotate(0)"></text>
+          <text x="30" y="12">capacity</text>
+          <text x="150" y="122">shell →</text>
+        </g>
+      </svg>
+      <div class="cap">capacity rises, then flattens well before the innermost core.</div>
+    </div>
+    <div>
+      <p>You'd expect capacity to keep rising all the way to the innermost core. But on <b>real social-network datasets</b> (freely downloadable — Facebook, Google+, Twitter, and almost any other), it <b>rises, hits a maximum, then stays constant</b> — a plateau. So a whole band of shells <em>outside</em> the true core already reach the same cascade capacity.</p>
+      <div class="sketch-box tint-yellow" style="margin-top:6px;">
+        <span class="label">🏁 pseudo-cores</span>
+        <p style="margin:2px 0;">Those plateau nodes are the <span class="def-term">pseudo-cores</span>. <mark class="yellow">You don't need the unreachable celebrities at the very centre — a large, easier-to-reach band of pseudo-cores spreads your meme just as effectively.</mark></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Among degree, closeness, betweenness and coreness, which best predicts a node's influence (cascade size)?
+        <div class="ans"><b>Coreness</b> (the k-shell / core number). A deep-core node spreads best; a high-degree node near the periphery can be a poor spreader.</div></li>
+      <li>How is a shell's "cascade capacity" measured, and what surprising shape does it take across shells?
+        <div class="ans">Seed the independent cascade from that shell and record the final infected count. Instead of rising all the way to the core, capacity rises then <b>plateaus</b> — a band of outer shells matches the core's capacity.</div></li>
+      <li>What is a pseudo-core, and why is it useful for going viral?
+        <div class="ans">Pseudo-cores are the plateau nodes just outside the true innermost core that achieve the same cascade capacity. They're far easier (cheaper) to reach than the celebrity core, yet spread a meme just as widely — so seed them instead.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 12 · How to go viral · course notes complete 🎓✏️</div>
+  <a class="backtop" href="#top">↑ back to contents</a>
+
+
+</div>
+
+</body>
+</html>

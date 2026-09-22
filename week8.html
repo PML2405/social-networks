@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Networks — Week 8 · Hubs, Authorities &amp; PageRank as a Matrix</title>
+
+<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
+
+<style>
+  :root{
+    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
+    --ink:#2E2A3D; --ink-soft:#5b5678;
+    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
+    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:#DDD6C4; }
+  body{
+    font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 12px 90px;
+  }
+  svg.defs{ position:absolute; width:0; height:0; }
+
+  /* ---------- page shell (ruled paper) ---------- */
+  .page{
+    position:relative; width:100%; max-width:920px;
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
+    background-color:var(--paper);
+    border-radius:6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
+    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
+  }
+  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
+  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
+
+  /* ---------- cover (series) ---------- */
+  .cover{ text-align:center; padding:14px 10px 8px; }
+  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
+  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
+  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+
+  /* ---------- table of contents (series) ---------- */
+  .toc{ margin:22px auto 6px; max-width:640px; }
+  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
+  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
+  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
+  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
+  .toc a:hover{ background:var(--yellow); }
+
+  /* ---------- lecture divider ---------- */
+  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
+    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
+  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
+  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
+  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
+
+  /* ---------- title block + wavy underline ---------- */
+  .title-block{ margin:22px 0 6px; }
+  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
+  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
+  .wavy{ display:block; width:230px; height:12px; }
+
+  /* ---------- headings ---------- */
+  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
+  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
+    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
+  p{ font-size:17px; line-height:1.62; margin:8px 0; }
+  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
+  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
+
+  /* ---------- sticky note (big-picture TL;DR) ---------- */
+  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
+    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
+    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
+  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
+  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
+    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
+  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
+
+  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
+  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
+    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
+  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
+  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
+  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .def-term{ font-weight:700; color:#231f33; }
+
+  /* highlighter marker */
+  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
+  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
+  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
+  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
+
+  /* ---------- equation cards (KaTeX inside) ---------- */
+  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
+  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
+    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
+    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
+  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
+  .index-card .katex{ font-size:1.12em; }
+  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
+
+  /* speech bubble — "read the formula out loud" */
+  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
+    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
+  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
+    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
+  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+
+  /* worked-example card */
+  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
+    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
+  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
+  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
+
+  /* figure card (REAL source image) */
+  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
+    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
+  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
+  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
+  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
+
+  /* diagram card (redrawn inline SVG) */
+  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
+    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
+  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  /* comparison table */
+  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
+  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
+  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
+  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
+  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
+
+  /* ===== CODING components ===== */
+  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
+    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
+  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
+    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
+  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
+  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
+    background:transparent; padding:0; }
+  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
+    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
+  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
+    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
+  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
+
+  /* takeaway banner */
+  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
+    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
+  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
+  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
+
+  /* quiz card */
+  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
+  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
+    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
+  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
+  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
+
+  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
+  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
+
+  @media (max-width:640px){
+    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
+    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- hand-jitter filter + arrow markers; define ONCE per page -->
+<svg class="defs">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
+    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
+  </defs>
+</svg>
+
+<div class="page" id="top">
+  <div class="margin-rule"></div>
+  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
+
+  <!-- ============ title ============ -->
+  <div class="title-block">
+    <div class="small" style="letter-spacing:2px;">SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)</div>
+    <h1>Week 8 — Hubs, Authorities &amp; PageRank as a Matrix</h1>
+    <svg class="wavy" viewBox="0 0 230 12"><path d="M2 7 Q20 1 40 7 T80 7 T120 7 T160 7 T200 7 T228 7" fill="none" stroke="var(--coral)" stroke-width="3" stroke-linecap="round"/></svg>
+    <div class="tsub">Lectures 101–114 · rating the place <em>and</em> the recommender, the Hubs &amp; Authorities (HITS) idea, and finally the <b>proof</b> — why PageRank's repeated resource-sharing always converges (eigenvectors + Markov matrices).</div>
+  </div>
+
+  <!-- ============ big picture ============ -->
+  <div class="sticky blue">
+    <div class="lead">🧠 the big picture, first</div>
+    <p>Two things point at each other: a <b>recommender</b> (a list) and a <b>resource</b> (a place). A good list points to good places; a good place is pointed to by good lists — a <b>recursive</b> rating you solve by the <b>principle of repeated improvement</b> (assign, add up your neighbours' scores, normalize, repeat). That gives every node a <b>hub</b> score (how well it points out) and an <b>authority</b> score (how well it's pointed at) — this is <b>HITS</b>. The exact same repeated-sharing process, applied to a directed graph where each node splits its value along its out-edges, <em>is</em> <b>PageRank</b>. The whole week then answers one question: <mark>why does this always converge?</mark> Answer: repeatedly applying a matrix to any vector pulls it onto the <b>eigenvector of the largest eigenvalue</b>; and PageRank's sharing matrix is a <b>Markov matrix</b> (columns sum to 1), whose largest eigenvalue is exactly <b>1</b> — so the total is conserved and the ranking is a unique stable vector.</p>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <div class="toc"><div class="toc-card">
+    <h3>📒 what's inside Week 8</h3>
+    <ol>
+      <li><a href="#s1">The story: rate the place AND the recommender</a><br><span class="small">principle of repeated improvement</span></li>
+      <li><a href="#s2">Hubs &amp; Authorities (HITS)</a><br><span class="small">two scores per node, a recursive definition, the algorithm</span></li>
+      <li><a href="#s3">PageRank revisited — resource sharing</a><br><span class="small">the 3-node worked example, conservation, a 5-node example</span></li>
+      <li><a href="#s4">Why it converges · part 1 — a matrix pulls every vector one way</a><br><span class="small">normalization + the numpy experiment</span></li>
+      <li><a href="#s5">Why it converges · part 2 — the eigenvector proof</a><br><span class="small">big + small ≈ big, and λ₁ᵏ dominates</span></li>
+      <li><a href="#s6">PageRank as a matrix operation + the Markov matrix</a></li>
+    </ol>
+  </div></div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 101–102</div>
+    <h2>The story: rate the place AND the recommender</h2>
+    <div class="lsub">a new city, two friends, and the principle of repeated improvement</div>
+  </div>
+
+  <h2 class="section" id="s1"><span class="num">1</span> A recommendation is really two ratings</h2>
+  <p>The professor opens, as always, with a story. You arrive in a new city for work; once free, you want good places to visit. A generic web search gives ten touristy hits that may not suit you, so you do what people actually do — <b>ask a friend</b>. You ring <b>Ramesh</b>; he sends you to a beach. You don't enjoy it, so you stop asking Ramesh. You ring <b>Raj</b>; he sends you to a book café — you love it. Next day you ask <b>Raj again</b>, he nails it again, and now you hold Raj in high regard.</p>
+  <p>Notice what happened. When a place turns out good, you give a star rating <em>to the place</em> — but you also silently raise your rating <em>of the person who sent you there</em>. And the higher your regard for that person, the more weight their next recommendation carries. So a single "good experience" feeds <b>two</b> things at once: the resource, and the pointer to it.</p>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the two roles</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Pointer / list / recommender</span> — Raj, or a printed list of "places to visit". It <b>points outward</b> to resources.</li>
+      <li><span class="def-term">Resource / authority</span> — the beach, the book café. It is the thing <b>pointed at</b>.</li>
+      <li>The link between them is mutual: <mark class="yellow">a better-rated list should point to better-rated places, and a better-rated place should be pointed to by better-rated lists.</mark> The definition of "good" on each side depends on the other — it is <b>recursive</b>.</li>
+    </ul>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚙️ the principle of repeated improvement</span>
+    <p style="margin:2px 0;">The professor's intuition-pumps: if you're in a good mood you treat your spouse well → they feel supported and get better → they support you → you get better… each side lifts the other, round after round. Likewise, <i>"divide your sorrow, multiply your happiness."</i> The formal name for this mutual lifting is the <span class="def-term">principle of repeated improvement</span>: <b>assign every node a score, then repeatedly replace each score by the (normalized) sum of the scores it is connected to, until the scores stop changing.</b></p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>Why is rating a recommender "recursive"?
+        <div class="ans">Because a recommender's score depends on the scores of the places it points to, and those places' scores depend on the scores of the recommenders pointing at them — each side is defined in terms of the other.</div></li>
+      <li>You loved Raj's café and stopped asking Ramesh. In "repeated-improvement" terms, what changed?
+        <div class="ans">The good resource (café) pushed up the pointer's (Raj's) score; Raj's higher score then makes his <em>next</em> recommendation count for more. Ramesh's score stayed low, so his future advice is down-weighted.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 103–104</div>
+    <h2>Hubs &amp; Authorities (HITS)</h2>
+    <div class="lsub">two scores per node · a recursive rule · guaranteed convergence</div>
+  </div>
+
+  <h2 class="section" id="s2"><span class="num">2</span> Two scores for every node</h2>
+  <p>Turn the story into a graph. Put recommenders on the left (<b>A, B, C</b>) and places on the right (<b>P1…P5</b>), with an arrow from a recommender to each place it suggests. This is a <span class="def-term">directed bipartite graph</span> (arrows only go left→right).</p>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>recommenders → places</h4>
+      <svg viewBox="0 0 260 170">
+        <g font-family="Kalam" font-size="12" fill="var(--ink)">
+          <!-- left nodes -->
+          <circle cx="40" cy="35" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="35" y="40">A</text>
+          <circle cx="40" cy="85" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="35" y="90">B</text>
+          <circle cx="40" cy="135" r="15" fill="var(--blue)" stroke="var(--ink)" stroke-width="1.6"/><text x="35" y="140">C</text>
+          <!-- right nodes -->
+          <circle cx="220" cy="20" r="13" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="212" y="24">P1</text>
+          <circle cx="220" cy="58" r="13" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="212" y="62">P2</text>
+          <circle cx="220" cy="96" r="13" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="212" y="100">P3</text>
+          <circle cx="220" cy="134" r="13" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="212" y="138">P4</text>
+          <circle cx="220" cy="158" r="12" fill="var(--pink)" stroke="var(--ink)" stroke-width="1.6"/><text x="212" y="162">P5</text>
+          <!-- A -> P1,P2,P3 -->
+          <path d="M55 33 Q140 20 207 21" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <path d="M55 35 Q140 48 207 57" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <path d="M55 40 Q140 75 207 95" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <!-- B -> P1,P4,P5 -->
+          <path d="M55 82 Q140 50 207 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <path d="M55 86 Q140 112 207 133" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <path d="M55 90 Q140 130 208 156" fill="none" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#arrow)"/>
+        </g>
+      </svg>
+      <div class="cap">a <b>hub</b> (left, blue) points out; an <b>authority</b> (right, pink) is pointed at. Illustrative edges.</div>
+    </div>
+    <div>
+      <p>Give the two roles their standard names:</p>
+      <div class="sketch-box tint-pink" style="margin-top:6px;">
+        <span class="label">📖 hub &amp; authority</span>
+        <ul class="notes" style="margin:4px 0 0;">
+          <li>A <span class="def-term">hub</span> is a node that <b>points outward</b> to resources — a recommender, a list. "A place where you get information."</li>
+          <li>An <span class="def-term">authority</span> is a node that is <b>pointed at</b> — the resource itself, where the solution lives.</li>
+        </ul>
+      </div>
+      <p class="small">In a <b>general</b> directed graph you don't split nodes into "only hubs" and "only authorities" — <mark>every node carries BOTH a hub score and an authority score at the same time.</mark> You point to some nodes (that's your hub-ness) and some nodes point to you (that's your authority-ness). The professor's picture: a room of 30 people where you ask someone for a solution and they say "I can't help, but I can point you to someone who can" — Sonia might point out to 3 people (her hub side) while 10 people point at her (her authority side).</p>
+    </div>
+  </div>
+
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">the two updates (one round of HITS)</div>
+      <div class="eqn" style="margin:6px 0;">$$ h(v)=\!\!\sum_{v \to w} a(w) \qquad a(v)=\!\!\sum_{u \to v} h(u) $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "a node's <b>hub</b> score is the sum of the <b>authority</b> scores of everyone it points to; a node's <b>authority</b> score is the sum of the <b>hub</b> scores of everyone pointing to it." Do both for all nodes, then <b>normalize</b> (divide by the total so scores don't blow up), and repeat.</div>
+
+  <h3 class="sub">Worked example — the "1,1,1 → normalize → repeat" loop</h3>
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(the professor's spreadsheet run, lecture 103)</span></span>
+    <ol>
+      <li><b>Setup.</b> A points to {P1,P2,P3}; B points to {P1,P4,P5}; C points to some places too. Start <em>every</em> node — A,B,C and P1…P5 — at score <b>1</b>.</li>
+      <li><b>Hub scores.</b> A's score becomes P1+P2+P3 = 1+1+1 = <b>3</b>; B's becomes P1+P4+P5 = <b>3</b>; and so on for C.</li>
+      <li><b>Normalize.</b> Divide each left score by the left total. If A,B,C are 3,3,1 the total is 7, so A → 3/7 ≈ 0.43. Do the same for the places (divide by the places' total).</li>
+      <li><b>Repeat.</b> Recompute, re-normalize. The professor watched the numbers on a Google Sheet: after a few rounds A drifts 0.42 → 0.45 → 0.46…; not settled yet, so he pulls the formula down to <b>~200 iterations.</b></li>
+      <li><b>Converged.</b> Eventually A locks at <b>0.4608111272…</b> and stops changing. $$ \boxed{\text{the scores converge — the proportions between nodes stop moving}} $$</li>
+    </ol>
+  </div>
+
+  <div class="sketch-box tint-yellow">
+    <span class="label">💡 what "convergence" means here</span>
+    <p style="margin:2px 0;">The raw numbers keep getting rescaled every round, but the <b>relative proportions</b> freeze: if node A ever settles at half of node B, it stays half of B forever. That frozen ratio <em>is</em> the ranking. The professor's promise: <mark class="mint">for ANY graph, the hubs-and-authorities repeated-improvement process always reaches such a stable point.</mark></p>
+  </div>
+
+  <div class="sketch-box tint-blue">
+    <span class="label">🕰️ where this came from</span>
+    <p style="margin:2px 0;">In the late 1990s people kept <span class="def-term">news lists</span> — pages linking to good news articles. How do you trust a list? If it points to genuinely good articles, it's a good list; and an article is good if good lists point to it. Exactly the Raj/Ramesh loop. That was the birth of <b>Hubs &amp; Authorities</b> (the HITS algorithm).</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>In a general (non-bipartite) directed graph, how many scores does a single node have, and what are they?
+        <div class="ans">Two: a hub score (= sum of the authority scores of nodes it points to) and an authority score (= sum of the hub scores of nodes pointing to it).</div></li>
+      <li>You run HITS and the raw scores keep shrinking every round because of normalization. Has it failed to converge?
+        <div class="ans">No — convergence is about the <em>ratios</em> between nodes, not the raw magnitudes. Once the proportions stop changing (A stays a fixed fraction of B), it has converged, even though every printed number is rescaled each round.</div></li>
+      <li>Why must you normalize each round?
+        <div class="ans">Because summing neighbours' scores makes the numbers grow without bound; dividing by the total keeps them bounded so you can watch the direction/proportions settle. Only the direction matters, not the size.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 105–108</div>
+    <h2>PageRank revisited — resource sharing</h2>
+    <div class="lsub">the same idea on a plain directed graph · a full worked trace · conservation</div>
+  </div>
+
+  <h2 class="section" id="s3"><span class="num">3</span> Sharing gold coins along the edges</h2>
+  <p>PageRank (seen conceptually a few weeks ago) is the same repeated-improvement idea, now on an ordinary directed graph. The rule: give every node some <b>resource</b> ("gold coins"); each round, <b>every node splits its value equally along its out-edges</b> and passes it on. A node's new value is the sum of what flows <em>in</em> to it.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">one PageRank round</div>
+      <div class="eqn" style="margin:6px 0;">$$ r(v)=\sum_{u \to v}\frac{r(u)}{\text{outdeg}(u)} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "a node's new score = for every node <b>u</b> that points to it, take u's score and divide by u's number of out-edges, then add them all up." A node with 2 out-edges gives <b>half</b> its value down each.</div>
+
+  <div class="two-col">
+    <div class="diagram">
+      <h4>the 3-node graph</h4>
+      <svg viewBox="0 0 200 150">
+        <g font-family="Kalam" font-size="13" fill="var(--ink)">
+          <circle cx="100" cy="28" r="17" fill="var(--yellow)" stroke="var(--ink)" stroke-width="1.7"/><text x="95" y="33">A</text>
+          <circle cx="40" cy="118" r="17" fill="var(--yellow)" stroke="var(--ink)" stroke-width="1.7"/><text x="35" y="123">B</text>
+          <circle cx="160" cy="118" r="17" fill="var(--yellow)" stroke="var(--ink)" stroke-width="1.7"/><text x="155" y="123">C</text>
+          <!-- B->A -->
+          <path d="M52 104 Q64 60 88 40" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <!-- A->C -->
+          <path d="M114 38 Q150 62 158 100" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <!-- B->C and C->B (two arrows between B and C) -->
+          <path d="M57 112 Q100 100 143 112" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <path d="M143 126 Q100 138 57 126" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arrow)"/>
+        </g>
+      </svg>
+      <div class="cap">edges: B→A, A→C, B→C, C→B. Out-degrees: A=1, B=2, C=1.</div>
+    </div>
+    <div>
+      <p>Start with resources split equally: <b>A=B=C=1/3</b>. Now apply the rule, node by node:</p>
+      <ul class="notes">
+        <li><b>A</b> receives only from B; B has 2 out-edges so gives half of 1/3 = <b>1/6</b>.</li>
+        <li><b>B</b> receives only from C; C has 1 out-edge so gives all of its 1/3 = <b>1/3</b>.</li>
+        <li><b>C</b> receives from A (all of A's 1/3) <em>and</em> from B (half of 1/3 = 1/6): 1/3 + 1/6 = <b>1/2</b>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(3-node PageRank, lectures 105–106)</span></span>
+    <p style="margin:0 0 6px;">Trace the vector (A, B, C), applying the sharing rule each iteration:</p>
+    <table class="hand trace" style="margin:6px 0;">
+      <thead><tr><th>iteration</th><th>A</th><th>B</th><th>C</th><th>sum</th></tr></thead>
+      <tbody>
+        <tr><td>0 (start)</td><td>1/3</td><td>1/3</td><td>1/3</td><td>1</td></tr>
+        <tr><td>1</td><td>1/6</td><td>1/3</td><td>1/2</td><td>1</td></tr>
+        <tr><td>2</td><td>1/6</td><td>1/2</td><td>1/3</td><td>1</td></tr>
+        <tr><td>⋯</td><td>⋯</td><td>⋯</td><td>⋯</td><td>1</td></tr>
+        <tr><td>converged</td><td><b>0.2</b></td><td><b>0.4</b></td><td><b>0.4</b></td><td><b>1</b></td></tr>
+      </tbody>
+    </table>
+    <p style="margin:4px 0 0;">On the spreadsheet the digits settle: 0.2, 0.39, 0.4 … then lock at exactly <b>(0.2, 0.4, 0.4)</b>. $$ \boxed{A=0.2,\; B=0.4,\; C=0.4} $$</p>
+  </div>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">⚖️ conservation — the sum stays 1</span>
+    <p style="margin:2px 0;">Look at the "sum" column: it's <b>1</b> in every row. The resources you handed out never leave the network — they only move along edges — so the total is conserved. The professor calls it the <mark class="mint">law of conservation of energy</mark> for the graph: <i>value can be neither created nor destroyed, only passed around.</i> That's exactly why the converged scores (0.2 + 0.4 + 0.4) add to 1 and can be read as a probability distribution / a ranking.</p>
+  </div>
+
+  <h3 class="sub">A bigger example — 5 nodes</h3>
+  <p>To check convergence isn't a fluke of a tiny symmetric graph, he repeats it on 5 nodes A–E and writes the update equations straight from the edges (each node's new value = the shares flowing in):</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">5-node update equations</div>
+      <div class="eqn" style="margin:6px 0; font-size:.95em;">$$ A=\tfrac{C}{3},\;\; B=A+\tfrac{E}{2},\;\; C=B,\;\; D=\tfrac{C}{3}+\tfrac{E}{2},\;\; E=D+\tfrac{C}{3} $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> C has 3 out-edges, so anyone fed by C gets "C/3"; E has 2 out-edges, so its recipients get "E/2". A handy self-check: add all five right-hand sides — every node's value gets fully distributed, so <b>A+B+C+D+E must stay = 1</b>. Starting at 1/5 each, it again converges to a fixed vector.</p></div>
+
+  <div class="quiz">
+    <ol>
+      <li>Node X has 4 out-edges and current score 0.8. How much does each neighbour receive from X this round?
+        <div class="ans">0.8 / 4 = <b>0.2</b> down each edge. A node always splits its value <em>equally</em> across its out-edges.</div></li>
+      <li>Why does the total score stay exactly 1 every iteration?
+        <div class="ans">Because each node passes on <em>all</em> of its value (split across its out-edges) and none is lost or added — conservation. The sum of everything sent equals the sum of everything received.</div></li>
+      <li>In the 3-node graph, C's converged score (0.4) equals B's (0.4) even though C has only one out-edge. Why is C highly ranked?
+        <div class="ans">Because C is pointed to by good nodes — it receives all of A's value and half of B's each round. PageRank rewards <em>who points to you</em>, not how many edges you send out.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 109–110</div>
+    <h2>Why it converges · part 1</h2>
+    <div class="lsub">a matrix applied over and over pulls every vector to one direction</div>
+  </div>
+
+  <h2 class="section" id="s4"><span class="num">4</span> Multiply, normalize, repeat</h2>
+  <p>To explain <em>why</em> the sharing always converges, the professor rebuilds it from two "high-school" prerequisites. Here's <b>prerequisite 1</b>.</p>
+  <p>Take a matrix, e.g. $A=\begin{bmatrix}1&2\\3&4\end{bmatrix}$, and a vector $v=\begin{bmatrix}1\\1\end{bmatrix}$. Then $Av=\begin{bmatrix}1+2\\3+4\end{bmatrix}=\begin{bmatrix}3\\7\end{bmatrix}$. The result grows, so we only care about its <b>direction</b>: pull it back onto the <span class="def-term">unit circle</span> (radius 1, centred at origin) by dividing by its length.</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">normalize a point (a, b) onto the unit circle</div>
+      <div class="eqn" style="margin:6px 0;">$$ (a,b)\;\longmapsto\;\left(\frac{a}{\sqrt{a^2+b^2}},\; \frac{b}{\sqrt{a^2+b^2}}\right) $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "keep the direction of the arrow but shrink it to length 1 — divide each coordinate by the arrow's length $\sqrt{a^2+b^2}$." So $(3,7)\mapsto(0.39,\,0.91)$. This is exactly what "normalize" meant back in HITS.</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(repeated multiply-and-normalize, lecture 109)</span></span>
+    <ol>
+      <li>$Av$ with $v=(1,1)$ gives $(3,7)$; normalize → $(0.39,\,0.91)$.</li>
+      <li>Apply $A$ again to $(0.39,0.91)$ → $(2.21,\,4.81)$; normalize.</li>
+      <li>Keep going: vector 1 → vector 2 → vector 3 → … each time <b>multiply by A, then pull to the unit circle</b>.</li>
+      <li>The direction stops moving — it <b>converges</b>. $$ \boxed{\text{any starting } v \;\to\; \text{one fixed direction}} $$</li>
+    </ol>
+  </div>
+
+  <p>He codes it live in an iPython shell with <code class="inline">numpy</code> to watch the convergence:</p>
+  <div class="code">
+    <div class="fname"><span>mat.py</span><span class="lang">python</span></div>
+<pre><code class="language-python">import numpy
+
+A = numpy.mat("1 2; 3 4")     # the matrix  [[1,2],[3,4]]
+v = numpy.mat("1; 1")         # column vector [1, 1]^T
+
+for i in range(10):
+    z = A * v                 # apply the matrix
+    z = z / numpy.linalg.norm(z)   # normalize: pull onto the unit circle
+    print(z)
+    print("****")
+    v = z                     # <-- feed the result back in (repeated application)
+</code></pre>
+  </div>
+  <p>Output settles to a constant vector: <code class="inline">[0.41597356, 0.90937671]</code>. Change the start vector to <code class="inline">(3, 11)</code> or anything else — <mark>you still land on the same direction.</mark> Complexity per iteration is a matrix–vector product, <span class="bigO">O(n²)</span> for a dense n×n matrix (cheaper if sparse); a fixed number of iterations makes the whole run <span class="bigO">O(n²·iters)</span>.</p>
+
+  <div class="sketch-box tint-pink">
+    <span class="label">⚠️ the bug the professor hit live (learn from it)</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li>His first version <b>forgot <code class="inline">v = z</code></b> at the end of the loop. Without it, every iteration recomputes $Av$ from the <em>same</em> original $v$ — so you never get "repeated" application and the output is wrong.</li>
+      <li>Fix: reassign <code class="inline">v = z</code> so the next round applies $A$ to the <em>previous result</em>. Only then do you see it converge.</li>
+      <li>Ignore numpy's harmless deprecation/warning messages about <code class="inline">numpy.mat</code> — they don't affect the result.</li>
+    </ul>
+  </div>
+
+  <div class="banner">
+    <h3>No matter which vector you start from, repeatedly applying a fixed matrix (with normalization) sends you to <em>one</em> direction.</h3>
+    <p>That single direction is the key to everything — the next section names it.</p>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 111–112</div>
+    <h2>Why it converges · part 2</h2>
+    <div class="lsub">big + small ≈ big, eigenvectors, and λ₁ᵏ domination</div>
+  </div>
+
+  <h2 class="section" id="s5"><span class="num">5</span> The eigenvector proof</h2>
+  <p><b>Prerequisite 2 — adding vectors.</b> Add a <b>big</b> vector to a <b>small</b> one and the result points almost exactly like the big one. Example: $(30,70)+(5,3)=(35,73)$, which sits right next to $(30,70)$, not $(5,3)$.</p>
+  <div class="bubble"><span class="say">read it as:</span> "big + small ≈ big" — the sum leans toward the vector with the larger amplitude, in both <b>direction</b> and <b>size</b>. (Only true when one really dominates; two equal-length vectors would split the difference.)</div>
+
+  <h3 class="sub">Now assemble the proof</h3>
+  <p>Recall two facts from basic matrix theory:</p>
+  <div class="sketch-box tint-blue">
+    <span class="label">📖 the two facts we need</span>
+    <ul class="notes" style="margin:4px 0 0;">
+      <li><span class="def-term">Eigenvector / eigenvalue:</span> $Av=\lambda v$ — the matrix $A$ just <b>scales</b> the special vector $v$ by the number $\lambda$ (it doesn't rotate it).</li>
+      <li>A 2×2 matrix (usually) has <b>two independent eigenvectors</b> $v_1, v_2$. "Independent" means <mark class="blue">any vector $z$ can be written as a combination $z=c_1 v_1 + c_2 v_2$.</mark></li>
+    </ul>
+  </div>
+
+  <p>Take any starting vector $v$ and write it in the eigenvector basis. Apply $A$ a total of $k$ times — each eigenvector just picks up its eigenvalue to the power $k$:</p>
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">applying A, k times</div>
+      <div class="eqn" style="margin:6px 0;">$$ A^k v \;=\; c_1\,\lambda_1^{\,k}\,v_1 \;+\; c_2\,\lambda_2^{\,k}\,v_2 $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "after k rounds, the part along $v_1$ has been blown up by $\lambda_1^k$ and the part along $v_2$ by $\lambda_2^k$." Now suppose $\lambda_1>\lambda_2$. As $k$ grows, $\lambda_1^k$ leaves $\lambda_2^k$ far behind.</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(why the bigger eigenvalue runs away — lecture 112)</span></span>
+    <ol>
+      <li>Take 2 and 3. Three is only <b>50% bigger</b> than two.</li>
+      <li>Square them: $2^2=4$, $3^2=9$ — now 9 is <b>more than twice</b> 4.</li>
+      <li>Cube them: $2^3=8$, $3^3=27$ — <b>more than 3×</b>.</li>
+      <li>Raise to 100: the ratio $\dfrac{2^{100}}{3^{100}}=\left(\dfrac{2}{3}\right)^{100}\to 0$ — a number below 1, multiplied by itself 100 times, collapses to essentially 0. $$ \boxed{\left(\tfrac{2}{3}\right)^{100}\approx 0} $$</li>
+    </ol>
+    <p class="small" style="margin-top:6px;">His analogy: God "cubes" everyone's bank balance. You had ₹3L, I had ₹2L — you were 50% richer. After cubing you're <em>more than 3× richer</em>. The one who started ahead pulls away enormously. That's the rich-get-richer effect of raising to a power (a taste of next week).</p>
+  </div>
+
+  <p>So in $A^k v = c_1\lambda_1^k v_1 + c_2\lambda_2^k v_2$, the first term is <b>huge</b> and the second is <b>tiny</b>. By prerequisite 2 (big + small ≈ big), the sum points in the direction of $c_1\lambda_1^k v_1$ — i.e. of <b>$v_1$</b>. The starting vector $v$ was arbitrary, yet:</p>
+  <div class="sketch-box tint-yellow">
+    <span class="label">🏁 the conclusion</span>
+    <p style="margin:2px 0;"><mark class="yellow">Repeatedly applying $A$ to any vector converges to $v_1$ — the eigenvector of the <b>largest eigenvalue</b> $\lambda_1$.</mark> That is <em>why</em> the numpy experiment always landed on the same direction, and why HITS / PageRank always converge. The final ranking is that dominant eigenvector.</p>
+  </div>
+
+  <div class="quiz">
+    <ol>
+      <li>What does "$v$ is an eigenvector of $A$ with eigenvalue $\lambda$" mean geometrically?
+        <div class="ans">$Av=\lambda v$: applying $A$ leaves $v$ pointing the same way and only stretches (or shrinks) it by the factor $\lambda$ — no rotation.</div></li>
+      <li>If $\lambda_1=3$ and $\lambda_2=2$, roughly what fraction of $A^{100}v$ lies along $v_2$?
+        <div class="ans">Essentially none — the $v_2$ part scales like $2^{100}$ while the $v_1$ part scales like $3^{100}$, and $(2/3)^{100}\approx 0$. The result is almost purely along $v_1$.</div></li>
+      <li>Why do we normalize between multiplications instead of just taking $A^k v$ directly?
+        <div class="ans">Because $\lambda_1^k$ makes the raw vector explode in size; normalizing keeps it length-1 so we can watch the <em>direction</em> settle. The direction — not the magnitude — is the answer.</div></li>
+    </ol>
+  </div>
+
+
+  <!-- ==================================================================== -->
+  <div class="lec-divider">
+    <div class="lno">LECTURES 113–114</div>
+    <h2>PageRank as a matrix operation + the Markov matrix</h2>
+    <div class="lsub">the sharing rule IS a matrix; its largest eigenvalue is exactly 1</div>
+  </div>
+
+  <h2 class="section" id="s6"><span class="num">6</span> The sharing rule is a matrix multiply</h2>
+  <p>The final connection: one round of "split your value along your out-edges" is exactly <b>one matrix–vector multiply</b>. Build the transition matrix $M$ whose entry in row <i>i</i>, column <i>j</i> is the share that flows from node <i>j</i> to node <i>i</i> (i.e. $1/\text{outdeg}(j)$ if $j\to i$, else 0). Then the update is simply $r_{\text{new}} = M\,r_{\text{old}}$.</p>
+  <p>For the 3-node graph, $M\begin{bmatrix}1/3\\1/3\\1/3\end{bmatrix}=\begin{bmatrix}1/6\\1/3\\1/2\end{bmatrix}$ — the very step we traced by hand. So the whole PageRank process is "apply $M$ over and over" — and by section 5 that converges to $M$'s dominant eigenvector.</p>
+
+  <div class="sketch-box tint-mint">
+    <span class="label">📖 Markov matrix (the punchline)</span>
+    <p style="margin:2px 0;">Because every node gives away <b>all</b> of its value (its out-shares sum to 1), <mark class="mint">every column of $M$ sums to 1.</mark> A square matrix whose columns each sum to 1 is a <span class="def-term">Markov matrix</span> (a.k.a. column-stochastic matrix). Its special property: its <b>largest eigenvalue is exactly $\lambda_1=1$</b>, and all others are $<1$.</p>
+  </div>
+
+  <div class="eq-card">
+    <div class="index-card">
+      <div class="cap">why a Markov matrix converges cleanly</div>
+      <div class="eqn" style="margin:6px 0;">$$ A^k v = c_1(1)^k v_1 + c_2\lambda_2^{\,k} v_2 \;\xrightarrow{\;k\to\infty\;}\; c_1 v_1 $$</div>
+    </div>
+  </div>
+  <div class="bubble"><span class="say">read it as:</span> "with $\lambda_1=1$, the $v_1$ term neither grows nor shrinks ($1^k=1$), while every other $\lambda_i^k\to 0$. So it converges to $v_1$ <b>without</b> blowing up — no normalization needed, and the total stays 1." That $v_1$ is the <span class="def-term">stationary vector</span>: the assignment $\alpha$ with $M\alpha=\alpha$ (it maps to itself, so it stops changing). It is <b>unique</b>, and you reach it from any start.</div>
+
+  <div class="worked">
+    <span class="tag">✍️ worked example <span class="illus">(4-node PageRank, lecture 114)</span></span>
+    <ol>
+      <li>Start $\big(\tfrac14,\tfrac14,\tfrac14,\tfrac14\big)$. One multiply by $M$ gives $\big(\tfrac18,\tfrac38,\tfrac38,\tfrac18\big)$.</li>
+      <li>Keep applying $M$ (or read it off as the eigenvector for $\lambda=1$).</li>
+      <li>It converges to the unique stable assignment: $$ \boxed{\Big(a,b,c,d\Big)=\left(\tfrac{19}{100},\; \tfrac{1}{3},\; \tfrac{19}{50},\; \tfrac{9}{100}\right)} $$ After this, applying $M$ leaves the vector unchanged ($M\alpha=\alpha$).</li>
+    </ol>
+  </div>
+
+  <table class="hand">
+    <thead><tr><th></th><th>Hubs &amp; Authorities (HITS)</th><th>PageRank</th></tr></thead>
+    <tbody>
+      <tr><td><b>scores per node</b></td><td>two — hub &amp; authority</td><td>one — its rank/resource</td></tr>
+      <tr><td><b>update</b></td><td>hub = Σ authorities it points to; authority = Σ hubs pointing in</td><td>value = Σ (incoming node's value ÷ its out-degree)</td></tr>
+      <tr><td><b>the matrix</b></td><td>general; needs normalizing each round (λ₁ may be &gt; 1)</td><td>column-stochastic <b>Markov</b> matrix; λ₁ = 1 exactly</td></tr>
+      <tr><td><b>why it converges</b></td><td colspan="2" style="text-align:center;">repeated multiplication → dominant eigenvector $v_1$ (largest eigenvalue)</td></tr>
+      <tr><td><b>conservation</b></td><td>via normalization</td><td>built in — total stays 1</td></tr>
+    </tbody>
+  </table>
+
+  <div class="quiz">
+    <ol>
+      <li>What makes a matrix a "Markov" matrix, and what is its largest eigenvalue?
+        <div class="ans">Every column sums to 1 (column-stochastic). Its largest eigenvalue is exactly 1, and all other eigenvalues are &lt; 1 in magnitude.</div></li>
+      <li>Why does PageRank's iteration converge <em>without</em> the numbers exploding, unlike the plain $[[1,2],[3,4]]$ example?
+        <div class="ans">Because PageRank's matrix is Markov, so its dominant eigenvalue is 1: $1^k=1$ keeps the leading term steady while all others decay to 0. In the $[[1,2],[3,4]]$ case the dominant eigenvalue exceeds 1, so values grow and you must normalize by hand.</div></li>
+      <li>The stable PageRank vector satisfies $M\alpha=\alpha$. In words, what does that say?
+        <div class="ans">Applying one more round of sharing leaves the scores unchanged — the assignment maps to itself. That fixed point is the eigenvector for eigenvalue 1, it's unique, and you converge to it from any starting distribution.</div></li>
+      <li>Two people start ₹2 lakh and ₹3 lakh; both amounts get raised to the 100th power. Which "eigen" fact does this illustrate?
+        <div class="ans">That the larger base dominates after repeated powering: $\lambda_1^{k}$ overwhelms $\lambda_2^{k}$ when $\lambda_1>\lambda_2$, so $A^k v$ collapses onto the top eigenvector.</div></li>
+    </ol>
+  </div>
+
+  <div class="signoff">— end of Week 8 · Hubs, Authorities &amp; the PageRank convergence proof ✏️</div>
+  <a class="backtop" href="#top">↑ back to contents</a>
+
+
+</div>
+
+</body>
+</html>
