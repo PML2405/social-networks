@@ -1,0 +1,315 @@
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 5 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — How an Open-Plan Office Sorts Itself: The Schelling Model
+Case Study
+A workplace analyst, Ravi, wants to understand why an open-plan office drifts into team enclaves even
+though no one is assigned a fixed seat. He models the office as a square grid of hot-desks. Every desk is
+either free or taken by an employee from one of two teams call them Design and Engineering. A desk's
+neighbours are the desks touching it, diagonals included, so a desk in the middle of the floor has eight
+neighbours, a desk in a corner has only three, and a desk along an edge but not at a corner has five.
+Each employee has the same modest preference, captured by a threshold t: an employee is content as long
+as at least t of its neighbouring desks are occupied by teammates. An employee with fewer than t
+neighbouring teammates is unsatisfied and moves to a randomly chosen free desk. Crucially, when one
+person moves it changes the neighbourhoods of others, so some previously content employees may
+become unsatisfied and vice versa; the set of unsatisfied employees therefore has to be recomputed each
+day. Ravi runs the reseating day after day and watches the overall pattern.
+He is careful to separate what the rule forces from what it merely tends to produce. He can hand-arrange
+mixed seatings in which every employee is content, so clustering is not logically unavoidable yet when
+employees act on the rule, sharply sorted team blocks appear again and again. He also notices that a higher
+threshold produces cleaner separation but takes far longer to settle, and that an extreme demand can stop
+the floor from ever settling at all.
+Questions 1–10
+Q1.  [MCQ]  What is the central finding that Ravi's simulation illustrates?
+A.  A central authority forces every employee to sit only among its own team.
+B.  Team blocks appear only when more than half of the desks are left free.
+C.  Each employee follows a mild local preference, yet the floor still sorts itself sharply.
+D.  Employees always end up evenly mixed, since random moves cancel any clustering.
+Answer:  C
+Reference:  Lecture 56 – Spatial Segregation: Conclusion (≈00:34–01:35)
+Solution:  The striking point is that no one demands a sorted office; each employee only wants a modest
+number of nearby teammates. Those mild local choices, repeated by everyone, still drive the whole floor
+into well-separated team blocks. There is no central planner, no need for free desks to dominate, and the
+moves do not cancel into an even mix.
+
+[p.2]
+Q2.  [Match the following]  Match each kind of desk in Column A with the correct fact in Column B.
+Column A (desk)
+Column B (fact)
+1. Internal desk (not on the floor's edge)
+a. has 3 neighbouring desks
+2. Corner desk
+b. never makes anyone unsatisfied (no team to be
+unhappy about)
+3. Edge desk (on the edge, not a corner)
+c. has 8 neighbouring desks
+4. Free (empty) desk
+d. has 5 neighbouring desks
+
+A.  1-a, 2-c, 3-d, 4-b
+B.  1-c, 2-a, 3-d, 4-b
+C.  1-c, 2-d, 3-a, 4-b
+D.  1-c, 2-a, 3-b, 4-d
+Answer:  B (1-c, 2-a, 3-d, 4-b)
+Reference:  Lecture 57 – Schelling Model Implementation: Introduction (≈01:24–03:48)
+Solution:  Counting touching desks including diagonals: an internal desk has 8 neighbours, a corner desk has
+3, and a non-corner edge desk has 5. A free desk has no team, so it is never counted as unsatisfied and no
+one relocates from it.
+
+Q3.  [MCQ]  An employee is content only if at least half of its eight neighbouring desks are teammates. What
+threshold t does this correspond to?
+A.  t = 2
+B.  t = 8
+C.  t = 4
+D.  t = 6
+Answer:  C
+Reference:  Lecture 55 – Simulation of the Schelling Model (≈01:30–02:00)
+Solution:  Half of eight neighbours is four, so demanding 50% teammates sets the threshold at t = 4. (For
+reference, 25% of eight is 2 and 75% of eight is 6.)
+
+Q4.  [MCQ]  An employee at an internal desk has 8 neighbours, of which 2 are teammates, and the threshold
+is t = 3. Is the employee content, and why?
+A.  Content, because 2 neighbouring teammates is more than enough at this threshold.
+B.  Content, because only internal desks with 8 neighbours are ever counted at all.
+C.  Unsatisfied, because it has 8 neighbours and 8 is well above the threshold of 3.
+D.  Unsatisfied, because 2 neighbouring teammates is fewer than the threshold of 3.
+Answer:  D
+Reference:  Lecture 57 – Schelling Model Implementation: Introduction (≈03:48–end)
+Solution:  Contentment depends on the number of neighbouring teammates, not the total number of
+neighbours. With only 2 teammates against a threshold of 3, the employee falls short and is unsatisfied, so
+
+[p.3]
+they move to a free desk. The count of 8 is the neighbourhood size, which is not what the threshold
+compares against.
+
+Q5.  [MCQ]  Suppose every employee demands that about 89% of its eight neighbouring desks be
+teammates. What is the likely outcome?
+A.  Almost no seating can satisfy everyone, so people keep reseating and the floor may never settle.
+B.  The office sorts faster than at any lower threshold, settling within just a few days of moves.
+C.  Everyone is content immediately, since 89% of eight rounds down to only two teammates.
+D.  All the free desks disappear at once, because every employee finds a satisfying desk.
+Answer:  A
+Reference:  Lecture 55 – Simulation of the Schelling Model (≈05:29–end)
+Solution:  89% of eight is about seven, so an employee would need nearly all eight neighbours to be
+teammates, which almost no seating achieves. People keep moving in search of an impossible desk, and the
+simulation may never converge. Higher demands sharpen the sorting only up to a point; an extreme
+demand prevents settling rather than speeding it.
+
+Q6.  [MCQ]  Which statement about whether the team sorting is inevitable is correct?
+A.  Sorting is logically guaranteed; no content seating can ever stay mixed.
+B.  Sorting never occurs in the model; employees always stay uniformly mixed.
+C.  Sorting is not forced — mixed content seatings exist — yet it usually emerges.
+D.  Sorting depends only on the size of the floor, not on employees' thresholds or their choices.
+Answer:  C
+Reference:  Lecture 56 – Spatial Segregation: Conclusion (≈01:35–end)
+Solution:  One can hand-build seatings where everyone meets the threshold without clustering, so sorting is
+not mathematically unavoidable. Despite that, when employees follow the relocation rule the floor almost
+always drifts into separated team blocks. It is a strong tendency, not a logical certainty, and it is driven by
+the employees' choices rather than fixed by floor size.
+
+Q7.  [MCQ]  Why does the simulation recompute the set of unsatisfied employees each day?
+A.  Moving one employee can flip its neighbours' status, so the unsatisfied set changes each day.
+B.  Once the unsatisfied list is built it never changes, so it is computed only a single time.
+C.  An employee always moves to the desk with the most teammates, never to a random one.
+D.  Content employees relocate each day, while unsatisfied employees always stay in place.
+Answer:  A
+Reference:  Lecture 60 – Getting a list of unsatisfied nodes; Lecture 61 – Shifting nodes
+Solution:  Each move rewrites the neighbourhoods around both the vacated desk and the new desk, so
+employees who were content can become unsatisfied and vice versa. The unsatisfied set is therefore stale
+after any move and must be rebuilt each day. In the version implemented, the mover goes to a random free
+desk, and it is the unsatisfied employees who move, not the content ones.
+
+[p.4]
+Q8.  [MCQ]  In this model, what does it mean to say that “local behaviour produces a global pattern”?
+A.  A central plan sets the floor-wide pattern that each employee must individually obey.
+B.  Each employee can see and control the whole floor's seating before deciding to move.
+C.  The global pattern is fixed first, and employees then pick desks to fit that pattern.
+D.  Many employees each acting on one simple local rule together yield a floor-wide pattern.
+Answer:  D
+Reference:  Lecture 56 – Spatial Segregation: Conclusion (≈00:34–01:35)
+Solution:  Emergence means the large-scale pattern is not imposed or planned; it arises from many
+individuals independently following the same simple local rule. No employee sees or controls the whole
+floor, and the pattern is an outcome of those local moves rather than a blueprint they fit themselves into.
+
+Q9.  [MSQ]  Which statements about the model's rules are correct? (Select all that apply.)
+I.   An employee is content if at least t of its neighbouring desks are teammates.
+II.  A free desk has no team and is never counted as unsatisfied.
+III. Raising the threshold tends to increase the sorting but slows convergence.
+IV.  A corner desk has 8 neighbours, the same as an internal desk.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, II, III
+D.  I, III
+Answer:  C (statements I, II, III)
+Reference:  Lectures 55–57 – Schelling model and its implementation
+Solution:  The threshold rule (I), the inert free desks (II), and the trade-off in which a higher threshold
+sharpens separation but slows settling (III) are all correct. A corner desk has only 3 neighbours, not 8, so IV
+is false.
+
+Q10.  [MSQ]  Which statements about neighbourhoods and emergence are correct? (Select all that apply.)
+I.   An internal desk has 8 neighbours, counting the diagonal desks.
+II.  A non-corner edge desk has 5 neighbours.
+III. The same local reseating rule, applied by everyone, yields floor-wide team sorting.
+IV.  The model proves the sorting is mathematically unavoidable in every case.
+A.  I, II, IV
+B.  I, II, III
+C.  II, III, IV
+D.  I, IV
+Answer:  B (statements I, II, III)
+Reference:  Lectures 56–57 – Conclusion and implementation
+
+[p.5]
+Solution:  Internal desks have 8 neighbours and non-corner edge desks have 5 (I, II), and the shared local
+rule produces floor-wide sorting (III). The model shows the sorting is a strong tendency, not a logical
+certainty — content mixed seatings exist — so IV is false.
+
+[p.6]
+Comprehension 2 — Allies and Rivals: Structural Balance in a Reality-Show Cast
+Case Study
+A data analyst, Sara, studies the web of relationships among the contestants of a reality competition. Every
+pair of contestants has a standing relationship that is either an alliance (a positive tie) or a rivalry (a negative
+tie), and since the cast is small, every pair has some relationship so the contestants form a complete signed
+graph. Sara is interested in which local arrangements sit comfortably and which generate pressure to
+change.
+She focuses on triangles of three contestants. A triangle of three mutual allies is comfortable, and so,
+perhaps surprisingly, is a triangle of two allied contestants who share a common rival the shared opponent
+only reinforces their bond. By contrast, a contestant allied to two others who are themselves rivals is under
+strain, and a triangle of three mutual rivals is also unstable, since two of them are apt to join forces against
+the third. A triangle is comfortable exactly when an odd number of its three ties are positive.
+When unstable triangles are present, the cast tends to rearrange itself ties flip until every triangle is
+comfortable. Sara proves a clean structural result about where this lands, and then implements the whole
+process: she builds a random complete signed graph, lists its triangles, classifies each, repeatedly repairs an
+unstable triangle, and finally sorts the settled cast into alliances. The key building block is
+itertools.combinations, used to enumerate the triangles and, where needed, the edges.
+Questions 1–10
+Q1.  [MCQ]  Sara finds three contestants where X is allied with both Y and Z, but Y and Z are rivals. What
+does the theory predict?
+A.  The configuration is stable and will persist unchanged for the foreseeable future.
+B.  It is unstable; the tension tends to resolve — e.g. Y and Z ally, or X drops one tie.
+C.  It is unstable, and the only way it can resolve is all three becoming mutual rivals.
+D.  It is stable, because every contestant in the triangle has at least one ally present.
+Answer:  B
+Reference:  Lecture 63 – Structural Balance (≈01:57–04:38)
+Solution:  Two allies of X who are rivals of each other put X in a bind — this is the unstable two-positive,
+one-negative triangle. The strain typically resolves either by the two rivals becoming allies or by X breaking
+one alliance. Becoming three mutual rivals is not the forced outcome, and the presence of an ally does not
+make the triangle stable.
+
+Q2.  [MCQ]  What is the rule that decides whether a triangle of signed ties is stable?
+A.  A triangle is stable when it has an odd number of positive ties (one or three).
+B.  A triangle is stable when it has an even number of positive ties (zero or two).
+C.  A triangle is stable only when all three of its ties are positive (alliances).
+D.  A triangle is stable only when all three of its ties are negative (rivalries).
+
+[p.7]
+Answer:  A
+Reference:  Lecture 64 – Enemy's Enemy is a Friend (≈06:12–end); Lecture 68
+Solution:  A signed triangle is balanced exactly when an odd number of its ties are positive: three positives
+(all allies) or one positive (two allies with a shared rival). The even cases — two positives or zero positives —
+are the unstable ones. Requiring all-positive or all-negative is too narrow.
+
+Q3.  [MCQ]  Which scenario is stable, and which social rule does it follow?
+A.  Three mutual rivals are stable, because a shared grudge keeps all of them apart.
+B.  Two allies with a common rival are unstable and must add a third rivalry.
+C.  Two rivals with a common ally are stable, since the shared ally binds them together.
+D.  Two rivals who share a third common rival tend to ally — enemy's enemy is a friend.
+Answer:  D
+Reference:  Lecture 64 – Enemy's Enemy is a Friend (≈01:37–end)
+Solution:  When two contestants are each rivals of a third, they have a common opponent, and that shared
+enmity tends to push them into an alliance — the “enemy's enemy is a friend” pattern, which yields a stable
+one-positive triangle. Three mutual rivals are unstable, and two allies with a common rival are already
+stable (not in need of repair).
+
+Q4.  [MCQ]  According to the balance theorem, what does a fully stable complete signed network look like?
+A.  It always splits into exactly three alliances that are mutually hostile to one another.
+B.  It is either one all-allied cast, or two alliances: allied within each, hostile across them.
+C.  It must have every contestant allied with every other, with no rivalries present anywhere.
+D.  It can split into any number of alliances, with the count depending on the cast's size.
+Answer:  B
+Reference:  Lecture 66 – Balance Theorem; Lecture 67 – Proof of Balance Theorem
+Solution:  The balance theorem says a balanced complete signed network has just two possible shapes: a
+single bloc of mutual allies, or two alliances with friendships inside each and rivalries between them. It is
+never three or more alliances, regardless of size, and it need not be rivalry-free.
+
+Q5.  [MCQ]  Sara models 6 contestants as a complete signed graph. How many triangles must she check for
+stability?
+A.  6, one triangle for each contestant in the cast.
+B.  15, one triangle for each pair of contestants.
+C.  30, counting the ordered triples of contestants.
+D.  20, one for each unordered triple of the contestants.
+Answer:  D
+Reference:  Lecture 69 – Outline of implementation (≈02:25)
+Solution:  A triangle is an unordered choice of 3 contestants, so the count is 6 choose 3 = 20. There are 15
+pairs (which give edges, not triangles), and ordering the triples would overcount each triangle six times, so
+neither 6, 15, nor 30 is right.
+
+[p.8]
+Q6.  [MCQ]  In the implementation, how are the triangles obtained from the list of contestants?
+A.  combinations(nodes, 2) lists every pair, and each pair is treated as one triangle.
+B.  combinations(nodes, 3) lists every triple, and each triple is one triangle to classify.
+C.  permutations(nodes, 3) lists the triangles, so each triangle shows up six separate times.
+D.  combinations(nodes, 3) returns the edges, whose signs are then added together.
+Answer:  B
+Reference:  Lecture 70 – Creating graph and counting unstable triangles (≈10:15–18:00)
+Solution:  Each triangle is an unordered triple of nodes, so combinations(nodes, 3) enumerates them with
+no repeats. permutations would list each triangle six times, and combinations returns triples of nodes (the
+triangles), not the edges.
+
+Q7.  [Arrange in order]  Arrange the steps of the structural-balance implementation in the correct order.
+Steps (in scrambled order):
+(i)   Repeatedly pick an unstable triangle and flip a tie to make it stable, until none remain.
+(ii)  Build a complete signed graph, assigning each tie + or − at random.
+(iii) Split the now-stable cast into two alliances (allies together, rivals apart).
+(iv)  Enumerate every triangle with combinations(nodes, 3) and record its three signs.
+(v)   Count how many of the triangles are unstable.
+A.  ii → v → iv → i → iii
+B.  iv → ii → v → i → iii
+C.  ii → iv → v → i → iii
+D.  ii → iv → i → v → iii
+Answer:  C (ii → iv → v → i → iii)
+Reference:  Lectures 69–71 – Outline, counting unstable triangles, moving to stable
+Solution:  First build the random signed graph (ii), then list every triangle and its signs (iv), then count the
+unstable ones (v). Next repeatedly repair an unstable triangle until none are left (i), and finally divide the
+settled cast into the two alliances (iii).
+
+Q8.  [MCQ]  In the code, a triangle's three signs have been collected into a list. How is it judged unstable?
+A.  If the list of signs contains zero or two + marks, the triangle is counted as unstable.
+B.  If the list of signs contains one or three + marks, the triangle is counted as unstable.
+C.  The triangle is unstable whenever its list of signs contains at least one − mark anywhere.
+D.  The triangle is unstable only when all three of the signs in the list are + marks.
+Answer:  A
+Reference:  Lecture 70 – Creating graph and counting unstable triangles (≈20:00–23:27)
+Solution:  The code counts the + signs: zero or two positives marks the triangle unstable, while one or three
+positives marks it stable. A single negative does not by itself make a triangle unstable (one-positive triangles
+are stable), and an all-positive triangle is the most stable case of all.
+
+[p.9]
+Q9.  [MCQ]  How does the implementation split a stabilised cast into the two alliances?
+A.  Pick a node; put its rivals in its own group and its allies into the other group.
+B.  Pick a node; put its allies in its own group and its rivals in the other, then repeat outward.
+C.  Pick a node; put every other node into the same single group regardless of the signs.
+D.  Pick a node; sort the others into three groups according to their distance from it.
+Answer:  B
+Reference:  Lecture 69 – Outline of implementation (≈05:24–end); Lectures 72–73
+Solution:  Starting from any contestant, its allies join its own alliance and its rivals go to the other; then each
+newly placed contestant is processed the same way, spreading outward until all are assigned. Putting allies
+and rivals the wrong way round, lumping everyone together, or using three distance-based groups all
+contradict the two-alliance structure.
+
+Q10.  [MSQ]  Which statements about structural balance are correct? (Select all that apply.)
+I.   A complete graph on n contestants has about n²/2 signed ties.
+II.  The proof picks one contestant and sorts the rest into its allies and its rivals.
+III. However many contestants there are, a balanced cast forms at most two alliances.
+IV.  A triangle with exactly two positive ties is stable.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III, IV
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 65–67 – Characterising balanced networks and the proof
+Solution:  A complete graph on n contestants has n(n−1)/2 ≈ n²/2 ties (I); the proof fixes one contestant and
+partitions the rest into its allies and rivals (II); and a balanced cast has at most two alliances however large it
+is (III). A two-positive triangle is one of the unstable cases, so IV is false.
+
+End of Week 5 Question Paper  —  20 questions  •  2 comprehensions

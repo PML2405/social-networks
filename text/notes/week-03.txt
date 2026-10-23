@@ -1,0 +1,323 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 3 — Strong & Weak Ties, and Communities
+
+Lectures 27–40 · why your acquaintances land you jobs, the local structure of friendship, and two algorithms that find hidden communities.
+
+🧠 the big picture, first
+
+Granovetter's shock: most jobs come not from close friends but from **weak ties** (acquaintances), because a distant contact lives in a different world and carries news you don't already have. To make this precise we build a toolkit of **local** measures — **triadic closure, clustering coefficient, neighbourhood overlap, bridges/local bridges, embeddedness** — and see how they explain trust, brokerage (**structural holes**) and **social capital**. Then we zoom out: how do you split a graph into **communities**? Two algorithms — brute force and **Girvan–Newman** (edge betweenness) — with real NetworkX code.
+
+### 📒 what's inside Week 3
+
+- The Strength of Weak Ties (Granovetter)
+
+why acquaintances matter for jobs
+- Local structure: triadic closure, clustering, neighbourhood overlap
+- Bridges, local bridges & the Strong Triadic Closure argument
+- Embeddedness, structural holes, social capital
+
++ cell-phone validation & passive engagement
+- Communities & betweenness
+
+brute force + Girvan–Newman code + Gephi
+
+LECTURES 27–28
+
+## The Strength of Weak Ties
+
+opportunity knocks through someone you barely know
+
+## 1 Why acquaintances land you jobs
+
+Ask 100 employed people "how did you hear about this job?" — more than 90% say it came from a distant contact, a friend-of-a-friend, an acquaintance — **not** a close friend. This feels backwards. The reason isn't secrecy; it's **information**.
+
+📖 strong tie vs weak tie
+A tie is a friendship. A strong tie = a close, frequent friend. A weak tie = an occasional, distant acquaintance. Granovetter's finding: weak ties are "strong" for spreading new information; strong ties are "weak" for it.
+
+#### you, four office friends, and E from another world
+
+[diagram: you | A | B | C | D | E]
+
+A,B,C,D (your office, strong solid ties) all know each other → they mostly know what you know. E (coral dashed weak tie) is from a different world → E brings new info.
+
+Say A, B, C, D work where you work and all know each other; E works elsewhere and knows none of them. Whatever A–D hear, you probably already heard too (same circle). But **E** reaches a different world — a job opening you'd never otherwise learn of.
+
+So a weak tie **expands your information sample space**. (Granovetter's 1969 paper was rejected; it finally published in **1973** and became famous.)
+
+⚠️ the self-defeating twist
+The moral is **not** "convert your acquaintances into close friends." If you keep an acquaintance too happy, they become a close friend — now inside your circle, sharing the same information you already have, so they stop being a source of new job leads. The real prescription is a large acquaintance circle (many weak ties), not a few strong ones.
+
+LECTURE 29
+
+## Local structure of friendships
+
+triadic closure · clustering coefficient · neighbourhood overlap
+
+## 2 Three local measures
+
+### Triad & triadic closure
+
+#### a triad closes into a triangle
+
+[diagram: You | A | B | A & B share a | friend (You) → | eventually A–B | befriend (coral)]
+
+**Triad**: You know A and B, but A–B don't know each other. **Triadic closure**: A and B eventually befriend, closing the triangle.
+
+📖 triad & triadic closure
+A triad = one person connected to two others who aren't connected to each other. Triadic closure = the tendency for those two friends-of-a-friend to eventually become friends (the triad closes into a triangle). A recurring engine all course.
+
+### Clustering coefficient
+
+clustering coefficient of node v
+
+$$ C(v)=\frac{\#\text{friendships among }v\text{'s friends}}{\binom{\deg(v)}{2}} $$
+
+read it as: "of all pairs of my friends, what fraction actually know each other." 1 = my friends form a clique; 0 = none know each other. (Research the instructor cites: people with very low clustering — friends from disconnected circles they can never gather together — were observed to be more prone to depression and even attempted suicide.)
+
+✍️ worked examples — clustering coefficient
+- **Transcript's example:** you have 5 friends with **6** friendships among them. Possible = $\binom{5}{2}=10$, so $C=\frac{6}{10}=0.6$.
+- **Assignment's example:** person P has 5 friends with exactly **4** friendships among them. $C=\frac{4}{\binom{5}{2}}=\frac{4}{10}=\boxed{0.4}$.
+
+### Neighbourhood overlap
+
+neighbourhood overlap of edge A–B
+
+$$ \text{overlap}(A,B)=\frac{|\,N(A)\cap N(B)\,|}{|\,N(A)\cup N(B)\,|} $$
+
+read it as: "of all the distinct friends A and B have between them, what fraction are shared." Analogy: redefining "rich" not as how much you earn but as how well you spend it — a ratio, not a raw count. Close to 1 = strongly-embedded strong tie; close to 0 = near a local bridge (weak tie).
+
+⚠️ precision — exclude A and B themselves
+When A and B are directly friends, remember that N(A) and N(B) here mean their other friends — **exclude A and B themselves** from both sets. Otherwise B (which sits in N(A)) and A (in N(B)) would inflate the union and shrink the overlap. In the worked example the sets {C,D,E} and {C,D,F} already exclude X and Y, so it's clean.
+
+✍️ worked example — overlap of edge X–Y
+X's friends = {C, D, E}; Y's friends = {C, D, F}. Common = {C,D} (2); union = {C,D,E,F} (4). $$\text{overlap}=\frac{2}{4}=\boxed{0.5}.$$
+
+LECTURES 30–31
+
+## Bridges, local bridges & why they're weak
+
+the Strong Triadic Closure argument + cell-phone validation
+
+## 3 Bridges, local bridges, and the STC argument
+
+📖 bridge vs local bridge
+- Bridge — an edge whose **removal disconnects** the graph (the only link between two parts).
+- Local bridge — the relaxed version: an edge with **no triad on it**, i.e. its two endpoints share **no common friend**.
+
+**Relationship:** every bridge is a local bridge, but not every local bridge is a bridge. (A bridge's endpoints can't have a common friend — that would give an alternate path — so it has no triad; but a local bridge needn't disconnect the graph.)
+
+**The motivating picture:** recall the two-cluster classroom — 25 people on each side with **625** possible cross-cluster friendships (25×25), yet only **one** actual edge joining the sides. That lone edge is obviously a bridge and a weak tie: its endpoint B knows a whole island of people that A doesn't. Such an extreme structure is rare in real life, which is why we relax the definition to the **local** bridge.
+
+#### a local bridge A–B (no shared friend)
+
+[diagram: A | B | local bridge]
+
+A and B each have many friends, but **none in common** → A–B is a local bridge, joining two worlds.
+
+⚙️ Strong Triadic Closure (STC) → a local bridge is weak
+**STC property:** if a person has two strong ties, those two people become connected. Now suppose the local bridge A–B were strong, and A has any other strong tie Z. By STC, Z and B would connect — giving A and B a common friend Z, destroying the "no triad" property. Contradiction. So a local bridge **cannot be strong** → it must be a **weak tie**. This is Granovetter's structural argument.
+
+📞 validation on real cell-phone data (2007)
+Granovetter (1960s) couldn't test his theory — no friendship data. In 2007 a cell-phone network (edge = a call; weight = minutes over 18 weeks; ~85% of nodes in one big component) let researchers check it. Result: edges with **low neighbourhood overlap** (near-local-bridges) carried **less** call time → they really are **weak ties**. Neighbourhood overlap is the continuous ("grey-scale") proxy for the binary local-bridge idea.
+
+LECTURES 32–34, 38
+
+## Embeddedness, structural holes, social capital
+
+trust, brokerage, and how social media really engages you
+
+## 4 Trust, brokerage & the value of a network
+
+### Embeddedness
+
+embeddedness of edge A–B
+
+$$ \text{embeddedness}(A,B)=|\,N(A)\cap N(B)\,| $$
+
+read it as: "the raw number of common friends the two endpoints share" (the numerator of neighbourhood overlap, un-normalised). It's a property of an **edge**, not a node. Higher embeddedness → more **trust** (a stranger who shares 5 of your friends is unlikely to cheat you; and if two friends fall out, a common friend can be pulled in to enforce fairness — with no common friend, there's no one to appeal to). It's the same logic as a bank asking for a **guarantor/surety** before a loan: a third party makes default costlier and rarer.
+
+✍️ worked example — embeddedness of X–Y
+X's friends {C,D,E}, Y's friends {C,D,F} → common {C,D} → embeddedness = $\boxed{2}$. (Same numerator as its neighbourhood overlap 2/4; overlap just divides by the union.)
+
+### Structural holes & brokerage
+
+#### Ramya brokers a structural hole
+
+[diagram: Sudarshan | Ramya]
+
+The gap between the two communities is a **structural hole**; the single low-embeddedness edge (coral) is spanned by Ramya, who **brokers** all traffic between them.
+
+📖 structural hole & brokerage
+A structural hole is the gap between two otherwise-separate communities, spanned by a single low-embeddedness edge. The person on that edge is a broker: everyone on one side who needs the other side must go through them. Ramya (a real-estate agent) monopolises access to her community, so she **profits** from the position. This is the network flip-side of weak ties: a low-embeddedness edge is bad for trust but great for brokerage.
+
+### Social capital: closure vs brokerage
+
+| | Closure | Brokerage |
+| what | friends-of-friends becoming friends (triadic closure everywhere) | spanning a structural hole between separate groups |
+| gives | high clustering, trust, mutual support | access, control, information advantage (Granovetter's weak ties) |
+| too much? | 100% closure = everyone on one team = boring : no distinct groups left to compete (you can't cheer for a side) | all brokerage, no closure = low trust |
+
+read it as: "the network itself is **social capital** — a resource. Both closure and brokerage are valuable; the ideal mix (where to sprinkle friendships so a team performs best) is an **open research question**."
+
+📱 tie strength on social media & passive engagement
+- Facebook links come in three kinds: one-way (you message, no reply), mutual/reciprocal (real back-and-forth), and maintained relationships — you never talk, but you follow their news feed and click "like". This last is passive engagement.
+- Plotting all three vs network size: **maintained/passive is highest**. What keeps people glued to social media is quietly watching each other's lives, not conversing.
+- On Twitter, "strong ties" (having exchanged direct messages) **converge to ~50** no matter how many followers you have — a fixed **cognitive/time budget**. Celebrities with millions of followers still have few genuine strong ties.
+
+LECTURES 35–37, 39
+
+## Finding communities & betweenness
+
+brute force · Girvan–Newman · edge betweenness · Gephi
+
+## 5 Detecting communities
+
+📖 community
+A community is a set of nodes with many links inside and few links across — high intra-community edge density, low inter-community density. It need not be a clique, need not be equal-sized, and nodes need not have equal degree. Splitting a graph into communities = a partition of the vertex set.
+
+### Method 1 — brute force
+
+Try every way to split the nodes into two parts; score each by comparing edges inside the parts against edges crossing between them; keep the best.
+
+brute_force_communities.pypython
+
+```
+import networkx as nx
+from itertools import combinations
+
+def communities_brute(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    first = []                                  # all candidate "part 1" node-sets
+    for i in range(1, n//2 + 1):                # sizes 1..n/2 (avoid mirror dupes)
+        first.extend([list(x) for x in combinations(nodes, i)])
+    second = [list(set(nodes) - set(part)) for part in first]   # complements
+
+    ratios = []
+    for i in range(len(first)):
+        intra1 = G.subgraph(first[i]).number_of_edges()   # edges inside part 1
+        intra2 = G.subgraph(second[i]).number_of_edges()  # edges inside part 2
+        inter  = G.number_of_edges() - intra1 - intra2    # crossing edges
+        ratios.append(float(intra1 + intra2) / inter)     # higher = better split
+
+    best = ratios.index(max(ratios))            # index of the best split
+    return first[best], second[best]
+
+G = nx.barbell_graph(5, 0)                      # two 5-cliques joined by 1 edge
+print(communities_brute(G))     # -> ([0,1,2,3,4], [5,6,7,8,9])
+```
+
+⚙️ the pieces
+- `combinations([1,2,3,4], 2)` → all **6** unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; it's an iterator, so wrap in `list()`.
+- `G.subgraph(nodes).number_of_edges()` = the **induced subgraph**'s edges — only edges with both endpoints inside the set → the **intra** count.
+- Sizes only go to `n//2`: a split of size k and its complement (n−k) are the same partition; `+1` because `range` excludes its stop.
+- `extend` (not `append`) adds the list's elements, not the list as one item.
+- `nx.barbell_graph(5, 0)` = two size-5 cliques joined by a single edge; obvious communities {0–4}, {5–9}.
+
+✍️ worked example — scoring a split
+A candidate split has intra1 = 10, intra2 = 10, inter = 2. Then `ratio = (10+10)/2 = `$\boxed{10}$. High ratio = dense inside, sparse across → the brute force keeps the **maximum**-ratio split (via `max()` and its `index()`).
+
+⚠️ why brute force doesn't scale
+The number of two-way splits grows like 2^(n−1) — for n=10 that's 2⁹=512; for n=50 it's ~2⁵⁰, hopeless. We need a smarter method.
+
+### Edge betweenness — the "highways" idea
+
+Think of the road network of a country with the names removed. Roads within a city are dense; **highways** between cities are few, and every cross-city trip funnels through them. Find and cut the highways → the cities (communities) fall apart. In a friendship graph the "highways" are the bridging edges — and we quantify "highway-ness" with **edge betweenness**.
+
+edge betweenness of edge e
+
+$$ c_B(e)=\sum_{s,t}\frac{\sigma_{st}(e)}{\sigma_{st}} $$
+
+read it as: "over every pair of nodes s, t, the fraction of shortest s–t paths that run through edge e, summed up." Here $\sigma_{st}$ = number of shortest s–t paths and $\sigma_{st}(e)$ = how many of them use e. Bridging edges score high because nearly all cross-community shortest paths funnel through them; edges deep inside a community have many alternative routes, so they score low.
+
+#### two communities joined by high-betweenness edges
+
+[diagram: high betweenness → cut these]
+
+Every path between the two clusters must use a coral edge → high betweenness. Remove them → two components = two communities.
+
+⚙️ Girvan–Newman, one round
+- Compute edge betweenness for **every** edge.
+- Remove the **single highest**-betweenness edge.
+- Check whether the graph split into more components.
+- If still connected, repeat; once it splits, return the components as communities.
+
+### Method 2 — Girvan–Newman (the code)
+
+girvan_newman.pypython
+
+```
+import networkx as nx
+
+def edge_to_remove(G):
+    dict1 = nx.edge_betweenness_centrality(G)    # {edge: betweenness}
+    lot = list(dict1.items())                    # [(edge, value), ...]
+    lot.sort(key=lambda x: x[1], reverse=True)   # highest betweenness first
+    return lot[0][0]                             # lot[0] = top tuple; [0] = its edge
+
+def girvan(G):
+    c = list(nx.connected_component_subgraphs(G))  # components as subgraphs
+    l = len(c)                                      # how many components
+    while l == 1:                                   # while still one piece...
+        G.remove_edge(*edge_to_remove(G))           # * unpacks (a, b)
+        c = list(nx.connected_component_subgraphs(G))
+        l = len(c)
+    return c                                        # the communities
+
+G = nx.barbell_graph(5, 0)
+for comp in girvan(G):
+    print(comp.nodes())      # -> [0,1,2,3,4] and [5,6,7,8,9]
+```
+
+⚠️ code notes & gotchas
+- `nx.edge_betweenness_centrality(G)` returns a **dict** {edge: value}; `.items()` → (edge, value) tuples; sort with `key=lambda x: x[1], reverse=True`; `lot[0][0]` is the edge to drop.
+- `G.remove_edge(*edge)` — the `*` unpacks the tuple `(a,b)` into two arguments; without it you'd pass one tuple and get an error.
+- `nx.connected_component_subgraphs(G)` returns the components as subgraphs, so `len(...)` is the component count. (Removed in NetworkX ≥2.4; modern equivalent: `[G.subgraph(c) for c in nx.connected_components(G)]`.)
+- Far faster than brute force — no enumerating 2^(n−1) splits. On the barbell both methods return {0–4},{5–9}; on Zachary karate, Girvan–Newman recovers the two real factions (~19 & 15 nodes).
+
+🎨 visualising communities in Gephi
+Open the graph, run **Modularity** (a community-detection metric); the **resolution** slider controls how many communities (lower → more). Colour nodes by **modularity class**, use the **Force Atlas** layout to pull each community together, and size nodes by degree to spot hubs. On Zachary karate this cleanly shows the two factions.
+
+### Weak ties (low-overlap, local-bridge edges) carry new information and broker structural holes — and community structure hides in the high-betweenness "highway" edges.
+
+clustering(v) = friendships-among-friends / C(deg,2) · overlap = |common| / |union| · embeddedness = |common| · edge betweenness = Σ σ_st(e)/σ_st. Brute force is 2^(n−1); Girvan–Newman cuts high-betweenness edges until the graph splits.
+
+- Why do most job leads come through weak ties?
+A weak tie reaches a **different circle**, so it carries news your close friends (who share your circle) don't already have — novelty, not secrecy or numbers.
+
+- Match: triadic closure / local bridge / embeddedness / neighbourhood overlap.
+Triadic closure = two friends-of-a-friend becoming friends; local bridge = edge with no common-friend triad; embeddedness = # common friends of an edge; neighbourhood overlap = common ÷ union of the two friend sets.
+
+- P has 5 friends with 4 friendships among them — clustering coefficient?
+$4/\binom{5}{2}=4/10=0.40$.
+
+- X's friends {C,D,E}, Y's friends {C,D,F}: neighbourhood overlap and embeddedness of X–Y?
+Overlap = common/union = {C,D}/{C,D,E,F} = 2/4 = **0.5**. Embeddedness = |common| = **2**.
+
+- Bridge vs local bridge — which implies which?
+**Every bridge is a local bridge**, but not vice versa. Bridge = removal disconnects; local bridge = no triad on it.
+
+- Using Strong Triadic Closure, why is a local bridge a weak tie?
+If A–B were strong and A had another strong tie Z, STC forces Z–B → A,B gain a common friend, killing the "no triad" property. So a local bridge can't be strong → it's weak.
+
+- Sudarshan's only link to Ramya's separate community — what structure, who benefits?
+A **structural hole**; **Ramya** benefits — she **brokers** (monopolises) all access to her community.
+
+- Closure vs brokerage — and is 100% closure ideal?
+Closure = friends-of-friends linking (trust, clustering); brokerage = spanning a hole (access). Both matter; the optimal mix is an **open question**. 100% closure is "boring" — no separate groups to compete.
+
+- `list(combinations([1,2,3,4], 2))` produces what?
+The **6** unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; not permutations.
+
+- Why does `G.subgraph(part).number_of_edges()` give intra-community edges?
+`subgraph` is the **induced** subgraph — it keeps only edges with both endpoints in the set, i.e. the edges inside that part.
+
+- Order one Girvan–Newman round: (i) remove highest-betweenness edge, (ii) compute all edge betweenness, (iii) check components, (iv) repeat/return.
+**ii → i → iii → iv**: compute betweenness, remove the top edge, test connectivity, repeat while connected then return the components.
+
+- Define edge betweenness.
+Over all pairs s,t, the fraction of shortest s–t paths through e, summed: $\sum_{s,t}\sigma_{st}(e)/\sigma_{st}$. Bridging edges score high.
+
+— end of Week 3 ✏️
+↑ back to top

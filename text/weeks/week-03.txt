@@ -1,0 +1,1347 @@
+# Social Networks (NPTEL, IIT Ropar, Prof. S. R. S. Iyengar)
+# Week 3: Strong & Weak Ties, Communities
+# Lectures 27-40
+# Website: https://pml2405.github.io/social-networks/   Repo: https://github.com/PML2405/social-networks
+
+This file has three parts, in order: (A) the student's handwritten-style study NOTES, (B) the weekly ASSIGNMENT / question paper with solutions, (C) the full lecture TRANSCRIPTS. The notes are a condensed re-teach of the lectures; the transcript is the authority.
+
+==============================================================================
+PART A - STUDY NOTES (Week 3)
+==============================================================================
+
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 3 — Strong & Weak Ties, and Communities
+
+Lectures 27–40 · why your acquaintances land you jobs, the local structure of friendship, and two algorithms that find hidden communities.
+
+🧠 the big picture, first
+
+Granovetter's shock: most jobs come not from close friends but from **weak ties** (acquaintances), because a distant contact lives in a different world and carries news you don't already have. To make this precise we build a toolkit of **local** measures — **triadic closure, clustering coefficient, neighbourhood overlap, bridges/local bridges, embeddedness** — and see how they explain trust, brokerage (**structural holes**) and **social capital**. Then we zoom out: how do you split a graph into **communities**? Two algorithms — brute force and **Girvan–Newman** (edge betweenness) — with real NetworkX code.
+
+### 📒 what's inside Week 3
+
+- The Strength of Weak Ties (Granovetter)
+
+why acquaintances matter for jobs
+- Local structure: triadic closure, clustering, neighbourhood overlap
+- Bridges, local bridges & the Strong Triadic Closure argument
+- Embeddedness, structural holes, social capital
+
++ cell-phone validation & passive engagement
+- Communities & betweenness
+
+brute force + Girvan–Newman code + Gephi
+
+LECTURES 27–28
+
+## The Strength of Weak Ties
+
+opportunity knocks through someone you barely know
+
+## 1 Why acquaintances land you jobs
+
+Ask 100 employed people "how did you hear about this job?" — more than 90% say it came from a distant contact, a friend-of-a-friend, an acquaintance — **not** a close friend. This feels backwards. The reason isn't secrecy; it's **information**.
+
+📖 strong tie vs weak tie
+A tie is a friendship. A strong tie = a close, frequent friend. A weak tie = an occasional, distant acquaintance. Granovetter's finding: weak ties are "strong" for spreading new information; strong ties are "weak" for it.
+
+#### you, four office friends, and E from another world
+
+[diagram: you | A | B | C | D | E]
+
+A,B,C,D (your office, strong solid ties) all know each other → they mostly know what you know. E (coral dashed weak tie) is from a different world → E brings new info.
+
+Say A, B, C, D work where you work and all know each other; E works elsewhere and knows none of them. Whatever A–D hear, you probably already heard too (same circle). But **E** reaches a different world — a job opening you'd never otherwise learn of.
+
+So a weak tie **expands your information sample space**. (Granovetter's 1969 paper was rejected; it finally published in **1973** and became famous.)
+
+⚠️ the self-defeating twist
+The moral is **not** "convert your acquaintances into close friends." If you keep an acquaintance too happy, they become a close friend — now inside your circle, sharing the same information you already have, so they stop being a source of new job leads. The real prescription is a large acquaintance circle (many weak ties), not a few strong ones.
+
+LECTURE 29
+
+## Local structure of friendships
+
+triadic closure · clustering coefficient · neighbourhood overlap
+
+## 2 Three local measures
+
+### Triad & triadic closure
+
+#### a triad closes into a triangle
+
+[diagram: You | A | B | A & B share a | friend (You) → | eventually A–B | befriend (coral)]
+
+**Triad**: You know A and B, but A–B don't know each other. **Triadic closure**: A and B eventually befriend, closing the triangle.
+
+📖 triad & triadic closure
+A triad = one person connected to two others who aren't connected to each other. Triadic closure = the tendency for those two friends-of-a-friend to eventually become friends (the triad closes into a triangle). A recurring engine all course.
+
+### Clustering coefficient
+
+clustering coefficient of node v
+
+$$ C(v)=\frac{\#\text{friendships among }v\text{'s friends}}{\binom{\deg(v)}{2}} $$
+
+read it as: "of all pairs of my friends, what fraction actually know each other." 1 = my friends form a clique; 0 = none know each other. (Research the instructor cites: people with very low clustering — friends from disconnected circles they can never gather together — were observed to be more prone to depression and even attempted suicide.)
+
+✍️ worked examples — clustering coefficient
+- **Transcript's example:** you have 5 friends with **6** friendships among them. Possible = $\binom{5}{2}=10$, so $C=\frac{6}{10}=0.6$.
+- **Assignment's example:** person P has 5 friends with exactly **4** friendships among them. $C=\frac{4}{\binom{5}{2}}=\frac{4}{10}=\boxed{0.4}$.
+
+### Neighbourhood overlap
+
+neighbourhood overlap of edge A–B
+
+$$ \text{overlap}(A,B)=\frac{|\,N(A)\cap N(B)\,|}{|\,N(A)\cup N(B)\,|} $$
+
+read it as: "of all the distinct friends A and B have between them, what fraction are shared." Analogy: redefining "rich" not as how much you earn but as how well you spend it — a ratio, not a raw count. Close to 1 = strongly-embedded strong tie; close to 0 = near a local bridge (weak tie).
+
+⚠️ precision — exclude A and B themselves
+When A and B are directly friends, remember that N(A) and N(B) here mean their other friends — **exclude A and B themselves** from both sets. Otherwise B (which sits in N(A)) and A (in N(B)) would inflate the union and shrink the overlap. In the worked example the sets {C,D,E} and {C,D,F} already exclude X and Y, so it's clean.
+
+✍️ worked example — overlap of edge X–Y
+X's friends = {C, D, E}; Y's friends = {C, D, F}. Common = {C,D} (2); union = {C,D,E,F} (4). $$\text{overlap}=\frac{2}{4}=\boxed{0.5}.$$
+
+LECTURES 30–31
+
+## Bridges, local bridges & why they're weak
+
+the Strong Triadic Closure argument + cell-phone validation
+
+## 3 Bridges, local bridges, and the STC argument
+
+📖 bridge vs local bridge
+- Bridge — an edge whose **removal disconnects** the graph (the only link between two parts).
+- Local bridge — the relaxed version: an edge with **no triad on it**, i.e. its two endpoints share **no common friend**.
+
+**Relationship:** every bridge is a local bridge, but not every local bridge is a bridge. (A bridge's endpoints can't have a common friend — that would give an alternate path — so it has no triad; but a local bridge needn't disconnect the graph.)
+
+**The motivating picture:** recall the two-cluster classroom — 25 people on each side with **625** possible cross-cluster friendships (25×25), yet only **one** actual edge joining the sides. That lone edge is obviously a bridge and a weak tie: its endpoint B knows a whole island of people that A doesn't. Such an extreme structure is rare in real life, which is why we relax the definition to the **local** bridge.
+
+#### a local bridge A–B (no shared friend)
+
+[diagram: A | B | local bridge]
+
+A and B each have many friends, but **none in common** → A–B is a local bridge, joining two worlds.
+
+⚙️ Strong Triadic Closure (STC) → a local bridge is weak
+**STC property:** if a person has two strong ties, those two people become connected. Now suppose the local bridge A–B were strong, and A has any other strong tie Z. By STC, Z and B would connect — giving A and B a common friend Z, destroying the "no triad" property. Contradiction. So a local bridge **cannot be strong** → it must be a **weak tie**. This is Granovetter's structural argument.
+
+📞 validation on real cell-phone data (2007)
+Granovetter (1960s) couldn't test his theory — no friendship data. In 2007 a cell-phone network (edge = a call; weight = minutes over 18 weeks; ~85% of nodes in one big component) let researchers check it. Result: edges with **low neighbourhood overlap** (near-local-bridges) carried **less** call time → they really are **weak ties**. Neighbourhood overlap is the continuous ("grey-scale") proxy for the binary local-bridge idea.
+
+LECTURES 32–34, 38
+
+## Embeddedness, structural holes, social capital
+
+trust, brokerage, and how social media really engages you
+
+## 4 Trust, brokerage & the value of a network
+
+### Embeddedness
+
+embeddedness of edge A–B
+
+$$ \text{embeddedness}(A,B)=|\,N(A)\cap N(B)\,| $$
+
+read it as: "the raw number of common friends the two endpoints share" (the numerator of neighbourhood overlap, un-normalised). It's a property of an **edge**, not a node. Higher embeddedness → more **trust** (a stranger who shares 5 of your friends is unlikely to cheat you; and if two friends fall out, a common friend can be pulled in to enforce fairness — with no common friend, there's no one to appeal to). It's the same logic as a bank asking for a **guarantor/surety** before a loan: a third party makes default costlier and rarer.
+
+✍️ worked example — embeddedness of X–Y
+X's friends {C,D,E}, Y's friends {C,D,F} → common {C,D} → embeddedness = $\boxed{2}$. (Same numerator as its neighbourhood overlap 2/4; overlap just divides by the union.)
+
+### Structural holes & brokerage
+
+#### Ramya brokers a structural hole
+
+[diagram: Sudarshan | Ramya]
+
+The gap between the two communities is a **structural hole**; the single low-embeddedness edge (coral) is spanned by Ramya, who **brokers** all traffic between them.
+
+📖 structural hole & brokerage
+A structural hole is the gap between two otherwise-separate communities, spanned by a single low-embeddedness edge. The person on that edge is a broker: everyone on one side who needs the other side must go through them. Ramya (a real-estate agent) monopolises access to her community, so she **profits** from the position. This is the network flip-side of weak ties: a low-embeddedness edge is bad for trust but great for brokerage.
+
+### Social capital: closure vs brokerage
+
+| | Closure | Brokerage |
+| what | friends-of-friends becoming friends (triadic closure everywhere) | spanning a structural hole between separate groups |
+| gives | high clustering, trust, mutual support | access, control, information advantage (Granovetter's weak ties) |
+| too much? | 100% closure = everyone on one team = boring : no distinct groups left to compete (you can't cheer for a side) | all brokerage, no closure = low trust |
+
+read it as: "the network itself is **social capital** — a resource. Both closure and brokerage are valuable; the ideal mix (where to sprinkle friendships so a team performs best) is an **open research question**."
+
+📱 tie strength on social media & passive engagement
+- Facebook links come in three kinds: one-way (you message, no reply), mutual/reciprocal (real back-and-forth), and maintained relationships — you never talk, but you follow their news feed and click "like". This last is passive engagement.
+- Plotting all three vs network size: **maintained/passive is highest**. What keeps people glued to social media is quietly watching each other's lives, not conversing.
+- On Twitter, "strong ties" (having exchanged direct messages) **converge to ~50** no matter how many followers you have — a fixed **cognitive/time budget**. Celebrities with millions of followers still have few genuine strong ties.
+
+LECTURES 35–37, 39
+
+## Finding communities & betweenness
+
+brute force · Girvan–Newman · edge betweenness · Gephi
+
+## 5 Detecting communities
+
+📖 community
+A community is a set of nodes with many links inside and few links across — high intra-community edge density, low inter-community density. It need not be a clique, need not be equal-sized, and nodes need not have equal degree. Splitting a graph into communities = a partition of the vertex set.
+
+### Method 1 — brute force
+
+Try every way to split the nodes into two parts; score each by comparing edges inside the parts against edges crossing between them; keep the best.
+
+brute_force_communities.pypython
+
+```
+import networkx as nx
+from itertools import combinations
+
+def communities_brute(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    first = []                                  # all candidate "part 1" node-sets
+    for i in range(1, n//2 + 1):                # sizes 1..n/2 (avoid mirror dupes)
+        first.extend([list(x) for x in combinations(nodes, i)])
+    second = [list(set(nodes) - set(part)) for part in first]   # complements
+
+    ratios = []
+    for i in range(len(first)):
+        intra1 = G.subgraph(first[i]).number_of_edges()   # edges inside part 1
+        intra2 = G.subgraph(second[i]).number_of_edges()  # edges inside part 2
+        inter  = G.number_of_edges() - intra1 - intra2    # crossing edges
+        ratios.append(float(intra1 + intra2) / inter)     # higher = better split
+
+    best = ratios.index(max(ratios))            # index of the best split
+    return first[best], second[best]
+
+G = nx.barbell_graph(5, 0)                      # two 5-cliques joined by 1 edge
+print(communities_brute(G))     # -> ([0,1,2,3,4], [5,6,7,8,9])
+```
+
+⚙️ the pieces
+- `combinations([1,2,3,4], 2)` → all **6** unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; it's an iterator, so wrap in `list()`.
+- `G.subgraph(nodes).number_of_edges()` = the **induced subgraph**'s edges — only edges with both endpoints inside the set → the **intra** count.
+- Sizes only go to `n//2`: a split of size k and its complement (n−k) are the same partition; `+1` because `range` excludes its stop.
+- `extend` (not `append`) adds the list's elements, not the list as one item.
+- `nx.barbell_graph(5, 0)` = two size-5 cliques joined by a single edge; obvious communities {0–4}, {5–9}.
+
+✍️ worked example — scoring a split
+A candidate split has intra1 = 10, intra2 = 10, inter = 2. Then `ratio = (10+10)/2 = `$\boxed{10}$. High ratio = dense inside, sparse across → the brute force keeps the **maximum**-ratio split (via `max()` and its `index()`).
+
+⚠️ why brute force doesn't scale
+The number of two-way splits grows like 2^(n−1) — for n=10 that's 2⁹=512; for n=50 it's ~2⁵⁰, hopeless. We need a smarter method.
+
+### Edge betweenness — the "highways" idea
+
+Think of the road network of a country with the names removed. Roads within a city are dense; **highways** between cities are few, and every cross-city trip funnels through them. Find and cut the highways → the cities (communities) fall apart. In a friendship graph the "highways" are the bridging edges — and we quantify "highway-ness" with **edge betweenness**.
+
+edge betweenness of edge e
+
+$$ c_B(e)=\sum_{s,t}\frac{\sigma_{st}(e)}{\sigma_{st}} $$
+
+read it as: "over every pair of nodes s, t, the fraction of shortest s–t paths that run through edge e, summed up." Here $\sigma_{st}$ = number of shortest s–t paths and $\sigma_{st}(e)$ = how many of them use e. Bridging edges score high because nearly all cross-community shortest paths funnel through them; edges deep inside a community have many alternative routes, so they score low.
+
+#### two communities joined by high-betweenness edges
+
+[diagram: high betweenness → cut these]
+
+Every path between the two clusters must use a coral edge → high betweenness. Remove them → two components = two communities.
+
+⚙️ Girvan–Newman, one round
+- Compute edge betweenness for **every** edge.
+- Remove the **single highest**-betweenness edge.
+- Check whether the graph split into more components.
+- If still connected, repeat; once it splits, return the components as communities.
+
+### Method 2 — Girvan–Newman (the code)
+
+girvan_newman.pypython
+
+```
+import networkx as nx
+
+def edge_to_remove(G):
+    dict1 = nx.edge_betweenness_centrality(G)    # {edge: betweenness}
+    lot = list(dict1.items())                    # [(edge, value), ...]
+    lot.sort(key=lambda x: x[1], reverse=True)   # highest betweenness first
+    return lot[0][0]                             # lot[0] = top tuple; [0] = its edge
+
+def girvan(G):
+    c = list(nx.connected_component_subgraphs(G))  # components as subgraphs
+    l = len(c)                                      # how many components
+    while l == 1:                                   # while still one piece...
+        G.remove_edge(*edge_to_remove(G))           # * unpacks (a, b)
+        c = list(nx.connected_component_subgraphs(G))
+        l = len(c)
+    return c                                        # the communities
+
+G = nx.barbell_graph(5, 0)
+for comp in girvan(G):
+    print(comp.nodes())      # -> [0,1,2,3,4] and [5,6,7,8,9]
+```
+
+⚠️ code notes & gotchas
+- `nx.edge_betweenness_centrality(G)` returns a **dict** {edge: value}; `.items()` → (edge, value) tuples; sort with `key=lambda x: x[1], reverse=True`; `lot[0][0]` is the edge to drop.
+- `G.remove_edge(*edge)` — the `*` unpacks the tuple `(a,b)` into two arguments; without it you'd pass one tuple and get an error.
+- `nx.connected_component_subgraphs(G)` returns the components as subgraphs, so `len(...)` is the component count. (Removed in NetworkX ≥2.4; modern equivalent: `[G.subgraph(c) for c in nx.connected_components(G)]`.)
+- Far faster than brute force — no enumerating 2^(n−1) splits. On the barbell both methods return {0–4},{5–9}; on Zachary karate, Girvan–Newman recovers the two real factions (~19 & 15 nodes).
+
+🎨 visualising communities in Gephi
+Open the graph, run **Modularity** (a community-detection metric); the **resolution** slider controls how many communities (lower → more). Colour nodes by **modularity class**, use the **Force Atlas** layout to pull each community together, and size nodes by degree to spot hubs. On Zachary karate this cleanly shows the two factions.
+
+### Weak ties (low-overlap, local-bridge edges) carry new information and broker structural holes — and community structure hides in the high-betweenness "highway" edges.
+
+clustering(v) = friendships-among-friends / C(deg,2) · overlap = |common| / |union| · embeddedness = |common| · edge betweenness = Σ σ_st(e)/σ_st. Brute force is 2^(n−1); Girvan–Newman cuts high-betweenness edges until the graph splits.
+
+- Why do most job leads come through weak ties?
+A weak tie reaches a **different circle**, so it carries news your close friends (who share your circle) don't already have — novelty, not secrecy or numbers.
+
+- Match: triadic closure / local bridge / embeddedness / neighbourhood overlap.
+Triadic closure = two friends-of-a-friend becoming friends; local bridge = edge with no common-friend triad; embeddedness = # common friends of an edge; neighbourhood overlap = common ÷ union of the two friend sets.
+
+- P has 5 friends with 4 friendships among them — clustering coefficient?
+$4/\binom{5}{2}=4/10=0.40$.
+
+- X's friends {C,D,E}, Y's friends {C,D,F}: neighbourhood overlap and embeddedness of X–Y?
+Overlap = common/union = {C,D}/{C,D,E,F} = 2/4 = **0.5**. Embeddedness = |common| = **2**.
+
+- Bridge vs local bridge — which implies which?
+**Every bridge is a local bridge**, but not vice versa. Bridge = removal disconnects; local bridge = no triad on it.
+
+- Using Strong Triadic Closure, why is a local bridge a weak tie?
+If A–B were strong and A had another strong tie Z, STC forces Z–B → A,B gain a common friend, killing the "no triad" property. So a local bridge can't be strong → it's weak.
+
+- Sudarshan's only link to Ramya's separate community — what structure, who benefits?
+A **structural hole**; **Ramya** benefits — she **brokers** (monopolises) all access to her community.
+
+- Closure vs brokerage — and is 100% closure ideal?
+Closure = friends-of-friends linking (trust, clustering); brokerage = spanning a hole (access). Both matter; the optimal mix is an **open question**. 100% closure is "boring" — no separate groups to compete.
+
+- `list(combinations([1,2,3,4], 2))` produces what?
+The **6** unordered 2-subsets: (1,2)(1,3)(1,4)(2,3)(2,4)(3,4). Order ignored; not permutations.
+
+- Why does `G.subgraph(part).number_of_edges()` give intra-community edges?
+`subgraph` is the **induced** subgraph — it keeps only edges with both endpoints in the set, i.e. the edges inside that part.
+
+- Order one Girvan–Newman round: (i) remove highest-betweenness edge, (ii) compute all edge betweenness, (iii) check components, (iv) repeat/return.
+**ii → i → iii → iv**: compute betweenness, remove the top edge, test connectivity, repeat while connected then return the components.
+
+- Define edge betweenness.
+Over all pairs s,t, the fraction of shortest s–t paths through e, summed: $\sum_{s,t}\sigma_{st}(e)/\sigma_{st}$. Bridging edges score high.
+
+— end of Week 3 ✏️
+↑ back to top
+
+==============================================================================
+PART B - ASSIGNMENT & SOLUTIONS (Week 3)
+==============================================================================
+
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 3 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — The Strength of Weak Ties
+Case Study
+An employment researcher, Devika, studies how people actually land new jobs. Surveying a large alumni
+network, she keeps hearing the same surprising thing: the lead that produced the job rarely came from a
+close, everyday friend; far more often it came from a distant acquaintance someone the person barely
+keeps in touch with. To make sense of this she models the alumni as a graph: each person is a node, and a
+friendship is an edge that can be strong (frequent, close contact) or weak (occasional, distant contact).
+She reasons about why a distant contact is so valuable. Close friends tend to move in the same circle, so
+they mostly know what you already know; a distant contact lives in a different cluster and carries
+information you would not otherwise reach. She also revisits the local structure of friendships: when one
+person is close to two others, those two tend, eventually, to meet and befriend each other. And she pays
+attention to edges that join two otherwise-separate clusters, since pulling such an edge would cut the
+network in two.
+To make these ideas concrete she keeps a few small examples in front of her. In one, a person P has five
+close friends and, among those five, exactly four friendships exist. In another, she looks at a single
+friendship between two people X and Y: X's friends are {C, D, E} and Y's friends are {C, D, F}. She is also
+interested in how a person who is the sole connection between two communities can quietly profit from
+that position.
+Questions 1–10
+Q1.  [MCQ]  In Devika's survey, most job leads come through weak ties (distant acquaintances) rather than
+strong ties (close friends). What is the best explanation?
+A.  Close friends deliberately keep job openings to themselves, so leads arrive only through acquaintances.
+B.  Weak ties reach into a different circle, so they carry news your close friends don’t already have.
+C.  Weak ties simply outnumber strong ties, so by sheer chance more leads happen to pass through them.
+D.  Strong ties cannot transmit information at all, leaving only weak ties able to pass job news along.
+Answer:  B
+Reference:  Lecture 28 – Granovetter’s Strength of Weak Ties (≈01:34–02:32)
+Solution:  Close friends share your circle and largely know what you already know; a weak tie reaches a
+different world and brings genuinely new information, such as an unfamiliar opening. It is this novelty — not
+secrecy, not sheer numbers, and not any inability of strong ties to communicate — that makes weak ties so
+useful in a job search.
+
+[p.2]
+Q2.  [Match the following]  Match each concept in Column A with its correct definition in Column B.
+Column A (concept)
+Column B (definition)
+1. Triadic closure
+a. an edge whose two endpoints have no common
+friend (no triad on it)
+2. Local bridge
+b. the number of common friends shared by the two
+endpoints of an edge
+3. Embeddedness
+c. two people with a common friend becoming
+friends with each other
+4. Neighbourhood overlap
+d. (common friends) ÷ (all distinct friends) of an
+edge’s two endpoints
+
+A.  1-a, 2-c, 3-d, 4-b
+B.  1-c, 2-a, 3-b, 4-d
+C.  1-c, 2-b, 3-a, 4-d
+D.  1-d, 2-a, 3-b, 4-c
+Answer:  B (1-c, 2-a, 3-b, 4-d)
+Reference:  Lecture 29 – Triads, clustering coefficient and neighbourhood overlap; Lecture 30 – bridges;
+Lecture 32 – embeddedness
+Solution:  Triadic closure is two friends-of-a-friend becoming friends (1-c). A local bridge is an edge with no
+triad on it — its endpoints share no common friend (2-a). Embeddedness of an edge is the count of
+common friends of its endpoints (3-b). Neighbourhood overlap normalises that count by the union of the
+two friend sets (4-d).
+
+Q3.  [MCQ]  Person P has five close friends, and among those five there are exactly four friendships. What is
+P’s clustering coefficient?
+A.  4/5 = 0.80
+B.  4/25 = 0.16
+C.  4/10 = 0.40
+D.  5/10 = 0.50
+Answer:  C
+Reference:  Lecture 29 – Triads, clustering coefficient and neighbourhood overlap (≈03:23–04:29)
+Solution:  Clustering coefficient = (friendships among your friends) ÷ (possible friendships among them).
+With 5 friends, the possible friendships number C(5,2) = 10, and 4 exist, so the coefficient is 4/10 = 0.40. A
+value near 1 means your friends all know each other; near 0 means they don’t.
+
+Q4.  [MCQ]  For the friendship between X and Y, X’s friends are {C, D, E} and Y’s friends are {C, D, F}. What is
+the neighbourhood overlap of the edge X–Y?
+A.  2/3 ≈ 0.67
+B.  2/6 ≈ 0.33
+C.  3/3 = 1.00
+
+[p.3]
+D.  2/4 = 0.50
+Answer:  D
+Reference:  Lecture 29 – Triads, clustering coefficient and neighbourhood overlap (≈06:14–08:54)
+Solution:  Neighbourhood overlap = |common friends| ÷ |all distinct friends|. Common = {C, D} (2); union =
+{C, D, E, F} (4). So the overlap is 2/4 = 0.50. A small overlap signals an edge close to a local bridge (a weak
+tie); a large overlap signals a strongly embedded, strong tie.
+
+Q5.  [MCQ]  Using the same two friend sets {C, D, E} for X and {C, D, F} for Y, what is the embeddedness of
+the edge X–Y?
+A.  2
+B.  4
+C.  6
+D.  0
+Answer:  A
+Reference:  Lecture 32 – Embeddedness (≈01:03)
+Solution:  Embeddedness of an edge is simply the number of common friends of its endpoints — here {C,
+D}, so 2. (Neighbourhood overlap in the previous question is this same count divided by the size of the
+union.) Higher embeddedness is associated with more trust between the two people.
+
+Q6.  [MCQ]  Devika notes the relationship between bridges and local bridges. Which statement is correct?
+A.  Every bridge is a local bridge, but not every local bridge is a bridge.
+B.  Every local bridge is a bridge, but not every bridge is a local bridge.
+C.  A bridge and a local bridge are simply two names for the same thing.
+D.  Neither a bridge nor a local bridge can ever turn out to be a weak tie.
+Answer:  A
+Reference:  Lecture 30 – Structure of weak ties, bridges, and local bridges (≈02:50–03:29)
+Solution:  A bridge is an edge whose removal disconnects the graph; a local bridge is the weaker notion of
+an edge with no triad on it (its endpoints share no common friend). Every bridge necessarily has no
+common-friend triad, so every bridge is a local bridge; but a local bridge need not disconnect the graph, so
+the converse fails. Both tend to be weak ties.
+
+Q7.  [MCQ]  Granovetter argued that a local bridge is almost always a weak tie. Using the
+strong-triadic-closure property, which reasoning supports this?
+A.  Two people in separate clusters rarely meet, so any cross-cluster edge must be weak, regardless of
+closure.
+B.  A local bridge has to be a strong tie, since only a strong tie can reach across two separate clusters.
+C.  If A–B were strong and A also had a strong tie Z, closure forces Z–B, so A and B share a friend.
+D.  Removing any strong tie disconnects the graph, so every strong tie is by definition a bridge and a local
+bridge.
+Answer:  C
+
+[p.4]
+Reference:  Lecture 30 – Structure of weak ties, bridges, and local bridges (≈11:09)
+Solution:  Under strong triadic closure, a person’s two strong ties become connected. So if the local bridge
+A–B were strong and A had any other strong tie Z, then Z–B would form — creating a common friend of A
+and B and destroying the “no triad” property. Hence a local bridge can’t be a strong tie; it is a weak tie. The
+other options misstate the bridge/strength relationship.
+
+Q8.  [MCQ]  Sudarshan is the only person linking his community to Ramya, who sits in a separate community
+of real-estate agents. What does this structure illustrate, and who benefits?
+A.  A structural hole; Ramya benefits, since every contact to her community must pass through her
+(brokerage).
+B.  High embeddedness; the two communities share many friends, so both sides benefit equally from the
+link.
+C.  Triadic closure; the two separate communities will soon merge into one single large community.
+D.  A clustering coefficient of one; the single link makes the entire network completely connected.
+Answer:  A
+Reference:  Lecture 33 – Structural Holes (≈00:51–end)
+Solution:  The gap between the two communities, spanned by a single low-embeddedness edge, is a
+structural hole. Ramya brokers it: anyone on Sudarshan’s side who needs the other community must go
+through her, so she profits from the monopoly position. This is the network-structure flip-side of
+Granovetter’s weak ties; it is not high embeddedness, triadic closure, or full connectivity.
+
+Q9.  [MSQ]  Which statements about embeddedness and trust are correct? (Select all that apply.)
+I.   Embeddedness is a property of an edge (a relationship), not of a single node.
+II.  Higher embeddedness (more common friends) is generally associated with greater trust between the
+two people.
+III. A low-embeddedness edge can still be valuable, because it may give one endpoint a brokerage position
+between communities.
+IV.  Embeddedness equals the total number of friends a single person has.
+A.  I, II, IV
+B.  I, II, III
+C.  II, III, IV
+D.  I, III
+Answer:  B (statements I, II, III)
+Reference:  Lecture 32 – Embeddedness; Lecture 33 – Structural Holes
+Solution:  Embeddedness is defined per edge (the common friends of its two endpoints), and more
+common friends usually means more trust (statements I and II). A low-embeddedness edge can still confer a
+brokerage advantage across a structural hole (III). Counting a single person’s friends describes that node’s
+degree, not an edge’s embeddedness, so IV is false.
+
+[p.5]
+Q10.  [MSQ]  Which statements about social capital, closure, and brokerage are correct? (Select all that
+apply.)
+I.   Closure refers to friends-of-friends becoming friends, which raises clustering and trust.
+II.  Brokerage refers to spanning a structural hole between otherwise-separate groups.
+III. A network where everyone is friends with everyone (100% closure) maximises healthy competition
+between distinct groups.
+IV.  Both closure and brokerage can be valuable; the ideal social structure is an open research question.
+A.  I, II, III
+B.  II, III, IV
+C.  I, II, IV
+D.  I, IV
+Answer:  C (statements I, II, IV)
+Reference:  Lecture 34 – Social Capital (closure vs brokerage)
+Solution:  Closure (friends-of-friends linking) and brokerage (spanning a hole) are the two mechanisms, and
+both matter — the optimal mix is unresolved (statements I, II, IV). Total closure leaves no distinct groups to
+compete (the “everyone-on-one-team” case the lecture calls boring), so III is false: competition needs
+separate communities linked by brokers.
+
+[p.6]
+Comprehension 2 — Finding the Hidden Groups: Community Detection
+Case Study
+A platform-integrity team wants to split a user-interaction graph into communities tightly knit groups with
+many links inside and few links across. Visualising the graph rarely reveals the groups directly, so the team
+turns to two algorithms covered in the course.
+The first is a brute-force partitioner. It enumerates every way of splitting the nodes into two parts, and for
+each split scores how community-like it is by comparing the edges that stay inside the two parts against the
+edges that cross between them; the split with the best score wins. To build the splits it relies on Python’s
+itertools.combinations, and to count the edges that fall inside a candidate part it uses an induced subgraph.
+For a tiny test it uses a barbell graph two cliques of five joined by a single connecting edge, whose obvious
+communities are nodes {0,1,2,3,4} and {5,6,7,8,9}.
+The second is the Girvan–Newman algorithm. Its insight is that the edges bridging two communities act like
+highways: an unusually large share of the network’s shortest paths must funnel through them, so those
+bridging edges carry a high value of edge betweenness. The algorithm repeatedly measures edge
+betweenness, deletes the most “highway-like” edge, and watches for the graph to fall apart into separate
+pieces those pieces are the communities. It is far faster than brute force on large graphs.
+import networkx as nx​
+from itertools import combinations​
+ ​
+# brute force: score a split by intra vs inter edges​
+sub = G.subgraph(first_community)        # induced subgraph​
+intra1 = sub.number_of_edges()           # edges inside part 1​
+inter  = G.number_of_edges() - intra1 - intra2​
+ratio  = (intra1 + intra2) / inter       # higher = better split
+Questions 1–10
+Q1.  [MCQ]  How does the team define a good community partition of the user graph?
+A.  Every node in the graph has exactly the same number of links as every other.
+B.  Each group forms a complete subgraph in which all of its members are linked.
+C.  The two groups always contain exactly the same number of nodes as each other.
+D.  Each group has many links inside it and only few links to the other groups.
+Answer:  D
+Reference:  Lecture 35 / 39 – community definition
+Solution:  A community is a set of nodes densely linked within and sparsely linked to the rest — high
+intra-community edge density, low inter-community density. It need not be a clique, need not be
+equal-sized, and does not require every node to have the same degree.
+
+[p.7]
+Q2.  [MCQ]  The brute-force code builds candidate parts with itertools.combinations. What does
+list(combinations([1,2,3,4], 2)) produce?
+from itertools import combinations​
+list(combinations([1, 2, 3, 4], 2))
+A.  All twelve ordered pairs, counting (1,2) and (2,1) as two different pairs.
+B.  All six unordered 2-element subsets of the list, each one listed exactly once.
+C.  The four single-element tuples (1,), (2,), (3,), and (4,) on their own.
+D.  One single tuple that contains all four elements together, (1, 2, 3, 4).
+Answer:  B
+Reference:  Lecture 35 – Finding Communities, Brute Force (≈03:39)
+Solution:  combinations(list, 2) returns every unordered 2-element combination as a tuple — C(4,2) = 6 of
+them: (1,2),(1,3),(1,4),(2,3),(2,4),(3,4). Order is ignored, so (2,1) never appears (that would be
+permutations). The result is an iterator; wrapping it in list() materialises the six tuples.
+
+Q3.  [MCQ]  Inside the loop the code calls G.subgraph(first_community).number_of_edges(). What does this
+value represent?
+A.  The number of edges joining nodes that both lie within first_community only.
+B.  The total number of edges present in the whole graph G, across both groups.
+C.  The number of edges that cross between the first and the second community.
+D.  The number of nodes that are contained in the set first_community.
+Answer:  A
+Reference:  Lecture 35 – Finding Communities, Brute Force (≈14:05–18:31)
+Solution:  G.subgraph(nodes) returns the induced subgraph on those nodes — it keeps only edges whose
+both endpoints lie in the set. So number_of_edges() on it counts the intra-community edges of that part.
+Inter-community edges are then obtained by subtracting both parts’ intra counts from the graph’s total.
+
+Q4.  [MCQ]  For one candidate split the team finds 10 intra-edges in part 1, 10 intra-edges in part 2, and 2
+edges crossing between the parts. Using ratio = (intra1 + intra2) / inter, what is the score, and how is it
+used?
+A.  0.1, and the split with the lowest ratio is chosen as best.
+B.  2, since the ratio just equals the number of crossing edges.
+C.  10, and the split with the highest ratio is chosen as best.
+D.  22, since the ratio counts every edge in the whole graph.
+Answer:  C
+Reference:  Lecture 35 – Finding Communities, Brute Force (≈13:49–23:15)
+Solution:  ratio = (10 + 10) / 2 = 10. A high ratio means dense connections inside the groups and sparse
+connections between them, so the brute-force method keeps the division with the maximum ratio (found
+via max() and its index) as the best partition.
+
+[p.8]
+Q5.  [MCQ]  Why does the team consider the brute-force method impractical for large graphs?
+A.  It only runs on graphs that have fewer than ten edges in total.
+B.  The number of two-way splits grows like 2^(n−1), which explodes as n gets large.
+C.  It has no way to count the number of edges inside a candidate subgraph.
+D.  It always returns the wrong communities, no matter how small the graph happens to be.
+Answer:  B
+Reference:  Lecture 39 – Betweenness Measures and Graph Partitioning (≈04:02); Lecture 36
+Solution:  Brute force checks essentially every split of the node set; the count grows exponentially (on the
+order of 2^(n−1)), so it becomes infeasible for large graphs — the lecture notes around 2^n cases for n = 50.
+For n = 10 that is already 2^9 = 512 divisions. Girvan–Newman avoids enumerating splits.
+
+Q6.  [MCQ]  What is the central idea that lets Girvan–Newman find communities by edge betweenness?
+A.  Bridging edges carry high betweenness, since most cross-community shortest paths run through them.
+B.  Edges that lie deep inside a single community carry the highest betweenness values of all.
+C.  Every edge in the graph has an identical betweenness, so any edge may be removed first.
+D.  Removing the lowest-betweenness edge first is what reveals the community structure.
+Answer:  A
+Reference:  Lecture 36 – Girvan–Newman (≈00:30); Lecture 39 (≈09:02–13:19)
+Solution:  Inter-community (bridging) edges are bottlenecks: nearly all shortest paths between the two
+groups funnel through them, giving them high edge betweenness. Removing the highest-betweenness
+edges first cuts these bridges and exposes the communities. Intra-community edges have many alternative
+paths around them, so they carry lower betweenness.
+
+Q7.  [Arrange in order]  Arrange the steps of one round of the Girvan–Newman algorithm in the correct order.
+Steps (in scrambled order):
+(i)   Remove the edge with the highest betweenness from the graph.
+(ii)  Compute the edge betweenness centrality of every edge.
+(iii) Check whether the graph has split into more connected components.
+(iv)  If still connected, repeat; once it splits, return the connected components as communities.
+A.  i → ii → iii → iv
+B.  ii → i → iii → iv
+C.  iii → ii → i → iv
+D.  ii → iii → i → iv
+Answer:  B (ii → i → iii → iv)
+Reference:  Lecture 36 – Girvan–Newman (≈01:55–12:45)
+Solution:  Each round first computes edge betweenness for all edges (ii), then removes the single
+highest-betweenness edge (i), then tests connectivity (iii); while the graph stays connected the loop repeats,
+and as soon as it disconnects the components are returned as communities (iv).
+
+[p.9]
+Q8.  [MCQ]  In the implementation, nx.edge_betweenness_centrality(G) is called and its result is processed
+as below. What does the function return, and what does the sort achieve?
+dict1 = nx.edge_betweenness_centrality(G)​
+lot = list(dict1.items())​
+lot.sort(key=lambda x: x[1], reverse=True)​
+return lot[0][0]    # the edge to remove
+A.  A list of nodes; the sort just arranges those nodes into alphabetical order.
+B.  A single betweenness number; the sort applied to one value has no real effect.
+C.  A dict {edge: betweenness}; the sort puts the largest first, so lot[0][0] is the edge to drop.
+D.  The shortest path between the two endpoints; the sort simply reverses the order of that path.
+Answer:  C
+Reference:  Lecture 36 – Girvan–Newman (≈04:00–08:00)
+Solution:  edge_betweenness_centrality returns a dictionary mapping each edge to its betweenness.
+Converting with .items() gives (edge, value) tuples; sorting with key=lambda x: x[1], reverse=True orders
+them by betweenness, largest first. lot[0] is that top tuple and lot[0][0] is its edge — the one removed
+(unpacked with * into G.remove_edge).
+
+Q9.  [MCQ]  Which description best matches the definition of edge betweenness used to drive the
+partitioning?
+A.  The number of neighbours that the edge’s two endpoints happen to share.
+B.  The total number of edges present in the graph, minus exactly one.
+C.  The length of the longest shortest-path found anywhere in the graph.
+D.  Over all node pairs s,t, the fraction of shortest s–t paths that use the edge.
+Answer:  D
+Reference:  Lecture 39 – Betweenness Measures and Graph Partitioning (≈11:35)
+Solution:  Edge betweenness sums, over every pair of nodes s and t, the fraction σst(e)/σst — the share of
+shortest s–t paths that run through edge e. Bridging edges score highly because they lie on a large fraction
+of cross-community shortest paths. It is not a shared-neighbour count, an edge total, or a longest-path
+length.
+
+Q10.  [MSQ]  Comparing the two methods on the barbell test graph and in general, which statements are
+correct? (Select all that apply.)
+I.   On the barbell graph both methods recover the communities {0,1,2,3,4} and {5,6,7,8,9}.
+II.  Girvan–Newman is generally much faster than brute force on large graphs.
+III. nx.connected_component_subgraphs(G) (used in Girvan–Newman) returns the connected components
+as subgraphs, so its length tells you how many components there are.
+IV.  Brute force is preferred for large graphs because it always runs faster than Girvan–Newman.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, II, III
+D.  I, III
+
+[p.10]
+Answer:  C (statements I, II, III)
+Reference:  Lecture 35 & 36 – Brute Force and Girvan–Newman
+Solution:  Both methods split the barbell into its two cliques (I); Girvan–Newman avoids enumerating all
+splits and is far faster at scale (II); and connected_component_subgraphs returns the components as graph
+objects, so its length is the component count used to detect the split (III). Brute force is the slow,
+exponential method, not the fast one, so IV is false.
+
+End of Week 3 Question Paper  —  20 questions  •  2 comprehensions
+
+==============================================================================
+PART C - LECTURE TRANSCRIPTS (Week 3, Lectures 27-40)
+==============================================================================
+=== LECTURE 27: Introduction (Week 3, transcript PDF page 2) ===
+
+[p.2] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 27 Strong and Weak Relationships Introduction
+
+Who is there? Dear Mister Potter, we are pleased to inform you that you have been accepted at Hogwarts School of Witchcraft and Wizardry. You will not be going thorough; we saw when we took him through, and we could have stopped all these rubbish. You knew; he knew all along and he never told me. Cruize, did you? I am sure most of you are watched Harry Potter. And this clip is a epic clip, we all remember this scene. What has this clip to do in social networks? Guess what just happened here, Hagrid comes to take Harry Potter and when Hagrid comes, Harry Potter has a; he is perplexed he is not sure who this person is; 8 foot long person who knocks the door off and then enters, he asks who are you? Why are you here? Hagrid says I am here to take you; take you to Hogwarts, he does not even know what is Hogwarts and he says here is this school of Witchcraft and Wizardry and you are invited to come and join the school. What just happened? Hagrid comes to meet Harry Potter and take him and Harry Potter does not know of Hagrid; pause for a minute and let us think is this what happens in a real life.
+
+[p.3] (Refer Slide Time: 02:22)
+
+Do you think opportunity knocks Orlando through someone whom we have no clue of or is it someone who is are friend and close relative who comes and gives us info of an opportunity? So, here at two possible cases case number one someone whom you know comes and comes and tells you about a job opportunity case two is the person who comes and tells you about the job opportunity is someone whom you do not know of well, says it is a second one where second one I mean most of the jobs that people get is basically through someone they are not very close with is with someone who is called a weak tie, tie means friendship weak friendship. So, if you have some hundred friends most probably your next job opportunity will come from someone who is la who is as a friend who is basically acquaintance I am not a close friend is what I meant very good friends will not give you the info for the next job it is from someone whom you are not very familiar not very close to is the one who is going to come and give you a job opportunity why is that is what makes this chapter. So, let see the concepts let us develop the ideas and finally, answer the question what the importance of weak ties is.
+
+[p.4] (Refer Slide Time: 04:04)
+
+So, the title of the chapter is the strength of weak ties, the strength of weak friendships.
+
+=== LECTURE 28: Granovetter's Strength of Weak Ties (Week 3, transcript PDF page 5) ===
+
+[p.5] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 28 Strong and Weak Relationships Granovetter's Strength of weak ties
+
+(Refer Slide Time: 00:07)
+
+Let us do this thought experiment. Assume I went to some 100 people randomly and ask them. So, you are working in this place, how did you get to know of this job? Who told you? You will be surprised to note that more than 90 percent of them will say; this person who was my friend’s friend or this person I was not close to told me about this job so on and so forth. You will never here a person saying oh my dad told me of this job opportunity very rarely you might encounter such an answer, but the most frequently heard answer will be this answer that a very far away relative or a very not. So, close friend told me of this job opportunity more than 90 percent. Now, I am sure most of you are finding this against your common sense your finding it very counter intuitive because an intuition says close people of the ones we will help us with job opportunities.
+
+[p.6] (Refer Slide Time: 01:08)
+
+Just what is happening here is it because or close friends do not want to tell us the of the job opportunities, not real the reason is something else, let see what exactly is the reason the answer is actually convincing if you know the right reasoning I am going to give you an example.
+
+(Refer Slide Time: 01:34)
+
+Assume I have 5 friends A, B, C, D and E, A, B, C, D work in the same place where I work, while E is someone who does not work in the same place as me and E does not know A, B, C, D, while A, B, C, D, they all know each other assume such a scenario.
+
+[p.7] Now, whatever A, B, C, D knows mostly even I know because I am from the same place there are may be many other people who would have told me the same information which A, B, C, D, might tell me well occasionally A, B, C, D my tell me something new, but mostly whatever they say even I would, but look at E is roll here E is actually as you can see here E is from a different world all together and hence this new information that E has is that of this new world that I am slightly away from.
+
+(Refer Slide Time: 02:32)
+
+So, E is the one who helps me get to know of things from his world which increases my sample space of information which A, B, C, D, cannot give me given that E is a distant friend of mine because he stays in a different world he probably is a weaker of my friends. I call that a week tie while A, B, C, D, they are strong ties strong ties are week when it comes to getting job related information new job related information while weak tie such as E is strong with the sense that any new information that I get which is worth knowing let say in terms of new job is from E and hence this weak tie is actually strong while strong ties are actually weak Granovetter in the late 1960s he conducted this experiment by going and asking people how did you find this new job and most of them said it was through acquaintance. And that is when he got this idea that there is something hap counter intuitive stuff happening here and let me experiment it properly he conducted is
+
+[p.8] experiments concluded that it is a strength of weak ties that is in play here as and always it sounds a little controversial and the scientific community did not accept his claims. In fact, he first published tried publishing it in 1969, but this paper got rejected it was only 1973 is at people shall I accepting is used and it got published and after it got published it became really famous, simply because it is such an important piece of information at very counterintuitive you see the fact that you are acquaintances are very very important is something that is to be learnt in the sense that the moral of the story is that keep your acquaintances happy, you should not just read your good friends you should reach your acquaintance is very happy. Now there is some kind of a fallacy in this statement if you keep your acquaintance is very happy they will become your good friends and when they become your good friends probably will not get job new information from them new job related information from them. So, the point is you should have a big friend circle your opportunities increase when you know a lot of people, but then new information actually comes from someone who is not. So, close to you for the reasons that I explain just now. So now, let us go ahead and see some slightly mathematically abstract principles that surround this concept.
+
+=== LECTURE 29: Triads, Clustering Coefficient and Neighborhood Overlap (Week 3, transcript PDF page 9) ===
+
+[p.9] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 29 Strong and Weak Relationships Triads, clustering coefficient and Neighborhoods overlap
+
+Now we will see some important concepts, I will define them, tell you some results about it and we will slowly go ahead and understand this notion of the strength of weak ties very clearly. Firstly, I would like to define this as structure as you can see.
+
+(Refer Slide Time: 00:23)
+
+This is called a triad; a triad is simply speaking Sudarshan knows 2 people A and B and this is called a triad and A and B; they do not know each other, what will happen? You have 2 good friends and they do not know each other, eventually you can expect that they become friends with each other, A and B will know each other. This structure is called at triad and the friendship that happens in this triad making it a triangle is called; this phenomenon is called the triadic closure. So, you see there is a triad and it closes and that is called triadic closure let this sink into your mind, this is one very important topic in social networks which will keep re visiting us in the forth coming chapters.
+
+[p.10] (Refer Slide Time: 01:21)
+
+(Refer Slide Time: 01:28)
+
+Triad becomes a triangle and that concept is called the triadic closure assume 2 scenario; scenario 1 is I have 5 friends; A, B, C, D and E and none of them know each other; that is scenario 1, scenario 2 I have this 5 friends; A, B, C, D and E and all of them know each other, now scenario 1; I have 5 friends, scenario 2; I have 5 friends, but what kind of which scenario would you favor scenario one or scenario 2. Obviously, scenario 2, you want your friends to know each other. So, that if there is any problem to you all of them can team up and then come and help you, correct, there are
+
+[p.11] situations where scenario 1 is also very helpful I am reminded of a Bollywood movie; I am unable to recollect the name. So, it is Shah Rukh’s movie and he has 3 girlfriends and he ensures that they do not know each other because if they know each other they will come and destroy him given that he is cheating on them by being in a relationship with 3 people simultaneously. So, here is a scenario where the friends not knowing girlfriends not knowing about each other might help any way, jokes apart. So, it is important that you maintain relationship with your friends in such a way that your friendship circle your friends they know each other let me try mathematically quantifying what I just now said here is me and I have 5 friends A, B, C, D, E and they all are friends with each other this was scenario 2, scenario 1 is none of them are friends with each other they can be something in between these two things what do I mean by this?
+
+(Refer Slide Time: 03:23)
+
+Imagine a scenario where I am friends with 5 people and there are some friendships between them how many possible friendships can happen between 5 people; 5 into 4 by 2 you see that that is very simple, right for 5 into 4 by 2 gives you 10, there are 10 possible friendships. How many friendships are there in this example there are 6 friendships. So, I would say the strength of my friends these 5 friends depend on the friendships between them. So, this fraction 6 by 10 denotes the strength of my friendship with this 5 people this goes by
+
+[p.12] the name clustering coefficient we will be calling this the clustering coefficient, from now onwards what does clustering coefficient mean it means in the numerator you put the total number of friendships between your friends and the denominator you put the total possible friendships this fraction if it is one it means all your friends know each other if it is 0 then none of them know each other.
+
+(Refer Slide Time: 04:29)
+
+Anything in between tells; how strong are the friendships between your friends? So, clustering coefficient is a particularly important concept in social networks and I just now defined it what is the use of this.
+
+[p.13] (Refer Slide Time: 04:53)
+
+A very eye opening research says in most of the cases where few sides was committed they observed that these people had very less clustering coefficient I mean is it surprising I do not think it is very surprising people who are into depression are the ones not with many friends not that they do not have many friends it is that they have friends, but this friends are from different circles. So, they do not get to meet a bunch of people at the same time. So, I go and meet this one person and come back another person and then come back another person and then come back I do not go and meet 5 of my friends because 5 of my friends do not know each other. So, clustering coefficient it is observed is less in people who have attempted suicide. So, this way I think clustering coefficient can be used to say many things about a person, but let us just use this definition in the forthcoming units I just introduce this as a concept that is close to triadic closure I explain what is triadic closure and I explained quick implication of what it is triadic closure which is clustering coefficient.
+
+[p.14] (Refer Slide Time: 06:14)
+
+So, let me define what is a neighborhood overlap it sounds slightly complicated let me use the right analogy to ensure that the definition is well understood by all of us.
+
+(Refer Slide Time: 06:27)
+
+If I were to judge a person philosophically speaking is it based on how much he earns, let me give a definition of judging a person look at a look at B if A earns more than B.
+
+[p.15] (Refer Slide Time: 06:36)
+
+(Refer Slide Time: 06:41)
+
+Then you say A is richer than B, let me try redefining this look at this definition that one can get I will not judge a person’s richness by looking at his bank balance.
+
+[p.16] (Refer Slide Time: 06:55)
+
+I will instead look at the following I will see how much he earns put that in the denominator and in the numerator, I will put how exactly he spends the money where exactly he spends the money.
+
+(Refer Slide Time: 07:03)
+
+If he is spending a good chunk of his money for let say a noble cause then I will call that person the richest. Now, I am re defining what is rich by rich I mean the proportion of how well the money is spent divided by how much you earn why do I use this fraction
+
+[p.17] that is because you earn a lot you spend a small chunk worthy way I do not call you rich whatever you earn you spend a good chunk of it forever the cause then I call you rich.
+
+(Refer Slide Time: 07:55)
+
+If this fraction is close to one you are very rich if this fraction is close to 0 you are not very rich. So, I am redefining richness with the help of this fraction.
+
+(Refer Slide Time: 08:06)
+
+Similarly, the strength of a friendship let say between A and B can be defined the following way you can simply see how many common friends do A and B have and
+
+[p.18] designate that as the strength of their friendship or you can put this in the numerator and in the denominator you can put the sum total of friendships of A and B; I repeat. You look at what fraction of the friends of A and B are common friends what fraction of the friends of A and B are common friends. So, this is called the neighborhood overlap.
+
+(Refer Slide Time: 08:54)
+
+What does the neighborhood overlap of the friendship between A and B it is in the numerator total number of common friends and the denominator all possible friends? So, mathematically speaking it is the number of elements in a intersection B divided by A union B by A intersection of B, I mean friends of a intersection friends of B divided by friends of A union friends of B this is called neighborhood overlap it is close to 1; means neighborhood overlap is maximum it is close to 0 means neighborhood overlap is very less.
+
+=== LECTURE 30: Structure of Weak Ties, Bridges, and Local Bridges (Week 3, transcript PDF page 19) ===
+
+[p.19] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 30 Strong and Weak Relationships Structure of weak ties, bridges, and local bridges
+
+(Refer Slide Time: 00:08)
+
+Now, assume I give you a graph g, a graph is basically a bunch of vertices and some edges, I show you the such a graph here and I ask you; can you tell me what are the weak ties here? How can you tell me? How do you know what is the intensity of friendship here? You obviously, cannot tell me, or can you? Look at the underline graph; the graph that is shown here, remember this graph is we discussed about this graph, you do not have to remember, I will help you recollect it. There are 25 nodes this side and 25 nodes that side and is only one friendship from someone this side to someone that side. First, there are 625 possible friendships between these 2 clusters because they are 25 this side, 25 that side. Total possible is 625 out of which I am saying this only one friendship happening here, alright, fine, let us assume the graph is like this do you sense that this particular edge here this red colored edge is actually a weak tie is it not that obvious because this person is in some other island all together and in this island this person
+
+[p.20] knows a lot of people that this person does not know mainly I am saying B knows a whole lot of people that a does not know and A and B are friends with each other. Now, A and B by definition would you think it should be a weak tie now we can tell me how do you know it is a weak tie maybe they are good friends now that is slightly not possible probably not possible for a simple reason that if they were good friends let say A and B were good friends then B has a lot of friends there and a you should also be friends with them because of triadic closure correct given the triadic closure is not happening itself is an indication of the fact that A and B are weak they form of weak tie their friendship is not in this now remember what I said a while back.
+
+(Refer Slide Time: 02:38)
+
+I said there are 625 possible friendships as well one friendship happening this is rare such a structure may not even exist in real life.
+
+[p.21] (Refer Slide Time: 02:50)
+
+So, this such a edge is called a bridge the definition of a bridge is basically this you remove that edge the graph becomes disconnected that is a definition now this does not definition does not seem to be of any help, because we may not see such structures if we see such structures then we know it is a weak tie we may not see such structures.
+
+(Refer Slide Time: 03:29)
+
+So, I am going to relax this definition slightly and I am going to define what is called a weak bridge it is called the local bridge, but it is intuitive a mind to call it a weak bridge.
+
+[p.22] So, what is a local bridge? Local bridge is bread an edge without any triad on the either sides of the vertices. A and B is called a local bridge if there is no triad on that not even a single triad now do you see every bridge is a local bridge by definition because a bridge means what A and B do not have any common friends nor is there a path from A to B apart from the A B edge, correct. So, A B is a local bridge if there is no triad on it as you can see from the figure here in this example A B is not a bridge, but is a local bridge because there is no triad on it correct now such local bridges are also can also be considered as a weak tie why think about it here again a is friends with B A B is a local bridge none of B’s friends a knows why if a well to know A B’s friend that would sort of result in a triad on A and B you see. So, none of B’s friends A knows none of A’s friend B knows sounds like a weak tie you see. So, Granovetter actually observed that these local bridges are what forms is what one means by a weak tie it forms a weak tie and a weak tie is mostly is a local bridge they both do not have a common friend. So, this is the definition of local bridge and this is where Granovetter argued that such weak ties is what resulted in a being friends with someone who connects him to a different island all together from where very good opportunity can knock his door through B, I am going to explain a very nice way in which we can analyze the local bridges that we just now discussed.
+
+(Refer Slide Time: 06:04)
+
+[p.23] So, what is the local bridge a local bridge between two people is that edge that relationship where let say A and B, A and B are friends you call this friendship as local bridge if there are no common friends right for example, as you can see A and B are friends and A is the left side, B is in the right side and there are lot of friendships for B lot of friendships for A, but A and B do not have a common friend, A and E; they have common friends A and D have common friends, but A and B do not have common friends this is called a local bridge here goes my question let me write that down the question if you are going to ask an answer right now is the following. What can one say about this local bridges are they strong ties or weak ties we saw strong ties we saw weak ties we discussed about the strength of weak ties right we saw local bridges now I am asking this question are local bridges are there strong ties or weak ties by this I mean A and B are friends and this A and B do they enjoy very close friendship or is it friendship very weak something in me tells me that it is indeed weak tie why let us try looking at it mathematically. Let us discuss logically why one can actually show whether it say a weak tie what I am trying to say let say as a real world analogy or I am saying is if I were it to have of friend in let say Indonesia will have be very good friends with this person. Firstly, it is the proximity. We may not meet each other very regularly, but that aside if you where it have a friends with some on in Indonesia will that friendship be very strong looks like no is the answer there could be exceptions, but mostly no when you have friendship across 2 different clusters the way have showed here as you can see this is a cluster this is another cluster right between these 2 clusters is there is a friendship that is mostly a weak friendship how why what makes me say this let us look at it mathematically. Now, assume this a let me just write a here once again A and B and there is friendship here a has a lot of friends let say forget this case I am looking at another situation you has a lot of friends and you see some of A’s friends let say A has; assume A has a has 50 friends; out of which 5 are strong friendships strong ties. What do I mean by this a we all have friendships some of them are close some of them are not so close, A has 50 friends and let say 5 of them are very close.
+
+[p.24] (Refer Slide Time: 11:09)
+
+Now, let us look at this in detail if you see what I just say I said if a has 2 very close friendships really close friendships assume A; let me. In fact, give them some name for clarity sake assume there is a person called Prakash, here and then raj and then Ram, Prakash is friends with Raj, Prakash is friends with Ram and they very good friends, their tie is really strong what can you say about the friendship between Raj and Ram? What can you say about it? Do you think that is also strong? That we cannot say, but for sure they should be friendship between Raj and Ram. Why imagine you are really close to 2 people very close in the past ten years you are close to these 2 people is there a possibility that these 2 people do not know each other every possibility that you would have made these 2 people meet each other I am not saying any 2 friends of mine now each other I am only saying if there are 2 really best friends of mine from a long time strong friendships they both will at least know each other they may not be a strong tie not necessarily they could be not necessarily, but definitely there is a tie between these 2 people, right, this property which is very straight forward intuitively goes by the name strong it is not of self explanatory strong triadic closure property. What do you mean by this? We just mean when this a triad and they are strong, they are closed that is what I mean here by a strong that is what I mean by strong triadic strong it is a triad and the friendships as strong and that will lead to the triad getting closed always
+
+[p.25] it is a property that is very easy for us to sort of visualize. Now, when this happens what do you mean by this happens is this always happens you see, but all I am saying is if we assume that this property is through in the network whenever you have 2 strong friendships there is a friendship between these 2 people. So, Raj and Ram become friends if Prakash is strongly in friendship with Raj and Ram. Let us get back to your previous slide as you can see, A has 50 friends out of which 5 were strong ties then let us say a and this person let say this person Z A and Z are very close friends my claim was local bridges are weak ties assume A and B was indeed strong tie and A is friends with 5 people with strong ties. So, A and Z is let us say strong see what happens A is friends with B, A is friends with Z both are strong friendships. So, what does the triadic closure property is say let us go and then see the triadic closure property says that wherever you have 2 close friends they are basically friends with each other. So, what happens here you observe that Z and B will be friends because a triadic closure property does resulting in A and B does resulting in A and B not being a local bridge why what is a definition of a local bridge there are no common friends, but here. So, see or seeing a common friend between A and B which is Z, correct. So, what have we just infer lets paraphrase A and B if you assume were local bridge was a local bridge then a naturally has a lot of friends and some of them are strong ties assume a has at least one strong tie namely Z and A and B is a local bridge my claim is this local bridge cannot be a strong tie if it becomes a string tie then there should be link between Z and B by the strong triad a closure property which is self explanatory and intuitive correct which while lets the fact that A B is a local bridge logically speaking local bridge is mostly weak tie. So, let me write that down. So, our conclusion is that local bridge is always rather mostly weak tie.
+
+=== LECTURE 31: Validation of Granovetter's Experiment Using Cell Phone Data (Week 3, transcript PDF page 26) ===
+
+[p.26] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 31 Strong and Weak Relationships Validation of Granovetter’s experiment using cell phone data
+
+Back then when Granovetter observed, it was in the 60s, he did not have any means to get the friendship network of people he observed the following he said people who get a new job or get it get the information through weak ties and that is it and he made up the story of possible network like thing with weak tie thing and things like that, but he had no clue whether this was this can actually be validated in real life.
+
+(Refer Slide Time: 00:52)
+
+But then in some 10 years back, in 2007, we had data of cell phone usage between people and let see how can this be use to validate the Granovetter’s strength of weak ties all you need to show is this so called local bridges actually are weak ties remember what we have been discussing all this 5 strength of weak ties means there are weak ties which are useful which are helpful what I am going to tell you right now is the fact that the local bridges turn out to be weak ties that Granovetter could not show back them how does he; for example, if he made an attempt to show how would he do that probably any scientist would look at the entire big network of friends and then go ask what is the
+
+[p.27] strength of your friendship with this person what is the strengths of your friendship with this person this person this person. How would I do that I am in that is not a very nice way to do it may be your survey results might have noise may be people may not give the right answer for your questions when you are surveying in 2007, we had this data set of whose speaks to who on cell phone. So, the huge network and an edge this put between 2 people if they have conversed on cell phone and we would record the total number of minutes that they have spent on cell phone to the past let say 2 to 3 weeks. So, to be precise 18 weeks not 2 to 3 weeks, 18 weeks is what they have observed 18 weeks is roughly what? Four and half months. They observed people for 4 and half months and then they saw whose speaks to whom how many minutes if I call you over cell phone then there is an edge between me and you we both are friends and they saw this big network the network was connected. In fact, around 85 percent of the nodes were belong to one big component the rest were another component you remember I discussion from first chapter that there is it is generally a connected network. Network is always connected or at least there is a big component of connected this a big, connected component in the network the rest is a small component if its disconnected. So, that a part. So, my point is when you look at this cell phone network it is a connected graph. So, what we will look at the local bridges here source a local bridge we just now saw that a proxy for local bridge better definition would be neighborhood overlap. So, we look at the neighborhood overlap of an edge if it is higher than it is local bridge if it is lower than it is not a local bridge.
+
+[p.28] (Refer Slide Time: 04:07)
+
+So, we saw the definition of neighborhood overlap if the neighborhoods overlap is very small then it comes close to being a local bridge. So, it was observed on this cell phone data that for those edges with very less neighborhood overlap which means it is close to being a local bridge it was observed that the cell phone talking that happened across this friendship was also very less which means higher the cell phone conversation between 2 friends higher it is local bridge properties smaller lesser the duration of the phone call more closer it is towards the local bridge. So, what does this tell us he just tells us that see local bridge is a very binary definition is it a local branch or not correct the neighborhood overlap definition tells you as I told you in the previous video tells you nice grey scale values it gives you between 0 and one 0 means local bridge one means not a local bridge there could be values between and that is what neighborhood overlap captures and what happens in this data of cell phone usage you observe that if 2 people are talking a whole lot.
+
+[p.29] (Refer Slide Time: 05:31)
+
+Then they are not weak tie they are strong tie if they are talking very less then there are they are weak tie and you observe that in the graph the graph structure when you observe the edges that correspond to smaller neighborhood overlap which means edges that are close to being local bridges. We observe that the cell phone usage between these two people is of lesser duration which means it is actually a weak tie think about it a very I opening research you need which is possibly doable only in this era because not only do we have data we even have sophisticated programming possibilities that we can check such a big data.
+
+=== LECTURE 32: Embeddedness (Week 3, transcript PDF page 30) ===
+
+[p.30] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 32 Strong and Weak Relationships Embeddedness
+
+(Refer Slide Time: 00:08)
+
+Imagine a situation where you meet a stranger on the road and you strike a conversation you both become quick friends and that friend asks you for some money what is your immediate reaction your immediate reaction is what is this we just friends in the past few minutes I do not even know this person really well and this person is asking me from money how would do I trust him?
+
+[p.31] (Refer Slide Time: 00:41)
+
+Maybe it is a genuine request, but you will not trust this person this as supposed to a situation where your good friend whom you know from the past several years comes and asks you for some help you trust that person more one reason probably is the duration of friendship there is another reason to it which we will explore slowly in this lesson and that concept is called the embeddedness.
+
+(Refer Slide Time: 01:03)
+
+So, what do you mean by embeddedness of a relationship? Embeddedness of a relationship; assume I am friends with Chetan; embeddedness of this relationship
+
+[p.32] between me and Chetan is defined as the number of common friends that we have we have seen similar definitions before, but this is pretty well studied in social sciences literature where they have observed that if the embeddedness of the relationship also known as number of common friends if the common friends are high then the relationship is strong. In the example I gave you where I meet this person on the street the embeddedness there was 0, we did not know any common friends.
+
+(Refer Slide Time: 01:49)
+
+(Refer Slide Time: 01:57)
+
+[p.33] Imagine I was speaking to him and then he talks something about a good common friend of as and I realize that he is so close to him and he is close to me and then probably I will trust this person and you will give is give you money in case he wants money you see the trust increased many folds when we realize that we had a common friend imagine we realize that we have 5 common friends it is very easy to check you know it is very what are the what are the what is the likelihood that you meet a stranger on the road and that person knows 5 people whom you know he keep probably is not trying to cheating you sort of feel like what you say? You sort of feel the trust in him and you are ready to give him many money some money at least. As a postal let say case where you know this person just now you got a know this person just now we got to know of this person just now and there is no common friends. So, all in all I am trying to say that if we have common friends also called is embeddedness if the embeddedness is high then there is trust probably trust is directly proportional or sort of correlated with the number of friends that we have.
+
+(Refer Slide Time: 03:16)
+
+Why let us illustrate a couple of examples you see you go to a bank manager asking for loan to buy let say a car or a house bank managers generally expect you to get someone who can act as surety for you guarantee here for you why does they do that they want a third person involved. So, that the chances of you being a defaulter becomes less in case you became a defaulter they can ask the third person.
+
+[p.34] (Refer Slide Time: 03:48)
+
+A similar situation arises in friendships 2 when 2 people are friends and they do not have any common friends the trust between them is a lot less why. So, think for a minute if I do any mischief for mistake or any anything unto words to the other person he has nobody to pull in and ask for justice generally if 2 friends fight they involve a common friend and it is look at this, this is happening between us resolve it at least in the fear of. So, many common friends two friends may not cheat, it is all these psychological factors involved where which results in having more common friends means more trust having less common friends means less trust. Now, do you think every single relationship should have high embeddedness I repeat what is embeddedness? Embeddedness is not with respect to a person it is with respect to a person's friendship with another person this edge when we say embeddedness it is about an edge it is not about a node correct here is my question do you think it is always important to have high embeddedness in a relationships.
+
+[p.35] (Refer Slide Time: 05:09)
+
+The answer is yes and no yes because I just told you why it is important for us to have high embeddedness the relationship gets stronger there is trust between 2 people if the relationship is high embedded embeddedness of the relationship is high no because not always is high embeddedness good how why what we will discuss in our next lesson.
+
+=== LECTURE 33: Structural Holes (Week 3, transcript PDF page 36) ===
+
+[p.36] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 33 Strong and Weak Relationships Structural Holes
+
+(Refer Slide Time: 00:12)
+
+Assume I have 2 friends, one by name Chethan, the other one by name Ramya, with Chethan I have high embeddedness, he is my colleague, we are very good friends, we have a lot of common friends. As I told you common friends means more trust; it is actually the other way round by other way round I mean the definition is slightly reversed the miss trust is not there the definition of trust here is there cannot be mis trust, right. So, me and Chethan I am a lot of common friends. So, we cannot cheat each other right there is a high penalty we pay if we cheat each other.
+
+[p.37] (Refer Slide Time: 00:51)
+
+So, high; the higher the embeddedness more is the trust that is what we saw in our previous lesson, now me and Ramya do not have any common friends, now is the dangerous a sort of yes it is to some extent as you know where the same old theory if you do not have any mutual friends it is fraught with the danger of me cheating that that person if we are into a business transaction or money transaction right it sort of intuitive not always true, but sort of intuitively it is mostly true will this be of any advantage that I know Ramya, but our relationship is not high on embeddedness we do not have any common friends me and Chethan have a lot of common friends me and Ramya do not have any common friends it can also be advantages why because imagine Ramya is into real world business. Look at this graph Sudarshan that is me and Ramya are friends and look at the graph here Sudarshan’s community is very different Ramya’s community is very different. In fact, for suggestion to reach out to anyone that that side in that community he must go through Ramya and imagine Ramya is a real estate agent if I want to buy a house I should consult Ramya because she is the only one who is into real estate business I do not know anyone who is into real estate anyone else are probably on the other community and I should go through Ramya only if I want to contact them. So, Ramya’s sort of monopolizes here. So, for a fact that we have low embeddedness imagine we had a common friend may be that common friend is common because he is
+
+[p.38] slightly on the other community side you see here is a common friend a new node between me and Ramya and that fellow is also friends with people from the other community right may be through him I can reach some other real estate agent correct. So, the fact me and Ramya have zero embeddedness is a huge advantage to Ramya in a situation where she is going to harness this fact that I do not know anyone from the other side community. This is very similar to Granovetter’s weak ties theory. So, I she is a connection to me for the other world do you see what is called a whole here whole in this graph structure where a lot of people on this side they should if they want to contact someone from the other side they have to go through a long chain of path. In fact, Sudarshan has to go through Ramya to contact anyone any friend of Sudarshan as you can see should go through Sudarshan through Ramya to contact the other world Ramya holds a very strong position here this concept is called the structural holes there are structural holes in these friendship networks in real life transaction networks in business transactions. We some people do not want come people from this side community to meet anyone from that side community Ramya here acts more like a broken she ensures that nobody from this side gets know anyone from that side because she will lose business in case anyone here gets know anyone that side. So, high embeddedness in the context of personal friendship adds in trust even in the context of business ads in trust higher the embeddedness more the trust. So, the relationship benefits, but in such a situation a huge structural whole exist in the network structure and whenever there is an edge between a people like Sudarshan and Ramya, Ramya benefits from this; any transaction between Sudarshan and her simply because she monopolizes.
+
+=== LECTURE 34: Social Capital (Week 3, transcript PDF page 39) ===
+
+[p.39] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 34 Strong and Weak Relationships Social Capital
+
+Let say Facebook wants to become popular, they are already popular assume they want to become even more popular what should they do.
+
+(Refer Slide Time: 00:18)
+
+What is one nice factor about Facebook because of which it is so popular, so famous? It is that if you sit in front of Facebook you find it very entertaining, its joyful to see what is happening with your friends life the pictures, the videos, the status messages, and the comments and the likes, and the re-shares right now here are two things that you should observe.
+
+[p.40] (Refer Slide Time: 00:45)
+
+Firstly, I should have a lot of Facebook friends, so that is a lot of content on my news field. Firstly, it is the content. Secondly, it should be interesting. So, interesting content lot of content interesting content; when will you get these two things? If you have the kind of friends on your friend list who are whose interest are similar to that of yours similar or least they are something exciting to share, with this in mind Facebook may want to ensure that new friends that you make not only should Facebook make you have.
+
+(Refer Slide Time: 01:30)
+
+[p.41] Not only should Facebook ensure that you have you make new friends, it should ensure that you do not make randomly new friends new friends who are random. You may want the Facebook may want to ensure that you make friends more and more friends, such that you find their shares and comments and photos remarkably interesting right. So, the point is every person tends to have some limited amount of friendship that he can maintain whom he can follow right; you better ensure that these friends whom he makes they all are interesting enough right.
+
+(Refer Slide Time: 02:15)
+
+So, what I am I trying to say if I am allowed to make a bunch of people become friends what where exactly will I sprinkle the edges; of course, I cannot make everybody become friends with everyone else, it comes with its own a bunch of problems for example, are a friendship budget is very minimum, we cannot have everybody as our friends. So, if god were to be sprinkling edges on a bunch of nodes, on this, this person should ensure that he has only 200 edges to be sprinkled let say 500 edges to be sprinkled on 100 people, where exactly will he put edges. So, that it becomes what is called a social capital. You want to benefit from the fact that you are creating a social network, the output is at its best for Facebook the output is a lot of attention for the user on their interface. So, as I told you one should have a lot of friends, one should also have exciting friend. So, that they should exciting stuff that is what Facebook like portal we will try to
+
+[p.42] maximize. Twitter like portal would want you to follow a whole lot of people and it would want ensure that you follow those people who is newsfeed is interesting to you right where other what is called the time line is interestingly. Now let shift guess and look at a different problem.
+
+(Refer Slide Time: 03:45)
+
+In your family if you were to enhance the relationship between two people, if you given a budget of enhancing the friendship between two people, which is that pair which you will like to enhance maybe if you can put an edge between these two people who are always fighting with each other, because of which is a lot of commotion is a family probably would want to enhance their relationship.
+
+[p.43] (Refer Slide Time: 04:13)
+
+But an example would be this assume this is a team of 20 people there is some kind of complicated friendship between them, there are this bunch of pairs let say three pairs of people who are who do not like each other, and you have some budget, you have some money to spend to ensure that their relationship gets enhanced what will you do? Maybe me as CEO of this company with 20 people, I will ask these three pairs of people to go out and have let say lunch together or I will give them free coupon to probably go to a water park and then play and then sort of bond well right. So, when I have limited money how will I ensure that I put some nice edges between the existing nodes, so that I create capital out of the network. All in all the fact here is the social network itself is a capital sometimes the reason why an organization works its best is because of the complicated network structure between people which probably is yielding the best possible productivity right. So, how do I ensure that I maximize this is an open question, it is not very easy to come out with let say proto call where this kind of friendship network is yields maximum benefit.
+
+[p.44] (Refer Slide Time: 05:45)
+
+As an example if there is a society of some thousand people all are friends with each other, is there any fun in playing a foot ball game between two teams. As an example, if a have my son and daughter playing chess with each other, who will I cheer for I must take a side and cheer for this person and hope that the other person looses. I cannot do it when I love two people equally well there must be two communities where a lot of love is within and not across, so that you can form two football teams and they can play with each other. While I say that a lot of friendships unity is good; at the same time there should be 100 percent unity. 100 percent unity as you know is boring, I gave you foot ball gave example. So, this is called closure versus brokerage.
+
+[p.45] (Refer Slide Time: 06:39)
+
+Closure means friends friend should become friends, when a friends friend become is a friend the network completely become sort of complete everybody will be friends with each other is not it. Here is a friends friend you become friends with him, here is a friend friends you become friends with him so on and so forth you see this sort of friends friend becoming a friend cascades and finally, everyone will become friends and there is no fun here, but is closure. Brokerage means there should be an edge, as I told you in my previous lecture me and Ramya. Ramya acts as a bridge here she benefits with the fact that I am we do not have any common friends, it is not easy for me to reach the other side of the community right Ramya is the bridging gap. So, there has to be what is called the structural holes two at the same time some closures should also happen. As an within the previous example me and Chethan were good friends we had a lot of common friends, we benefit with that kind of relationship me and Ramya are of course friends, but it is a sort of a local bridge it is a bridge she is a bridge for the for me to connect to the other community that is also important brokerage is important closure is also important. In general the bigger question is given a choice for you to come out with a nice network, I will give you 100 people and I will give you a 1000 friendships and ask you place this friendships properly so that this particular 100 friends maximum yield maximum benefit if they work in a team.
+
+[p.46] Let say how will you sprinkle this friendships right is seems to be a tough question to answer, there has been a whole lot of research in this direction, but it is not very well understood what should be the exact social structure which will yield the maximum benefit.
+
+=== LECTURE 35: Finding Communities in a Graph (Brute Force Method) (Week 3, transcript PDF page 47) ===
+
+[p.47] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture - 35 Strong and Weak Relationships Finding Communities in a graph (Brute Force Method)
+
+Hi everyone! In this video we are going to divide the nodes of a given graph into 2 communities using a Brute Force approach. Now Brute Force approach means we will be trying all possible divisions of the nodes of the graph into 2 parts and after that we will check which of these divisions is the best? Now how do we check which of these divisions is the best? As per the definition of communities, the nodes which are a part of a community; they form a lot of connections to the nodes of the same community and they form very less connections with the nodes of the other communities. So, here we are going to make use of this property and we are going to find the best division out of all possible divisions and that is what you will display. So, let us get started.
+
+(Refer Slide Time: 00:59)
+
+So, let me import networkx. So, let me create a function here, let us pass the graph here. So, we are given the graph object, our aim is to divide the nodes of this graph into 2
+
+[p.48] partitions. So, let us first get the nodes of this graph. So, we can make use of this function G.nodes you might be knowing that this returns a list of the nodes of the graph let us also check the total number of nodes. So, we can write G.number_of_nodes, now our aim is to divide the nodes of this graph into 2 communities; let us call them first community and second community now on. So, we must divide the nodes this list of nodes into first community and second community. Since you have to try all possible cases, we would have to try all those cases where the first community has one node and the second community has n - 1 node. All those cases where the first community has 2 nodes and the second committee has n - 2 nodes; and all those cases were the first community has 3 nodes and second community has n - 3 nodes and so on. So, we must check for all these possible cases. So, if we find the combination of nodes that are going to fall in the first community, it is very easy to get the nodes which are going to fall in the second community because they are going to be all the remaining nodes. So, our aim is to get all the nodes that may fall into the first community; basically, all the combinations of the nodes that may fall in the first community. So, how do we do that? To get the combination, there is a function in the package called itertools. So, I am going to import that package and function name is combinations.
+
+(Refer Slide Time: 03:39)
+
+[p.49] Let me show you the functionality of this function first. So, let me show you on ipython console a how this work function works, let me import itertools here and let me show you the functioning of the combinations function itertools dot combination. So, we pass 2 parameters in this function; first is the list from which we want the combinations and second is some number that we pass which goes from one to the length of the list. So, length of the list is 4 here, we can pass any number from 1 to 4 here let me pass 2 over here. So, what it does is it returns all possible combinations out of this list which are of length 2. So, let me run this, this another point to note here is that this function does not return a list it returns an object, which has tuples of the combination as in the combinations are in the form of tuples. So, when if you want to see that we will write maybe we can use for loop for i in let me use this for i in this object print i. So, it has returned the combinations in the form of tuples, since we are working in list, we would want to convert them into list. So, we can do that by just writing list over here. So, now, it is returning in the form of list.
+
+(Refer Slide Time: 05:15)
+
+Similarly, if you want all the combinations which are of length 3 then you will write like this. So, our aim here is to get all possible combinations of the nodes list which are of length 1 2 3 and so on. So, let us get back here we are going to put all the combinations in a list, let me create a list first say first community. Now I am going to start a loop for i
+
+[p.50] in range one to what is the length of our list that is n. So, I will write n/2 + 1. I will explain why I get this. So, I will store these combinations that this function will written in the form of a list and since it is it returns the tuples, I will pass convert them into list. So, I will write list of x for x in whatever it returns. Let me also pass the parameters. So, the parameters are going to be the nodes list and i. So, as you can see the i is ranging from 1 up to n/2 + 1. So, why did we do n/2 here? This is because the case is where the first community has k nodes, and the second community has the remaining n - k nodes and the cases where the first community has n - k nodes and the second community have k nodes. So, these cases are going to be the same these divisions are basically the same. So, there is no point of checking all the n to 1 for the first community combinations. So, that is why we are starting from 1 and we are stopping at n/2 that is if the list nodes list has 10 elements. So, we will start from 1, 2, 3, 4, up to 5 and we are not going to check for 6, 7, 8, up to 10 cases, this is because they are going to give us the same divisions and there is no point checking for the extra cases. And the reason why we put plus one here is that you might be knowing the functionality of this range function if you pass 1 , n in range it goes from 1 to n - 1. So, since we wanted to go exactly up to n/2 we are going to add plus 1 over here. So, what is this comb variable going to have; this is basically going to have a list this comb is a list of lists where all the list is having i elements. So, as I showed you on the screen comb is going to have all these 3 all these 4 lists for the value 3 and for the value 2 it is going to have all these list, and after this our aim is to add all these combinations to this list first community. So, what I am going to do here is first community dot extend and I am going to add all the list that I am getting from this comb based.
+
+[p.51] (Refer Slide Time: 08:57)
+
+Now, let me tell you why I am using this extend function here and not the append function, let me show you an over here why i used extend let me take some example lists; let me take another list and yet another list. So, if I do l1.append(l2) what will happen let me print l1. See how it is adding the elements my aim was basically to add this 3 4 2 this list which is having 12 already. So, when I write l1.append(l2) were l2 is itself a list this is how it does. In case I want to add only the elements we make use of the function extend. So, let me show you l2.extend(l3). So, let me print l2, now this is how it works and this is how I wanted to be; that is why I have used this function extend this is because comb is a list of list and I want to add the elements only to this first community. So, we are using extend function here now we have stored all possible combinations of nodes in in this list first community, now we should also do the same for the second community as I am going to create a list here, now this is going to be very easy because all the remaining node are going to fall into this community. Now, you see we have the list of all the nodes we have the list of nodes which are going to fall in the first community, we must get the list of remaining nodes in the second community. So, how do we do that? Basically, we must subtract the elements of first community from the elements in nodes. So, how do we do subtraction in list? If you want to do subtraction set is the appropriate data structure. So, what we can do is we can
+
+[p.52] convert the list into set and after that we can apply the subtraction operation for example, I can write set nodes minus set first community. So, whatever it will give me it will give me the difference of the elements from nodes, nodes minus first community it will give me the difference of elements and that will also be in the form of set. So, I can later convert them into a list. So, that is how I will get the second community lists. So, let me store it here. Now, since we have to do it for all the elements of first community, we have to start a loop here. So, I will write for i in range. So, I am going to do it for all the elements of first community. So, I will write length of first community all right. So, we are going to do it for all the elements of the first community and once we get the list in l we have to append it to the second community list. So, I will write second community dot append l. So, now, we have all the combinations in this list first community and all the combinations of the second community in this list second community, and please note that these 2 lists are themselves list of lists. So, we have the divisions in these lists, and we have to find which division is the best. Now, as I told you as per the definition of community communities, the nodes which are a part of one community have a lot of connections with the nodes in the same community that is there are going to be a lot of intra community edges and there are going to be very less intercommunity edges. So, if a division is good then the number of intra community edges should be high and the number of intercommunity edges should be less. So, this is what we are going to use here. So, we are going to keep track of the number of intra and intercommunity edges for all the possible divisions that we have made so far.
+
+[p.53] (Refer Slide Time: 13:49)
+
+So, what you going to do now is which division is the best. So, this is what we are going to check now, since we have to keep track of the number of intra community edges in the first community we will create a list for it and we have to keep a track of intercommunity edges in the second community we will create a list for it and we also have to keep track of the number of intercommunity edges. So, we have these 3 lists, now apart from this to check which division is the best we are going to find the ratio where (Refer Time: 14:05) in the numerator will have the sum of intra community edges, and in the denominator will have the intercommunity edges. So, whichever division has highest value of this ratio will mean that in that community inside community; there are dense connections and outside community there are spark connections. So, we are going to find this ratio for every division that we have made so far. So, I am going to create this list as well, let me write here what this means ratio of intra divided by this is basically number of intra and number of inter community edges; alright. Now, we have the nodes which are falling into the first community and the nodes which are fall into the second community, arrange to find the number of edges that are existing amongst the nodes in the first community and the same for the second community as well. Now how do we find the number of edges amongst the nodes in a given community because we have only as of now, we have only the list of nodes. So, for this purpose we
+
+[p.54] are going to make use of function that is subgraph, which is given which is inside the graphic object. So, we will make use of a the subgraph function let me tell you the syntax for this function. So, this function is available in graph object. So, I will write G.subgraph and here I will pass the list of the nodes. So, in our case the list of nodes is kept in first community and second community also. So firstly, we are doing for the first_community and for the first community also let us do it for i we are going to start loop here, for i in range basically whatever we are doing we are going to do it for all the lists given in the first community. So, we will start it for i in range will write length of first community yeah. So, I was saying you about this sub graph function this function basically takes as input a list of edges, and it returns a graph object itself which is an induced subgraph over this list of elements, over this list of nodes. So, whatever it returns is basically a graph and whatever operations you can apply on graph you can apply on the written value of this function as well. So, if you want to find the number of edges, we can just use the formula that is number of edges. Since this is itself or graph object as I told you subgraph returns an induced subgraph which is a sort of graph itself. So, you can apply this function number of edges on the return value. Now, whatever it returns we must keep store that value in this list it is number of intra edges, because this will give us the number of intra edges in that subgraph. So, I will write number of intra edges in first_community.append all right. So, let me explain you once again what this statement is doing. So, we have the nodes that are falling into the first_community and these are here first_community right. We are starting this for loop from i goes from zero to the length of the first_community , basically we are checking it for all the possible combination. So, we have this list of nodes which we are passing into this subgraph function which. So, this function will return an object of graph itself. So, that will basically be an induced subgraph over these nodes. So, since that is a graph, we are calling this function number of edges to find the number of edges which are existing amongst those nodes.
+
+(Refer Slide Time: 18:31)
+
+[p.55] For example, if you pass one 2 3 here this will tell us the number of edges amongst these 1 2 and 3 nodes ,if there is an edge from 3 to 4 let us say, that will not be counted here that is because 4 is not a part of this subgraph. So, that is how we will get the number of edges and that information we are storing in this list as we know created this list number of intra edges one that is for first_community . So, we are appending that information here. Now, the same thing you have to do for the second_community as well. So, we are just going to copy paste it and I am going to write second_community here and information has to go to this second list and here I will write second yeah, I think we are done. So, now, we have the number of intra edges in the first_community in this list and we have the number of intra edges in the second_community in this list, now we have to find the number of inter edges. So, we can easily find the total number of edges in the graph right let us do that e is equal to G dot number of edges right. So, we got the total number of edges here and we have the intra edges in first_community and we have to intra edges in the second_community . So, we subtract these all these intra edges from the total number of edges, we will get the number of inter edges intercommunity edges. So, let us do that. So, what we will do is e minus number of intra edges in first_community ; we are going to start a loop now minus number of intra edges in the second_community .
+
+[p.56] And we have to do it for all values of i. So, I will start for i in range length of here we can use length of first_community or second_community because they are the same. So, number of intra edges or to maintain uniformity I will write first_community itself here. So, we have to keep this information in this list that is number of inter edges. So, i like I will write it here I am sorry. So, in this list number of inter edges dot append.
+
+(Refer Slide Time: 21:34)
+
+So, we have to append this information here. So, now, we have the number of intra edges in this list, we have the number of inter intra edges in the second_community in this list we have the number of inter edges in this list. Next thing is to find is the ratio. So, let us find the ratio. So, again we have to start this loop am going to copy here.
+
+[p.57] (Refer Slide Time: 22:03)
+
+I am sorry. So, we have to find the ratio for all these possible combinations; ratio is going to be the divisions of number of intra edges with the number of inter edges. So, numerator is going to be the total number of intra edges, we have intra edges in 2 lists. So, we are going to sum them up the value from this list plus the value from this list. So, I will write number of intra edges 1 for the ith combination, plus number of intra edges in 2 for the ith combination. So, we have to sum them up and then we have to divide them with the number of inter edges for the ith combination. So, since I want all the precise values. So, I will write float here and this will give me the ratio and this ratio I am going to keep in the list that I have already created by the name ratio. So, I will write ratio dot append.
+
+[p.58] (Refer Slide Time: 23:15)
+
+So, let me explain you once again what this statement is doing, we are finding the ratio of the intranet inter edges. So, on the numerator we have the total number of intra edges and in the denominator we have the total number of inter edges, and this ratio we are just keeping in this list which is named ratio and we have already created that list. Now we have all the ratio in this ratio list and our aim is to find the list the best value of this ratio that is the maximum value of this ratio. So, what we can do is. So, let us create the variable max value is equal to. So, this is a function that you can use max function and the parameter can be the list this returns us the maximum value in the list ratio. Now, our aim is not to get the maximum value basically, our aim is to get the index at which the maximum is coming so that we get to know; what was the best division? We can make use of the index function from the list that is ratio. So, what we can write is ratio dot index max value. So, what it will return is it will return the index of the max value here. So, I will write max index is equal ratio dot index. So, this index is what we are interested in; this is because this index tells us the division which is the best division out of all possible division. So, now we got this max division I am sorry max index that is the best index, and in the first_community and in the second_community list we have the divisions of nodes into first and second committee. So, we are going to access the division out of this list and out of this list which is falling at this index. So, what we are going to do is we are going to
+
+[p.59] basically print the final result. So, I will write first_community and which element the one which is falling at max index and similarly second_community we are going to access the element which is falling at max index. Now, I am going to print these. So, let me just do some representation thing here. So, after this is done and I will add a bracket here and then I will start the other 1 and this and then I will close it this is about the representation. So, this is how our lists 2 divisions will be printed divisions of nodes into 2 communities. Now the function is return we have to now call it and use it we want an example graph here. So, let me take an example graph here the function name is communities brute. So, let me call this and let me pass this graph as an example graph let us take this graph which is called barbell graph, I am going to show you what this graph looks like let us pass 2 parameters here. So, let me go back to the ipython screen and I will show you how this graph looks like.
+
+(Refer Slide Time: 26:50)
+
+So, let us go here, here let me import the package networkx and I will show you how this graph looks like. So, I will take a graph G = nx.barbell_graph, and I am going to pass the same parameters. Now what it indicates I will show you in the visualization. So, I will write nx.draw to show this I need matplotlib. So, I will import matplotlib dot my plot as plt and I will write plt.show.
+
+[p.60] (Refer Slide Time: 27:39)
+
+Now this is a graph that comes out of these 2 parameters 5 and 0. So, let me explain you what this parameter indicate; the first parameter which is 5 here it indicates that there should be 2 clicks of size 5, as you can see here first click and the second click and they should be connected by a path which has these nodes which is 0 node here.
+
+(Refer Slide Time: 28:08)
+
+So, this is a path which is connecting these 2 clicks and it has 0 node. So, this is how it looks like let me change the parameters a bit and show you how it comes out to be.
+
+[p.61] So, if I pass 4 and 1 let us see how it looks like. So, we passed 4 , 1 which means it should be 2 clicks of size 4 as you can see, and they should be connected with the path which has one node. So, the same is showing here.
+
+(Refer Slide Time: 28:43)
+
+So, this is one node in between. So, this is a kind of barbell graph, I plan to take this graph because the kind of community is required to visible here and it is also small. So, it would not take much time for the testing. So, I am going to take the graph. So, let us go and a test this function this is yeah. So, these are the 2 communities that we get if you remember we passed 5 , 0 which means 5 + 5 there are going to be 10 nodes, and these 10 nodes are divided into 2 communities where the first_community have 0, 1, 2, 3, 4 and the second has 8, 9, 5, 6, 7. Let me quickly show you once again what kind of plot we were getting when we pass these parameters see this is what we got.
+
+[p.62] (Refer Slide Time: 29:20)
+
+So, here you can see that communities are clearly visible that these should be the communities and our brute force algorithm is nicely able to differentiate the communities.
+
+(Refer Slide Time: 29:28)
+
+So, as you see 0, 1, 2, 3, 4, 5 are falling to one community, and the rest are in the second one. So, that is what we are getting here. So, the brute force algorithm is working fine, next we are going to see the Girvan Newman algorithm for community detection.
+
+=== LECTURE 36: Community Detection Using Girvan Newman Algorithm (Week 3, transcript PDF page 63) ===
+
+[p.63] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture - 36 Strong and Weak Relationships Community Detection Using Girvan Newman Algorithm
+
+Hey everyone, in the previous video we divided the graph into two communities using brute force approach. Brute force approach means we tried all possible divisions of nodes into two communities which was very time-consuming process. So, if the graph is very huge it is going to take whole lot of time and incase of very you know large graphs it might not even run it my get stuck. So, that was not a feasible way to find communities in a given graph. On the other hand we have this algorithm which is called Girvan Newman Algorithm and this algorithm is basically base on the concept of edge betweenness. Now the key idea is that the edge is which are inter community that is the edge is which are you know linking the nodes from one community to the other community, they tend to have high value of betweenness now; that means, that number of shortest pass through these edges. So, if variable find the edge betweenness of these edges and we keep removing them we tend to get the community structure of the graph. So, this is the whole idea behind this algorithm and this is what we are going to implement and after that will try this algorithm on the sample graph that we took in previous video that is bubble graph, and after that will also execute this algorithm on Zachary karate club as well and will see the communities that get formed.
+
+[p.64] (Refer Slide Time: 01:55)
+
+So, let us get started. So, I am going to import this package import networkx as nx and let us create a function for Girvan algorithm. So, I will write Girvan G. So, let us first of all check whether the graph is connected or not. So, I will write nx.connected. I am sorry connected component sorry component sub graphs G. So, what is function does connected component sub graphs this function returns the connected component of the graph as sub graphs. So, if there are two connected components in the graph G it will return two sub graphs. If there is only one connected component that is graph is connected it is going return only one sub graph and that is graphic itself. So, let us store that in this list c. So, if the length of this list is one; that means, graph the is connected right because it return only one connected component, and if the list if the length of the list is more than one that means, the graph is disconnected and there are more than one connected components right. So, let us store the length of this list c and let us print that because we are going to keep checking whether the graph is now connected or not. So, we are going to make use of this function again and just to keep track of algorithm we are going to print whether the graph is connected or not at that particular moment. So, I am going to print the number of connected components is. So, write l. So, l is number of connected components. So, initially it will be one if the graph is connected of course. Now as I told you we will keep removing the edges from this graph G. So, the
+
+[p.65] function that we will use to remove the edges from the graph is G.remove_edge, and as the parameter we will passed the edge that has be removed basically we will passed two parameters first is the source of the edge and second is the target of the edge that has to be removed. Now, the big question is which edge to remove right as I told you we are going to remove the edges based on the betweenness value. So, we have to calculate the betweenness value of the edges first, now since you have to keep removing the edges I am going to keep that code in a function. So, let me better create a function here, I will create a function say edge to remove I will pass the graph G here. So, let us first create this function, edge to remove and let us pass the graph here edge to remove. Now, in order to be able to know which edge to remove we have to first calculate the edge betweenness values, and for that we have a function nx.edge betweenness centrality or of G. So, so edge betweenness centrality is a function in networkx which returns a dictionary of values. So, I am going to name it like dict1. So, that you know the data structure of the return value. So, what does this dictionary contain? This dictionary contains as a key the edge and as a value it contains the edge betweenness centrality of that edge correct. So, that is what this dictionary contains. Now, what is our aim? Our aim is to sort the edges based on their betweenness centrality value. So, since dictionary does not keeps track of the sorted elements basically there is no association between the element and the index. So, the elements can ampere in any order. So, order is not a thing of dictionary. So, let us take the values from this dictionary and keep them in the form of a list. So, what I will do is I will write dict1.items and I will store these in the form of list of tuples and going a to give similar name to it. So, that you it is easy of you list of tuples is equal to dict1.items. So, you might be knowing that these items function basically returns the tuples of the dictionary, where the first element of each tuple is a key and second element of each tuple is the value. So, this list is going to have tuples where the first element will be the edge of a each tuple and the second element of each tuple is going to be the edge betweenness value. Now make sense for us to sort this list as we know sort this list based on the edge betweenness value right now how we do that let me show you list of tuples dot sort this is the function that we will use to sort this list. Now the list is having tuples
+
+[p.66] and tuples have two values, second value is the edge betweenness value and based on that only we must sort the list. So, whenever we must sort list of tuples there is syntax that we follow let me show you that, key = lambda x : x1. Now, let me tell you why I write x : x1 and one more thing reverse is equal to true. So, this is how we sort list of tuples you can see the documentation of this lambda key word and. So, this is basically a shortcut to sort list based on either you know first value of the tuple or the second value of the tuple. So, here we want to sort based on second value of the tuples. So, I am writing x : x1, in case you want to sort the list based on the first value of the tuple you will write x : x0. Second thing is we want in the descending order that is we want the edge which has highest betweenness to be on the top. So, I will write reverse is equal to true in case you want opposite you do not need write anything here. So, we have now the list which is sorted. So, the first element of the list is the tuple, where the first element of the tuple is the edge and the second element of the tuple is the betweenness value. What do we have to return here by this function? This function should return the edge right. So, what we are going to return is list of tuples first I am sorry first element first tuples first element which is 0 because the index start from 0 I hope I am clear here 0th with element means 0th tuple and in that tuple 0th element which is the first element that is the edge. So, we are going to return this alright I am sorry return this, alright. So, you know which edge to remove now, there is one catch here which should be noted this edge to remove is going to return tuple right let me write here as a comment is going to return the edge which is of the form a comma b where a is the source and b is target . So, when we pass it here it becomes like this a comma b right this becomes this comes over here instead of this which will give you syntax error. So, what is needed is we instead of this we want this thing a comma b I am sorry a comma b, basically out of the tuple we have to extract the edge. So, what we can put here is star, when we write star here, we get the content of the tuple and not the tuple ok. So, we now we got the edge which has to be removed after we remove the edge from the graph, we again have to check whether the graph is corrected or not right. So, again we will make use of this function and again we will find the length and again we make print whether the as in what are the number of connected components. So, I am going to use it
+
+[p.67] here, we have to keep removing the edges until the graph becomes disconnected. So, which means we have to start while loop here. So, I will write while l is equal to 1 which means as long as the graph is connected keep doing this and as soon as this l becomes 2 right l becomes 2 means the graph becomes disconnected and number of connected component in the graph is 2 the control will come out this loop and here we have two connected components correct. So, and these two connected components are there in this list c which is what we are going to return here. So, will write return c. So, we are going to return this c and we will see in while we are calling it we will see how we can extract the connected component out of this c. So, I think we are done with the functions let us try to make use of them, let us take the example graph that we took in previous video nx.barbell_graph with the same values I will take as a from 5 , 0 and I will pass them in this function, and let me take the return values now c is going to have the two connected components right. So, and these two connected components in the form of graph which means we can apply all the functions of graph on these connected components because they are actually graph objects.
+
+(Refer Slide Time: 12:45)
+
+So, I can start to look here, or I can manually do that as well. So, I will write for i in c. So, c was less which has two elements. So, I will write for i and c let me. So, what is our aim are our is to print the nodes which are falling in the first community and in the
+
+[p.68] second community, community means connected component here right. So, let us print i because i is a graph I can use i.nodes and that is all. So, i goes from 0 to 1 and both the connected components nodes will be printed here let me put some separately here something anything.
+
+(Refer Slide Time: 13:39)
+
+So, we should get the two connected component the nodes of the two connected components by this let us see, let us check the program what was the name yeah right. So, you see the number of connected components initially was one, and then we removed some edge and the number of connected components became 2. So, it was very small graph. So, quickly it conversed as we as see how quickly it conversed as compared to the brute force method. In that method we it took good amount of iteration to finally, give us the communities. Here it quickly given as the communities and as we saw in the previous video the communities were 0 1 2 3 4 in the first one and 8 9 5 6 7 in the second community. So, it is giving us correctly the communities in the given graph let us go back to our code and we can also check the karate clubs current communities here ok. So, let us check this code for the Zachary karate club as well, let me copy paste this and let me common this. So, let us takes the Zachary karate club. So, this is the function that we can use karate club graph. Let me tell you can also follow another method to get the is Zachary karate club in the graph object which I think we used in the previous video
+
+[p.69] you if you have the karate dot gml or karate club graph in any format you can just read that graph file and then that is how you can you know convert that into graph object.
+
+(Refer Slide Time: 15:43)
+
+So, you can use that, or you can use this inbuilt function which is given by networkx. So, we are going to run this again on this graph let us see, let me its let me show you. So, you see the number of connective components in initially was one and then it removed some good number of edges based on the betweenness until it reached to the two connective components part, and this is these are the nodes in the first community and these are the notes in the second community, and yeah I think these are the these are the nodes which actually constitute the two communities in the karate club network, you can also verify you can google and you can see the communities that would actually formed in the karate club network. So, this given (Refer Time: 16:26) is doing good job of giving the communities here, you can also see the number of nodes if you want to print the number of nodes in each community let us do that. So, as I told you this is i is a graph. So, you can you know use any graph function here number of nodes it should work.
+
+[p.70] (Refer Slide Time: 16:51)
+
+So, I want to see the number of nodes in each community. So, there are 19 and 15, I think if I am not wrong there were 16 or 18 or something, but nevertheless this is pretty good approximation of finding the communities in the given graph.
+
+=== LECTURE 37: Visualizing Communities Using Gephi (Week 3, transcript PDF page 71) ===
+
+[p.71] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture – 37 Strong and Weak Relationships Visualizing Communities using Gephi
+
+(Refer Slide Time: 00:06)
+
+Hey everyone, in this video we are going to see how we can visualize the communities in the Zachary karate network. So, I have this Gephi opened already I am going to open the new project.
+
+[p.72] (Refer Slide Time: 00:23)
+
+And in the overview, I am going to open the; I am sorry; I am going to open the file which is containing the karate network. So, I already have this karate.gml file, I am going to open that I know that this is undirected. So, I am going to select that this has 34 nodes and 78 edges.
+
+(Refer Slide Time: 00:50)
+
+This is the graph that we are getting I think we did in the previous it as well let me zoom in, so this is the karate network let me thick in the edges.
+
+[p.73] (Refer Slide Time: 01:01)
+
+Let me increase the node size maybe. So, I will go to nodes and I will change the size of the nodes let me keep it 20; does not look so nice because they are black in color.
+
+(Refer Slide Time: 01:25)
+
+So, let me change the color of the nodes let me have something like this may be. So, it has changed the color the edges as well.
+
+[p.74] (Refer Slide Time: 01:36)
+
+Let me change the color of the edges maybe with this one let see not so good, I will little darker decent. So, I have to show you how to visualize the communities in this network. So, I am going to go to this right-hand side panel here we have this modularity feature I am going to run this.
+
+(Refer Slide Time: 02:01)
+
+[p.75] And here we have this resolution value if the value is less than we get more communities is resolution values higher we get less communities- let see how many communities we get with this value of resolution.
+
+(Refer Slide Time: 02:18)
+
+So, this is what we get we get 4 communities here.
+
+(Refer Slide Time: 02:24)
+
+And these are community 0, 1, 2 and 3, these are you see the small red dots, these are the number of nodes, in these communities, I am going to close it, it is well known that
+
+[p.76] Zachary karate network had 2 communities. So, I am going to change the value of this resolution so that we get to 2 communities.
+
+(Refer Slide Time: 02:50)
+
+Let us change this where it 2 and let see how many communities to be get.
+
+(Refer Slide Time: 02:52)
+
+We are getting 2 communities here the 2 most prominent communities that existed the time of fight that happened there by be knowing the history behind this network.
+
+[p.77] (Refer Slide Time: 02:59)
+
+Let us close this and let us try to visualize the communities I am going to nodes and we basically want to partition the nodes into 2 communities. So, communities I have already been found we just want to display them accordingly. So, we want to change the colors color of the nodes based on the partitioning that has happened because of communities. So, nodes just selected colors are selected partition we will click and here we have this modularity class.
+
+(Refer Slide Time: 03:43)
+
+[p.78] You see there are 2 communities. So, we are getting 2 different colors here when I apply. So, you see the nodes have changed color based on the communities that they belong to.
+
+(Refer Slide Time: 04:07)
+
+So, this is nice; we can see the nodes which belong to different communities and in case you want to display the labels so that you get to know which no which node belongs to which community you can do that. So, I am going to click this. So, you see the labels of the nodes are also visible. Let me show you some layouts that might be useful maybe in this situation let me show you this force atlas layout. So, what this layout does is it forces the nodes in the given community to be displayed together.
+
+[p.79] (Refer Slide Time: 04:38)
+
+So, let us run this, it is not looking so nice and going to stop it. So, I am going to increase this value of repulsion strength. So, as of now the nodes I have gotten clustered together based on the communities you see all the green nodes are on one side and all the pink nodes are on the other side, but it is difficult to see them because the repulsion is less. So, let me increase the value of repulsion may be to this value you can just do it and try.
+
+(Refer Slide Time: 05:03)
+
+So, this is a little better. So, I am going to stop it. So, green nodes are in the left hand side and pink nodes are in the right hand side. So, this is a little better visualization let
+
+[p.80] me increase the size of nodes. So, that the labels are visible better. So, I am going to nodes unique and color partitioning we have done size basically we have to change size. So, let me make it 30.
+
+(Refer Slide Time: 05:41)
+
+Little better; so this is one thing another thing that we can do here is that we can change the size of the nodes based on degree. So, I mean nodes I will change the size basically I am going to run the nodes based on decrease. So, I am going to click on ranking and the attribute that I will choose will be degree. So, I think this is good enough hundred go should be the maximum size.
+
+[p.81] (Refer Slide Time: 06:06)
+
+So this is what I see. So, you can quickly see which are the nodes that are having the high degree and you can; obviously, see the community is that they belong to let me also you should one more layout here which is force atlas 2 there is one particular nice feature that I will like about it and let me show you that let me click prevent overlap because I see some of the nodes overlapping. So, I do not want that to happen I think this we can go ahead.
+
+(Refer Slide Time: 06:37)
+
+So, you see what it is doing it is sort of moving the graph.
+
+[p.82] So, whenever you like it you get this stop maybe I like the green nodes to be in this selection I will stop it.
+
+(Refer Slide Time: 06:47)
+
+(Refer Slide Time: 06:57)
+
+So, that is one thing and since they; the repulsion has reduced. So, I can go back to this force atlas and then run it and then again, I get the nodes you know for a part from each other so that I can nicely see them.
+
+[p.83] (Refer Slide Time: 07:06)
+
+So when you see, they kind of high lighting that is happening when you when you how are your mouse on one node all the nodes in that community are visible and so on. Let me reduce this size. So, that I can this is the labeling let me go back here let me.
+
+(Refer Slide Time: 07:27)
+
+So, this is the network that you can see.
+
+[p.84] (Refer Slide Time: 07:36)
+
+And you can also go to data laboratory. So, here you see modularity class for every node is given you can just export this table. So, that you can use it to the way you want in any other tool as well. So, there are 2 modality classes; class is 0 and 1 because there are 2 communities here and you can also go to preview and let me refresh; refresh you are that was about how we can visualize communities in Gephi. So, that was a brief introduction to a few a feature of Gephi with respect to visualizing the communities in the graph.
+
+=== LECTURE 38: Tie Strength, Social Media and Passive Engagement (Week 3, transcript PDF page 85) ===
+
+[p.85] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture - 38 Strong and Weak Relationships (Continued) and Homophily Tie Strength, Social Media and Passive Engagement
+
+We observed that Granovetter indeed had guessed it right. The data set that is available today tells us the following.
+
+(Refer Slide Time: 00:26)
+
+Given an edge, given a link you observe that in the phone call network they take the phone call network and they see that are given link between two people you have an edge if they have had a phone call. If they have had less conversation across a period this experiment said that it is mostly a weak tie and it is topologically also a weak tie which means its neighborhood strength is less. What do I mean by this? It just means in a network if you look at all the links, links denote two people are have had conversation on phone and you see how much conversation they have had and you observe that more the conversation more is the neighborhood overlap, lesser the conversation less is the neighborhood overlap. We saw this in detail, we made are inferences, we saw the plot as well.
+
+[p.86] Now the world has been there done that they were phone conservations, how do conversations happened today, it is mainly through Facebook, Whatsapp, different social media, right.
+
+(Refer Slide Time: 01:40)
+
+So, let us now shift gears and ask a nice question. So, we have seen Granovetter strength of weak ties and we saw its validation on the cell phone, phone usage network. Now we will slightly take move, will drift slightly away from Granovetter strength of weak ties theory and ask an entirely different seemingly different, but related question. The question is the following. We all use Facebook, imagine when was the last time you met your old friend and this person comes and says hey dude how are you, I saw your updates on Facebook, very interesting you seem to have, you seem to doing this, you seem to doing, that I see that you got married recently, did you invite me, you had a kid, oh videos are very cute. Now you are wondering this friend of mine which I have lost touch for a fairly long time, since to be in touch with me he is following what is happening with my life, this is what we call passive engagement we may not be in touch with our friends, but we know what is happening with their lives. Now, we have thousands of friends on Facebook, if not thousands at least hundreds. Each one on an average, let us say each one of you have around 500 friends.
+
+[p.87] (Refer Slide Time: 03:18)
+
+But if you ask this question with how many people are you really close? The answer probably will be very less if you have let say 500 friends you hardly will be close to let us say 50 friends or even less correct, let us do this experiment. Let me take you your Facebook profile and let me try to see with how many people you had a conversation.
+
+(Refer Slide Time: 03:46)
+
+So, let us say you say hi Roopa how are you it is been long since we spoke and Roopa does not reply back. I would call this one-way communication; you have spoken to Roopa and Roopa has not replied back. Two-way communication, whether mutual
+
+[p.88] communication is when you say something that person also say something you say something, she says something so on and so forth right. There has been some amount of conversation. I keep a threshold and say if it has caused this many back and forth conversations then I call them as people who are in mutual communication. So, one-way communication is just a few messages, mutual communication means a lot of messages is a third type.
+
+(Refer Slide Time: 04:35)
+
+People observed there first-time one-way communication is a lot in number, we just add people we just say hi and then we forget on Facebook, we do not care. They also add us, but they were not respond back to our replies, I mean our messages, one-way communication. Mutual communication is you have a very close we keep talking, mutual communication is very less one-way communication is lot more. This is a third type as I was telling you. The third type is if a person is following you, on your timeline on whatever is happening with you whatever news you keep posting he comes and clicks on like or comments there and things like that right I call it the third type. So, what is so interesting about this third type thing about it, is it, is the third type better than one-way communication or is it less than mutual communication, let us think about it for a minute. So, this third type is called the maintained relationships. Let me ask what happens on Facebook, given a friendship what how do you classify this, is it one way communication or two way communication
+
+[p.89] or is it a maintained relationship. You probably will say some of the there could be overlap between reciprocal communication, which is two way communication and maintained relationships, two people were talking to each other, might even follow each other.
+
+(Refer Slide Time: 06:21)
+
+Now, what I will do is I will see which one is more and classify and link as either one way or two way or the third one maintains relationship. And what I will do is I will plot with x axis being the network size, actually the neighborhood size, but took keep it simple on your minds I will call it the network size and then on y axis I will plot three things - one is one way communications, second one is mutual communications reciprocal communications or two way communications whatever recall it that is a second plot, the third one is the maintained relationships. You see what is happening here lets at any point on x axis, let me say network of some 100 people when I see the total number of friends that a person has is basically this these many people are one way relationships, these many are two way relationships and these many are maintained relationships right. What do you see from the plot? The maintained one also called the passive relationships is the highest, why is that, why does that happen, is it that obvious Facebook keeps you glued by showing you some interesting stories about my life, but we seldom talk there. More often on Facebook what happens is you checking my news feed, me checking your
+
+[p.90] recent photograph that you uploaded, me click clicking a like on it, me seeing your status message commenting on it etcetera right. There is not much of talking that happens would me and you and that is what happens on Facebook, there is a whole lot of mutual engagement, but very less of first and the second type. So, the plot clearly says most the friendships on Facebook is basically about two people just checking there Facebook profiles clicking on like, commenting and stuff like that. So, what we mean by this? What is the inference? The inference is that on social media the most important thing that sells that keeps people engaged is the third type, if you let them just talk to each other probably that particular media will not be very popular. You should make them indirectly be updated about each other’s life by not talking to each other, but by just seeing each others Facebook profile, that is what the plot says.
+
+(Refer Slide Time: 09:18)
+
+So, a similar question was also asked on twitter what the question was asked on twitter. Let me classify friends as strong friends and weak friends on twitter, you know in twitter you basically follow a person and that person may also follow you, only if a person follows can you send that person and direct message which will personally go to that persons twitter inbox let us say, they observed the following. They saw if two people are friends and if they have exchanged personal messages then it is a strong tie otherwise it is a weak tie: so what. They saw something very expected. People may have 1000s of friends, if you see Obama or Donald Trump or Narendra
+
+[p.91] Modi you will see that they have millions and millions and millions of followers, but you will observe something very startling about all the celebrities. The amount of direct messages that they would have exchanged and hence the strong ties that I define. I repeat a link is a strong tie if they have exchanged direct messages with each other, more than let us say 3 4 direct messages, they observed that this seems to be a constant. No matter how many people you are following or being followed this does not seem to go beyond some 50 or 60.
+
+(Refer Slide Time: 10:55)
+
+Look at the plot the x axis is the number of friends and the y axis signifies the number of strong ties, you see that it sort of converges, converges to a value which is a lot less than 100 which means converge may the number of people to whom you can be closed cannot go beyond a particular number. Now is not this obvious, why is this obvious? This obvious because we all have limited time, we cannot endlessly keep communicating with people, but we can follow some 1000-2000 people I know what is happening with their life. But we will not be able to talk to them regularly that is probably because the limited cognitive budget that we have, limited time that we have correct. So, we can only do this much and that is what the plot says. Very eye-opening plot in the sense that we think many people who have a lot of; few people have a lot of friends and probably they know a lot of people that is not very true
+
+[p.92] even. If they have a lot of followers or if they have following so many people those people that they are close to or let us say strong tie is way too less.
+
+=== LECTURE 39: Betweenness Measures and Graph Partitioning (Week 3, transcript PDF page 93) ===
+
+[p.93] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture - 39 Strong and Weak Relationships (Continued) and Homophily Betweenness Measures and Graph Partitioning
+
+(Refer Slide Time: 00:08)
+
+Let us start with the nice puzzle. Here is the classroom of 100 people and there are precisely two teams in this, two groups. Now what do I mean by two groups? Guess what I am saying, two groups means what? We say there is groupism in this place, in this organization means there are two teams, two groups and friendships are within and not across. By not across I mean, I do not mean there is no nothing across, I mean it is less across and more within then we say oh the classroom right now has two segregations, is segregated into two, right, and there is groupism here.
+
+[p.94] (Refer Slide Time: 00:57)
+
+Now, look at this graph what can you say about the graph? Does this graph have this is the friendship network of some 50 students, do you see any kind of what to say grouping here, are there two groups here, I think no there is a look like there are two groups.
+
+(Refer Slide Time: 01:23)
+
+But probably you are wrong there are two groups here observe, there are two groups there. The way it was shown before to you probably did not recognize that there were two groups, but actually there were two groups it all depends on how you visualize the graph, I tried visualizing a different way and I see that there are actually two groups. The
+
+[p.95] visualization before was very important that said there is only one group, it is all in the visualization. In fact, visualization is a separate branch of research in computer science anyway I will we will not get there, but we will answer this question given a network like this how many groups are there. These groups are called communities, in the languages or subject it is called communities. So, how do you define a community? A community is a bunch of nodes where the connections are a lot within them and a lot less outside. This is technically called, a bunch of nodes is called communities these nodes partitioning of a vertex at basically, you have 50 nodes that is the vertex said and you classify them as some 20 and 30 or something like that and you call this partitioning as a valid community partitioning if such a partitioning is such that there is a lot of intercommunity edge spar city and intra community edge density intra means what within inter means between. So, between it is less, within it is more then you call such a partitioning, or the vertex set as community partitioning. Now let us get back the network that I showed you 50 people you we all initially thought this only one group here, but we realized is two groups here. Given a graph g which is input to a computer how do you find how many groups are there, maybe there are two or may be more why more? I will give you an example.
+
+(Refer Slide Time: 03:36)
+
+[p.96] Look at this network how many groups do you have? 2, 1, observe if you visualize it properly you see that there are 3 groups, how do we deducts its groups, such groups. I will give you a quick answer to it intuitive answer and a technical answer to it.
+
+(Refer Slide Time: 04:02)
+
+50 people there is some partitioning here and I need to know what is the partition. Is it even easy to answer this the graph is given to me in the form of let us say adjacency list or edge list, what do you mean by this I just know all the links in the graph it is given to me in a file let us say. We have seen these things in our programming assignments right. This is how I know the graph let us say this way, now A is adjacent to B, C is adjacent to D so on and so forth. There is some complicated graph like this, and I see that there are 50 people, and these are the links and the links are known to me. Only with this information can I get to see get to know if there are teams here, this is hard, very hard to solve, it is a lot of computation whole lot of computation. In fact, precisely speaking you may have to, you observe that there are actually around 250 possible partitioning of this 50 people, how is slightly complicated do not worry about it trust me it is 250 number of partitions. For each partition you must check is this partition leading to community, is there inter community spar city and intra community density, is technical languages all I am saying is there more adjust within and let us say just across then you say this is the community, I have found the community there are two communities. There are 250 cases that you must
+
+[p.97] check that is the huge number, you probably cannot do it. Is there a easy way out? Yeah, there is an easy way out and I will give you the intuition the intuition is very clear. Assume I gave you all the road network of India, I will give you all the roads connecting two points you must and I will remove all the names, you do not know which node represents what just given the nodes. Nodes are all regions let us say town, cities, villages whatever and edges are the roads connecting these two places, direct roads connecting these two places.
+
+(Refer Slide Time: 06:02)
+
+So, where is a road that connects two points through region then you do not put a link between these two nodes, you put a link through this node. Let us say city A and city B do not have a direct road, but you should pass through C then you put a link between A to C and then C to B clear. How do you find out what are the main, what are states here let us say of the country? Yeah, states are basically probably communities here do you see, there are very few roads between the states and a lot of roads within this state. There are very few roads across cities and a lot of roads inside a city, grab on this sentence. There are a lot of roads inside the city, but a lot less roads across the city why? You see highways connecting two cities there will not be many roads between any two locations of the city, the only way you can get to this location of the city to some other location of some other city is through this highway correct.
+
+[p.98] This highways act as bridges in connecting two cities, if you can identify these highways and remove them then you get a partition that represents communities. I repeat in the road network if you identify the highways drop these highways remove them basically from the graph, what is remaining? Remember you are removing edges not nodes in the road network you have nodes and edges nodes represent cities towns and edges represent roads between them what you do is you look at the highways and drop these highways and the resulting network should be, the resulting nodes that you see should be partitioning of the graph. What you mean by resulting nodes? It results in a disconnected bunch of; you will see a lot of edges within when you remove the highways. They are probably the states or cities. This is basically the intuition behind what I am going to say next. Our puzzle that we are we were trying to solve is 50 student classroom how do you detect whether there are groups here or not.
+
+(Refer Slide Time: 09:02)
+
+You just go on the hunt for highways here. What do you I mean by highways here? Of course, there are highways here even in friendship networks, how do you see these are the edges that connect between these two clusters, they act as highways right. How do you detect them when the graph is not really viewer friendly, it does not tell you the communities when you see it unless you pluck it out like this, place it like this and then you see there – yes, there are two teams. These edges if you can detect and remove them then you see a disconnected two components - component 1, component 2 and then you can say ha yes there are two teams.
+
+[p.99] So, it all boils down to you detecting these links which act as highways. How do you detect them? So, we need to quantify this, how stronger a highway is this road correct, there is this notion of betweenness that does this. Now let us go slowly and let me define what one means by betweenness. Look at this edge in this graph take a node from this side and a node from that side, consider a path connecting these two nodes you see it always passes through this red edge, red link correct, it always passes through this red link. Take some other node these sides, some other node that side you have to invariably pass through this edge if you want to take a connecting path between these two nodes. But when you pick two nodes well within the left side then you can have a path which connects these two links directly like this correct. Now betweenness of an edge is defined as the total number of paths that go on it, this is the very dumb definition. A very regress definition is slightly mathematically involved. All it says is the total number of paths that pass through this edge the total number of shortest paths that pass through these edges versus the total number of shortest paths between two vertices. What do I mean by this?
+
+(Refer Slide Time: 11:35)
+
+Betweenness of an edge is defined as σst (e) / σst, this fraction means what? You consider basically a path from s to t, you take a path from s to t and you see if edge e is coming on it; what are those shortest path from s to t where edge e comes on it; and what are all the shortest paths from s to t.
+
+[p.100] This fraction you see I take the sum of all such fractions across all possible s and t as a little mathematically involved all that it says is I am going to take the fraction of edges, a fraction of paths that uses this edge this is complicated version of this very straightforward statement and this is called the betweenness value of v. So, betweenness of value v is computed by using this rational of edge is has high betweenness if it comes in between as a link in the paths connecting two nodes. So, formally speaking betweenness a value of an edge is Σst σst (v) / σst running through all the vertices by this simply speaking all that we say is straightforward intuition that what are the fraction of shortest paths that cross e. This quantifies betweenness, now how can we use this. Do not you think intuitively betweenness means this, higher the betweenness more does it connect two components that otherwise are not connected correct.
+
+(Refer Slide Time: 13:19)
+
+Look at this example this edge there are two edges that connect these two components and the betweenness of these two edges will be high as compared to the betweenness of some edges within the clusters that is easy to see. So, what I do is remember the question that we started with, given a classroom of 50 people we check are there two groups here, how do we do that? You take this graph and compute the betweenness of all the edges here other is seemingly not so complicated, it is very well known that this runs in a time
+
+[p.101] that is doable on a computer it does not take two to the power of 50 computations, it can be done much faster. I do this and I find out the betweenness values of all the edges and then look at those edges that I have betweenness I observed that these two edges have high betweenness and what I do is I remove these two vectors and I observed that the graph becomes disconnected. When the graph becomes disconnected it has two components and these two components are the two groups in the classroom. So, we can find out what are the communities by looking at high betweenness edges.
+
+=== LECTURE 40: Strong and Weak Relationship - Summary (Week 3, transcript PDF page 102) ===
+
+[p.102] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Lecture - 40 Strong and Weak Relationships (Continued) and Homophily Summary - Strong and Weak Relationships
+
+(Refer Slide Time: 00:10)
+
+Congratulations, we have reached the end of week 3. Let us quickly recap what all we have studied. So, the first important lesson that we have learnt was we should be nice, we should be caring towards our close friends, towards our strong friends, but probably we should forget them when it comes about finding a nice job opportunity.
+
+[p.103] (Refer Slide Time: 00:20)
+
+When it comes to finding a job opportunity it is better to contact a friend who is just an acquaintance, with whom we talk really, with whom we talk lesser less frequently and probably that person is my future employer or maybe a link to my future employer.
+
+(Refer Slide Time: 00:53)
+
+So, these people these kind of ties between me and a person with whom I talk less often we term it as a weak tie and we have looked at the importance of these weak ties in the networks. We have seen that in a network these kinds of weak ties they act as a connector between two different worlds.
+
+[p.104] (Refer Slide Time: 01:19)
+
+So, in our entire world these kinds of weak ties they connect two communities what will happen if we pull these weak ties and throw them away, we see what will happened to the world then. The world will get divided into individual components where there are no ties between these two.
+
+(Refer Slide Time: 01:26)
+
+What happens in this world, in this component nobody in this component comes to know about it. What happens here nobody here comes to know about it and all these different components evolve independently and probably that is not nice.
+
+[p.105] (Refer Slide Time: 01:56)
+
+Next cute concept which we looked at was what kind of ties are there how do the ties they behave in our social networks, online social networks - like Facebook, Twitter, LinkedIn and all such places and we have seen that what happens on Facebook is we have so many friends, so many friends and we do not talk to them on a regular basis, we are not we are not very much close to them, but we always open a news feed and we are always interested in looking what is happening in their lives and this kind of a tie is termed as passive engagement. So, we do not talk to them regularly, but occasionally we look at what is happening in their life in a news feed and probably then we follow it up. The last incredibly beautiful concept and personally my best is that of clustering coefficient. I hope you remember what clustering coefficient is.
+
+[p.106] (Refer Slide Time: 02:49)
+
+So, it is mainly what fraction of my friends are friends with each other. So, it kind of indicates the amount of the level of bounding between my friends and we have seen that if the clustering coefficient is very less very less of my friends know each other I am more prone to commit suicide.
+
+(Refer Slide Time: 03:10)
+
+But then there are people like Ramya we talked about who have a very less clustering coefficient, but they make use of this clustering coefficient to flourish their business.
+
+[p.107] (Refer Slide Time: 03:26)
+
+So, how should our world look like was the next question, how should our social networks look like - should everybody here has a very high clustering coefficient, so that the world is united or we need some people like Ramya who kind of act as weak ties connecting these different worlds, so that there kind of immergence a competition between the two. So, which is the best should everything be united or there should be different worlds connected with weak ties and we do not know, it is an open question what should happen this one or this one or a nice combination something in between both of these.
+
+(Refer Slide Time: 04:03)
+
+[p.108] Next in the league is coming an interesting chapter on homophily. So, you might find Homophily to be a quite a technical term, but in simple words Homophily simply means like a treks like birds of a feather flocked together, that is mainly if I am fat and you are fat we tend to go together, we tend to becomes friends with each other. It might appear to you as a silly idea or stupid idea and realistic, but in the next chapter we will look at how it is true and how it is a very important component in our life. The second interesting concept we will be talking is about social influence. Influence we know what a social influence and it is again an interesting concept which says that beware of your fat friends.
+
+(Refer Slide Time: 04:52)
+
+Probably if you are hanging out with that fat guy you also tend to gain weight over a period. So, this chapter kind of reinforces our old parental advice watch your company. So, I will not trivial many of the secrets here you go head and watch week 4.

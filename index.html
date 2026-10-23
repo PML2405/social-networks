@@ -2,276 +2,214 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Social Networks — Study Notes (Weeks 1–12)</title>
-
-<!-- ===== FONTS: Caveat (marker/titles) + Kalam (pen/body) + Fira Code (code) ===== -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- ===== KaTeX: crisp math inside the hand-drawn boxes ===== -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-<script>
-  window.addEventListener("DOMContentLoaded", function () {
-    if (window.renderMathInElement) {
-      renderMathInElement(document.body, {
-        delimiters: [
-          {left: "$$", right: "$$", display: true},
-          {left: "\\[", right: "\\]", display: true},
-          {left: "$", right: "$", display: false},
-          {left: "\\(", right: "\\)", display: false}
-        ],
-        throwOnError: false
-      });
-    }
-  });
-</script>
-
-<!-- ===== highlight.js: syntax highlighting for code blocks ===== -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-<script>window.addEventListener("DOMContentLoaded",function(){ if(window.hljs) hljs.highlightAll(); });</script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social Networks Study Hub (NPTEL, IIT Ropar)</title>
+<meta name="description" content="Social Networks (NPTEL, IIT Ropar): study notes, assignment solutions and full lecture transcripts for all 12 weeks, as plain text and PDF. Paste the link into ChatGPT or Claude to ask doubts.">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <style>
-  :root{
-    --paper:#FBF7EC; --rule:#E2D9C4; --margin:#F3B8B0;
-    --ink:#2E2A3D; --ink-soft:#5b5678;
-    --yellow:#FFE98A; --pink:#FFB8CE; --mint:#A9E8CE; --blue:#A9D4F5;
-    --coral:#FF7A5C; --tape1:#F6C89F; --tape2:#CBE7DE; --tape3:#F3AEBB;
-  }
-  * { box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background:#DDD6C4; }
-  body{
-    font-family:'Kalam', cursive; color:var(--ink);
-    display:flex; flex-direction:column; align-items:center;
-    padding:28px 12px 90px;
-  }
-  svg.defs{ position:absolute; width:0; height:0; }
-
-  /* ---------- page shell (ruled paper) ---------- */
-  .page{
-    position:relative; width:100%; max-width:920px;
-    background:
-      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--rule) 34px, var(--paper) 35px);
-    background-color:var(--paper);
-    border-radius:6px;
-    box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 2px 0 rgba(0,0,0,.05);
-    padding:46px 40px 46px 74px; overflow:hidden; margin-bottom:30px;
-  }
-  .margin-rule{ position:absolute; top:0; bottom:0; left:50px; width:2px; background:var(--margin); opacity:.75; }
-  .doodle{ position:absolute; opacity:.85; pointer-events:none; }
-
-  /* ---------- cover (series) ---------- */
-  .cover{ text-align:center; padding:14px 10px 8px; }
-  .cover .kicker{ font-family:'Kalam',cursive; font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
-  .cover h1{ font-family:'Caveat',cursive; font-weight:700; font-size:72px; margin:2px 0 0; line-height:.95; }
-  .cover .sub{ font-size:19px; color:var(--ink-soft); margin-top:8px; }
-  .cover .prof{ font-size:15.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
-
-  /* ---------- table of contents (series) ---------- */
-  .toc{ margin:22px auto 6px; max-width:640px; }
-  .toc .toc-card{ border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
-    filter:url(#rough); background:#FFFEFA; padding:16px 24px; }
-  .toc h3{ font-family:'Caveat',cursive; font-size:26px; margin:0 0 8px; }
-  .toc ol{ margin:0; padding-left:22px; font-size:17px; } .toc li{ margin:6px 0; }
-  .toc a{ color:var(--ink); text-decoration:none; border-bottom:2px dotted var(--ink-soft); }
-  .toc a:hover{ background:var(--yellow); }
-
-  /* ---------- lecture divider ---------- */
-  .lec-divider{ margin:14px 0 6px; padding:14px 22px; position:relative; background:var(--ink); color:var(--paper);
-    border-radius:16px 10px 16px 10px/10px 16px 10px 16px; filter:url(#rough); transform:rotate(-.4deg); }
-  .lec-divider .lno{ font-family:'Kalam',cursive; font-size:14px; letter-spacing:2px; opacity:.85; }
-  .lec-divider h2{ font-family:'Caveat',cursive; font-weight:700; font-size:40px; margin:2px 0 0; line-height:1; }
-  .lec-divider .lsub{ font-size:14.5px; opacity:.9; margin-top:6px; }
-
-  /* ---------- title block + wavy underline ---------- */
-  .title-block{ margin:22px 0 6px; }
-  .title-block h1{ font-family:'Caveat',cursive; font-weight:700; font-size:48px; margin:0; line-height:1; }
-  .title-block .tsub{ font-style:italic; color:var(--ink-soft); font-size:16px; margin-top:2px; }
-  .wavy{ display:block; width:230px; height:12px; }
-
-  /* ---------- headings ---------- */
-  h2.section{ font-family:'Caveat', cursive; font-weight:700; font-size:31px; margin:32px 0 8px 0; display:flex; align-items:center; gap:10px; }
-  h2.section .num{ font-family:'Kalam',cursive; font-size:15px; background:var(--ink); color:var(--paper);
-    border-radius:50%; width:27px; height:27px; min-width:27px; display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
-  h3.sub{ font-family:'Caveat',cursive; font-size:24px; margin:18px 0 4px; }
-  p{ font-size:17px; line-height:1.62; margin:8px 0; }
-  ul.notes, ol.notes{ font-size:16.5px; line-height:1.55; } ul.notes li, ol.notes li{ margin:5px 0; }
-  .small{ font-size:14.5px; color:var(--ink-soft); } b, strong{ color:#231f33; }
-
-  /* ---------- sticky note (big-picture TL;DR) ---------- */
-  .sticky{ position:relative; background:var(--yellow); padding:18px 20px 20px;
-    border-radius:2px 14px 3px 12px / 10px 3px 14px 4px; filter:url(#rough);
-    transform:rotate(-1.1deg); box-shadow: 4px 6px 10px rgba(0,0,0,.14); margin:18px auto 30px; max-width:660px; }
-  .sticky.blue{ background:var(--blue); } .sticky.mint{ background:var(--mint); } .sticky.pink{ background:var(--pink); }
-  .sticky::before{ content:""; position:absolute; top:-14px; left:50%; width:48px; height:20px;
-    background:var(--tape3); opacity:.85; transform:translateX(-50%) rotate(-3deg); box-shadow:0 2px 3px rgba(0,0,0,.15); }
-  .sticky p{ margin:4px 0; font-size:16.5px; } .sticky .lead{ font-family:'Caveat', cursive; font-size:24px; font-weight:700; margin-bottom:6px; }
-
-  /* ---------- sketch box (definitions / warnings / key ideas) ---------- */
-  .sketch-box{ position:relative; border:2.6px solid var(--ink); border-radius:225px 15px 225px 15px/15px 225px 15px 225px;
-    filter:url(#rough); padding:16px 22px; background:#FFFEFA; margin:16px 0; }
-  .sketch-box.tint-blue{ background:#EFF7FF; } .sketch-box.tint-mint{ background:#F1FAF5; }
-  .sketch-box.tint-pink{ background:#FFF3F6; } .sketch-box.tint-yellow{ background:#FFFBEC; }
-  .sketch-box .label{ display:inline-block; font-family:'Caveat',cursive; font-size:22px; font-weight:700; margin-bottom:2px; }
-  .def-term{ font-weight:700; color:#231f33; }
-
-  /* highlighter marker */
-  mark{ background:linear-gradient(180deg, transparent 55%, var(--pink) 55%); padding:0 2px; }
-  mark.yellow{ background:linear-gradient(180deg, transparent 55%, var(--yellow) 55%); }
-  mark.mint{ background:linear-gradient(180deg, transparent 55%, var(--mint) 55%); }
-  mark.blue{ background:linear-gradient(180deg, transparent 55%, var(--blue) 55%); }
-
-  /* ---------- equation cards (KaTeX inside) ---------- */
-  .eq-card{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; justify-content:center; margin:18px 0; }
-  .index-card{ background:#fff; border:2.5px solid var(--ink); filter:url(#rough);
-    border-radius:8px 16px 10px 18px/14px 8px 16px 10px; padding:14px 22px; min-width:230px;
-    box-shadow:3px 5px 0 rgba(0,0,0,.08); transform:rotate(-0.5deg); }
-  .index-card .cap{ font-family:'Caveat',cursive; font-size:20px; text-align:center; margin:0 0 6px; color:var(--ink-soft); }
-  .index-card .katex{ font-size:1.12em; }
-  .eqn{ text-align:center; margin:14px 0; } .eqn .katex-display{ margin:.3em 0; }
-
-  /* speech bubble — "read the formula out loud" */
-  .bubble{ position:relative; background:var(--blue); border:2.4px solid var(--ink); filter:url(#rough);
-    border-radius:22px; padding:13px 20px; max-width:560px; margin:16px auto; font-size:16.5px; }
-  .bubble:after{ content:""; position:absolute; left:40px; bottom:-16px; width:0; height:0;
-    border:14px solid transparent; border-top-color:var(--blue); filter:drop-shadow(0 2px 0 var(--ink)); }
-  .bubble .say{ font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
-
-  /* worked-example card */
-  .worked{ border:2.6px solid var(--ink); border-left:10px solid var(--coral); border-radius:12px;
-    filter:url(#rough); background:#FFFDF6; padding:14px 20px; margin:18px 0; }
-  .worked .tag{ font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B4590E; display:block; margin-bottom:4px; }
-  .worked .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
-  .worked ol{ padding-left:20px; } .worked li{ margin:7px 0; font-size:16px; }
-
-  /* figure card (REAL source image) */
-  .fig{ border:2.4px solid var(--ink); background:#fff; filter:url(#rough);
-    border-radius:12px 14px 12px 14px; padding:10px 10px 8px; margin:16px 0; transform:rotate(-.3deg); }
-  .fig img{ width:100%; height:auto; display:block; border-radius:4px; }
-  .fig figcaption{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:7px; font-style:italic; }
-  .illus{ font-size:13px; color:var(--ink-soft); font-style:italic; }
-
-  /* diagram card (redrawn inline SVG) */
-  .diagram{ border:2.6px solid var(--ink); filter:url(#rough); background:#fff;
-    border-radius:18px 10px 18px 10px/10px 18px 10px 18px; padding:14px 16px 10px; margin:18px 0; }
-  .diagram h4{ font-family:'Caveat',cursive; font-size:22px; margin:0 0 6px; }
-  .diagram svg{ width:100%; height:auto; display:block; }
-  .diagram .cap{ font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:6px; font-style:italic; }
-  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
-
-  /* comparison table */
-  table.hand{ width:100%; border-collapse:collapse; margin:18px 0; font-size:15.5px; }
-  table.hand th, table.hand td{ border:2px solid var(--ink); padding:9px 10px; text-align:left; vertical-align:top; }
-  table.hand thead th{ background:var(--yellow); font-family:'Caveat',cursive; font-size:19px; }
-  table.hand tbody tr:nth-child(odd) td:first-child{ background:#fdf6e6; }
-  table.hand.trace thead th{ background:var(--mint); }   /* dry-run / trace variant */
-
-  /* ===== CODING components ===== */
-  .code{ position:relative; margin:16px 0; border-radius:10px; border:2.6px solid var(--ink);
-    background:#282c34; box-shadow:3px 6px 0 rgba(0,0,0,.16); overflow:hidden; transform:rotate(-.25deg); }
-  .code .fname{ font-family:'Kalam',cursive; font-size:12.5px; letter-spacing:.5px; background:var(--ink);
-    color:var(--paper); padding:5px 14px; display:flex; justify-content:space-between; align-items:center; }
-  .code .fname .lang{ opacity:.7; font-size:11px; text-transform:uppercase; }
-  .code pre{ margin:0; padding:12px 16px; overflow-x:auto; }
-  .code pre code{ font-family:'Fira Code',ui-monospace,'SFMono-Regular',monospace; font-size:13px; line-height:1.65;
-    background:transparent; padding:0; }
-  code.inline{ font-family:'Fira Code',ui-monospace,monospace; font-size:.9em; background:#efe7d4;
-    border:1px solid var(--rule); border-radius:4px; padding:1px 5px; color:#3a3550; }
-  .bigO{ display:inline-block; font-family:'Fira Code',monospace; font-size:13px; font-weight:500;
-    background:var(--ink); color:var(--paper); border-radius:20px; padding:2px 12px; margin:0 2px; }
-  .bigO.good{ background:#2E7D53; } .bigO.bad{ background:#B4463C; }
-
-  /* takeaway banner */
-  .banner{ position:relative; background:var(--coral); color:#FFF7F0; border-radius:16px; filter:url(#rough);
-    padding:20px 26px; text-align:center; margin:32px 0 24px; transform:rotate(0.35deg); }
-  .banner h3{ font-family:'Caveat', cursive; font-size:29px; margin:0 0 6px; line-height:1.22; }
-  .banner p{ color:#FFF0E8; font-size:15px; margin:0; }
-
-  /* quiz card */
-  .quiz{ border:2.6px dashed var(--ink); border-radius:14px; padding:18px 22px; background:#FFFDF3; margin:22px 0 6px; position:relative; }
-  .quiz:before{ content:"✎ quick check"; position:absolute; top:-14px; left:18px; background:var(--paper);
-    padding:0 8px; font-family:'Caveat', cursive; font-size:20px; font-weight:700; }
-  .quiz ol{ margin:6px 0 0; padding-left:22px; font-size:16px; } .quiz li{ margin:11px 0; }
-  .quiz .ans{ color:#2E7D53; font-weight:700; } .quiz .ans:before{ content:"→ "; }
-
-  .signoff{ text-align:right; font-family:'Caveat', cursive; font-size:20px; color:var(--ink-soft); margin-top:24px; }
-  .backtop{ display:block; text-align:right; font-size:13px; color:var(--ink-soft); text-decoration:none; margin-top:6px; }
-
-  @media (max-width:640px){
-    .page{ padding:36px 18px 36px 46px; } .margin-rule{ left:26px; }
-    .cover h1{ font-size:52px; } .lec-divider h2{ font-size:30px; } .two-col{ grid-template-columns:1fr; }
-  }
+:root{--bg:#FBF7EC;--card:#fff;--ink:#2E2A3D;--soft:#5b5678;--line:#E2D9C4;--accent:#d9573a;--link:#2a5db0}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1a22;--card:#24232d;--ink:#ece9f5;--soft:#a9a4c2;--line:#3a3850;--accent:#ff8a6b;--link:#8fb4ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:24px 16px 80px}
+a{color:var(--link)}
+header h1{font-size:2rem;margin:.2em 0 0} header p{color:var(--soft);margin:.3em 0}
+.kicker{letter-spacing:.12em;font-size:.8rem;color:var(--accent);font-weight:700}
+.how{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:18px 0}
+.how code{background:var(--bg);padding:1px 6px;border-radius:4px;word-break:break-all}
+.bar{position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.bar input{flex:1 1 220px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.bar button{padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}
+.bar button[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.week{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.week h2{margin:0;font-size:1.25rem} .week h2 span{font-weight:500;color:var(--soft)}
+.blurb{color:var(--soft);margin:.2em 0 .6em;font-size:.92rem}
+.items{list-style:none;padding:0;margin:.4em 0} .items li{padding:4px 0}
+.items.hide-notes [data-kind=notes],.items.hide-solutions [data-kind=solutions],.items.hide-transcripts [data-kind=transcripts]{display:none}
+small{color:var(--soft)} summary{cursor:pointer;color:var(--soft)} .lecs{columns:2;font-size:.9rem}
+@media(max-width:620px){.lecs{columns:1}}
+footer{margin-top:30px;color:var(--soft);font-size:.9rem}
 </style>
 </head>
 <body>
+<main>
+<header>
+  <div class="kicker">NPTEL ONLINE COURSE &middot; IIT ROPAR</div>
+  <h1>Social Networks Study Hub</h1>
+  <p>Prof. S. R. S. Iyengar &middot; 12 weeks, 166 lectures, with <b>handwritten-style study notes</b>, assignment solutions and full lecture transcripts &middot; 24 PDFs (88.0 MB).</p>
+</header>
 
-<!-- hand-jitter filter + arrow markers; define ONCE per page -->
-<svg class="defs">
-  <defs>
-    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/></filter>
-    <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="14" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/></filter>
-    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1,1 L8,4.5 L1,8" fill="none" stroke="#2E2A3D" stroke-width="1.5"/></marker>
-  </defs>
-</svg>
-
-<div class="page" id="top">
-  <div class="margin-rule"></div>
-  <svg class="doodle" style="top:18px; right:34px;" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2 L14 9 L21 10 L15 14 L17 21 L12 17 L7 21 L9 14 L3 10 L10 9 Z" fill="var(--coral)" opacity="0.85"/></svg>
-
-  <!-- ============ cover ============ -->
-  <div class="cover">
-    <div class="kicker">NPTEL ONLINE COURSE · IIT ROPAR</div>
-    <h1>Social Networks</h1>
-    <div class="sub"><b>iPad-handwritten study notes</b> — re-taught from scratch, Weeks 1–12</div>
-    <div class="prof">Prof. Sudarshan Iyengar · Computer Science &amp; Engineering</div>
-  </div>
-
-  <div class="sticky yellow" style="background:var(--yellow);">
-    <div class="lead">🧠 how to use these notes</div>
-    <p>Twelve self-contained pages, one per week — the whole course. Each <b>re-teaches from zero</b> (every term defined on first use), puts a "read it as" bubble under every formula, gives step-by-step worked examples and full code with dry-run traces &amp; common-bugs boxes, and ends with an inline-answer quiz. You should never need the video lectures — these notes alone cover everything taught. Open any week below.</p>
-  </div>
-
-  <!-- ============ TOC ============ -->
-  <div class="toc"><div class="toc-card">
-    <h3>📒 the twelve weeks</h3>
-    <ol>
-      <li><a href="week1.html">Week 1 — Introduction, Python &amp; NetworkX</a><br><span class="small">graphs, connectedness, the coding toolkit, the challenge (2^C(n,2))</span></li>
-      <li><a href="week2.html">Week 2 — Datasets &amp; Emergence of Connectedness</a><br><span class="small">formats, degree/density/clustering/diameter, Gephi, ~n·log n links to connect</span></li>
-      <li><a href="week3.html">Week 3 — Strong &amp; Weak Ties, Communities</a><br><span class="small">Granovetter, triadic closure, embeddedness, structural holes, Girvan–Newman</span></li>
-      <li><a href="week4.html">Week 4 — Homophily, Selection &amp; Influence</a><br><span class="small">homophily measure, foci/membership closure, the Fatman model</span></li>
-      <li><a href="week5.html">Week 5 — Schelling &amp; Structural Balance</a><br><span class="small">spatial segregation, signed triangles, the Balance Theorem</span></li>
-      <li><a href="week6.html">Week 6 — PageRank &amp; Link Analysis</a><br><span class="small">web graph, points-distribution &amp; random-walk PageRank, DegreeRank</span></li>
-      <li><a href="week7.html">Week 7 — Cascading Behaviour &amp; Diffusion</a><br><span class="small">coordination game q=b/(a+b), cascades vs clusters, collective action</span></li>
-      <li><a href="week8.html">Week 8 — Hubs, Authorities &amp; PageRank as a Matrix</a><br><span class="small">repeated improvement, HITS, eigenvector convergence, Markov matrices</span></li>
-      <li><a href="week9.html">Week 9 — Power Laws &amp; Rich-Get-Richer</a><br><span class="small">bell curve vs power law, Barabási–Albert, Erdős–Rényi, attack survivability, long tail</span></li>
-      <li><a href="week10.html">Week 10 — Epidemics on Networks</a><br><span class="small">branching model, R₀, SIR/SIS, percolation, the cobweb proof</span></li>
-      <li><a href="week11.html">Week 11 — The Small-World Effect</a><br><span class="small">Milgram, six degrees, Watts–Strogatz, decentralized search, Kleinberg's exponent</span></li>
-      <li><a href="week12.html">Week 12 — How to Go Viral: Search, Cores &amp; Cascades</a><br><span class="small">myopic search, k-shell decomposition, independent cascade, coreness &amp; pseudo-cores</span></li>
-    </ol>
-  </div></div>
-
-  <div class="sketch-box tint-blue">
-    <span class="label">📖 what each page contains</span>
-    <ul class="notes" style="margin:4px 0 0;">
-      <li><b>Concepts</b> re-taught with intuition, analogies and comparison tables — every named term in bold.</li>
-      <li><b>Formulas</b> in boxed cards with a plain-English "read it as" bubble, and step-by-step <b>worked examples</b>.</li>
-      <li><b>Code</b> (Python + NetworkX) reconstructed cleanly from the screencasts, with algorithm walkthroughs, <b>dry-run traces</b>, complexity notes and <b>common-bugs</b> boxes.</li>
-      <li><b>Diagrams</b> redrawn as clean inline SVG (graphs, networks, plots).</li>
-      <li>Each page ends with a <b>takeaway banner</b> and an <b>inline-answer quiz</b> aligned to that week's assignment.</li>
-    </ul>
-  </div>
-
-  <div class="banner">
-    <h3>The entire course, Weeks 1–12, re-taught so you can revise from these notes alone.</h3>
-    <p>Weeks 1–7 verified against the transcript <em>and</em> the solved assignments; Weeks 8–12 authored straight from the full lecture transcript (Weeks 9–12 have no released assignments) — every concept and every code screencast is covered.</p>
-  </div>
-
-  <div class="signoff">— start with Week 1 ✏️</div>
+<div class="how">
+  <b>Using this with ChatGPT / Claude:</b> paste this site link, or one week's text link, into the chat and ask your doubt.
+  Everything is plain text, no files to upload. For one week (notes + assignment + transcript together):
+  <br><code>https://pml2405.github.io/social-networks/text/weeks/week-05.txt</code>
+  <br>For only the condensed notes of the whole course: <a href="text/all-notes.txt">all notes as one text file</a>.
+  Index for AI tools: <a href="llms.txt">llms.txt</a>.
+  <br><small>Text is extracted from PDFs and may have small errors; the PDF is the authority. The notes are a condensed re-teach of the lectures.</small>
 </div>
 
+<div class="bar">
+  <input id="q" type="search" placeholder="Search topics, e.g. PageRank, homophily, SIR" aria-label="Search weeks">
+  <button data-f="all" aria-pressed="true">All</button>
+  <button data-f="notes" aria-pressed="false">Notes</button>
+  <button data-f="transcripts" aria-pressed="false">Transcripts</button>
+  <button data-f="solutions" aria-pressed="false">Assignment solutions</button>
+</div>
+
+
+<section class="week" id="week-1" data-text="introduction, python &amp; networkx graphs, connectedness, the coding toolkit, the challenge (2^c(n,2)) introduction answer to the puzzle introduction to python-1 introduction to python-2 introduction to networkx-1 introduction to networkx-2 social networks: the challenge google pagerank searching in a network link prediction the contagions importance of acquaintances marketing on social networks">
+  <h2>Week 1 <span>Introduction, Python &amp; NetworkX</span></h2>
+  <p class="blurb">graphs, connectedness, the coding toolkit, the challenge (2^C(n,2)) &middot; Lectures 1&ndash;13</p>
+  <p class="all"><a href="text/weeks/week-01.txt">All of week 1 as one text file</a> <small>(notes + assignment + transcript, 163 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-01.txt">Text</a> &middot; <a href="notes/week-01.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_01_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_01_Assignment_Solution.pdf">PDF</a> <small>(10 pp, 214 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 1&ndash;13</b> <a href="text/transcripts/Week_01_Transcript_Lec01-13.txt">Text</a> &middot; <a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf">PDF</a> <small>(151 pp, 9.0 MB)</small></li>
+  </ul>
+  <details><summary>13 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=2">Lecture 1: Introduction</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=13">Lecture 2: Answer to the puzzle</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=21">Lecture 3: Introduction to Python-1</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=45">Lecture 4: Introduction to Python-2</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=74">Lecture 5: Introduction to Networkx-1</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=85">Lecture 6: Introduction to Networkx-2</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=131">Lecture 7: Social Networks: The Challenge</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=137">Lecture 8: Google PageRank</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=140">Lecture 9: Searching in a Network</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=143">Lecture 10: Link Prediction</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=146">Lecture 11: The Contagions</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=148">Lecture 12: Importance of Acquaintances</a></li><li><a href="2_Transcripts/Week_01_Transcript_Lec01-13.pdf#page=150">Lecture 13: Marketing on Social Networks</a></li></ul></details>
+</section>
+<section class="week" id="week-2" data-text="datasets &amp; emergence of connectedness formats, degree/density/clustering/diameter, gephi, ~n·log n links to connect introduction to datasets ingredients network synonymy network web graph social network datasets datasets: different formats datasets: how to download? datasets: analyzing using networkx datasets: analyzing using gephi introduction: emergence of connectedness advanced material: emergence of connectedness programming illustration: emergence of connectedness summary to datasets">
+  <h2>Week 2 <span>Datasets &amp; Emergence of Connectedness</span></h2>
+  <p class="blurb">formats, degree/density/clustering/diameter, Gephi, ~n·log n links to connect &middot; Lectures 14&ndash;26</p>
+  <p class="all"><a href="text/weeks/week-02.txt">All of week 2 as one text file</a> <small>(notes + assignment + transcript, 177 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-02.txt">Text</a> &middot; <a href="notes/week-02.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_02_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_02_Assignment_Solution.pdf">PDF</a> <small>(10 pp, 218 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 14&ndash;26</b> <a href="text/transcripts/Week_02_Transcript_Lec14-26.txt">Text</a> &middot; <a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf">PDF</a> <small>(126 pp, 7.9 MB)</small></li>
+  </ul>
+  <details><summary>13 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=2">Lecture 14: Introduction to Datasets</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=9">Lecture 15: Ingredients Network</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=13">Lecture 16: Synonymy Network</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=16">Lecture 17: Web Graph</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=19">Lecture 18: Social Network Datasets</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=22">Lecture 19: Datasets: Different Formats</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=36">Lecture 20: Datasets: How to Download?</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=50">Lecture 21: Datasets: Analyzing Using Networkx</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=78">Lecture 22: Datasets: Analyzing Using Gephi</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=91">Lecture 23: Introduction: Emergence of Connectedness</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=96">Lecture 24: Advanced Material: Emergence of Connectedness</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=104">Lecture 25: Programming Illustration: Emergence of Connectedness</a></li><li><a href="2_Transcripts/Week_02_Transcript_Lec14-26.pdf#page=125">Lecture 26: Summary to Datasets</a></li></ul></details>
+</section>
+<section class="week" id="week-3" data-text="strong &amp; weak ties, communities granovetter, triadic closure, embeddedness, structural holes, girvan–newman introduction granovetter&#x27;s strength of weak ties triads, clustering coefficient and neighborhood overlap structure of weak ties, bridges, and local bridges validation of granovetter&#x27;s experiment using cell phone data embeddedness structural holes social capital finding communities in a graph (brute force method) community detection using girvan newman algorithm visualizing communities using gephi tie strength, social media and passive engagement betweenness measures and graph partitioning strong and weak relationship - summary">
+  <h2>Week 3 <span>Strong &amp; Weak Ties, Communities</span></h2>
+  <p class="blurb">Granovetter, triadic closure, embeddedness, structural holes, Girvan–Newman &middot; Lectures 27&ndash;40</p>
+  <p class="all"><a href="text/weeks/week-03.txt">All of week 3 as one text file</a> <small>(notes + assignment + transcript, 159 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-03.txt">Text</a> &middot; <a href="notes/week-03.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_03_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_03_Assignment_Solution.pdf">PDF</a> <small>(10 pp, 226 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 27&ndash;40</b> <a href="text/transcripts/Week_03_Transcript_Lec27-40.txt">Text</a> &middot; <a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf">PDF</a> <small>(108 pp, 7.2 MB)</small></li>
+  </ul>
+  <details><summary>14 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=2">Lecture 27: Introduction</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=5">Lecture 28: Granovetter&#x27;s Strength of Weak Ties</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=9">Lecture 29: Triads, Clustering Coefficient and Neighborhood Overlap</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=19">Lecture 30: Structure of Weak Ties, Bridges, and Local Bridges</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=26">Lecture 31: Validation of Granovetter&#x27;s Experiment Using Cell Phone Data</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=30">Lecture 32: Embeddedness</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=36">Lecture 33: Structural Holes</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=39">Lecture 34: Social Capital</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=47">Lecture 35: Finding Communities in a Graph (Brute Force Method)</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=63">Lecture 36: Community Detection Using Girvan Newman Algorithm</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=71">Lecture 37: Visualizing Communities Using Gephi</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=85">Lecture 38: Tie Strength, Social Media and Passive Engagement</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=93">Lecture 39: Betweenness Measures and Graph Partitioning</a></li><li><a href="2_Transcripts/Week_03_Transcript_Lec27-40.pdf#page=102">Lecture 40: Strong and Weak Relationship - Summary</a></li></ul></details>
+</section>
+<section class="week" id="week-4" data-text="homophily, selection &amp; influence homophily measure, foci/membership closure, the fatman model introduction to homophily - should you watch your company? selection and social influence interplay between selection and social influence homophily - definition and measurement foci closure and membership closure introduction to fatman evolutionary model fatman evolutionary model - the base code (adding people) fatman evolutionary model - the base code (adding social foci) fatman evolutionary model - implementing homophily quantifying the effect of triadic closure fatman evolutionary model - implementing closures fatman evolutionary model - implementing social influence fatman evolutionary model - storing and analyzing longitudinal data">
+  <h2>Week 4 <span>Homophily, Selection &amp; Influence</span></h2>
+  <p class="blurb">homophily measure, foci/membership closure, the Fatman model &middot; Lectures 41&ndash;53</p>
+  <p class="all"><a href="text/weeks/week-04.txt">All of week 4 as one text file</a> <small>(notes + assignment + transcript, 163 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-04.txt">Text</a> &middot; <a href="notes/week-04.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_04_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_04_Assignment_Solution.pdf">PDF</a> <small>(9 pp, 219 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 41&ndash;53</b> <a href="text/transcripts/Week_04_Transcript_Lec41-53.txt">Text</a> &middot; <a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf">PDF</a> <small>(142 pp, 7.7 MB)</small></li>
+  </ul>
+  <details><summary>13 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=2">Lecture 41: Introduction to Homophily - Should You Watch Your Company?</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=11">Lecture 42: Selection and Social Influence</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=21">Lecture 43: Interplay Between Selection and Social Influence</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=36">Lecture 44: Homophily - Definition and Measurement</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=50">Lecture 45: Foci Closure and Membership Closure</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=54">Lecture 46: Introduction to Fatman Evolutionary Model</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=58">Lecture 47: Fatman Evolutionary Model - The Base Code (Adding People)</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=73">Lecture 48: Fatman Evolutionary Model - The Base Code (Adding Social Foci)</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=89">Lecture 49: Fatman Evolutionary Model - Implementing Homophily</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=99">Lecture 50: Quantifying the Effect of Triadic Closure</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=103">Lecture 51: Fatman Evolutionary Model - Implementing Closures</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=119">Lecture 52: Fatman Evolutionary Model - Implementing Social Influence</a></li><li><a href="2_Transcripts/Week_04_Transcript_Lec41-53.pdf#page=131">Lecture 53: Fatman Evolutionary Model - Storing and Analyzing Longitudinal Data</a></li></ul></details>
+</section>
+<section class="week" id="week-5" data-text="schelling &amp; structural balance spatial segregation, signed triangles, the balance theorem spatial segregation: an introduction spatial segregation: simulation of the schelling model spatial segregation: conclusion schelling model implementation-1 (introduction) schelling model implementation-2 (base code) schelling model implementation-3 (visualization, boundary and internal nodes) schelling model implementation-4 (getting a list of unsatisfied nodes) schelling model implementation-5 (shifting unsatisfied nodes, final graph) chapter 5 - positive and negative relationships (introduction) structural balance enemy&#x27;s enemy is a friend characterizing the structure of balanced networks balance theorem proof of balance theorem introduction to positive and negative edges outline of implementation creating graph, displaying it and counting unstable triangles moving a network from an unstable to stable state forming two coalitions forming two coalitions (contd.) visualizing coalitions and the evolution">
+  <h2>Week 5 <span>Schelling &amp; Structural Balance</span></h2>
+  <p class="blurb">spatial segregation, signed triangles, the Balance Theorem &middot; Lectures 54&ndash;74</p>
+  <p class="all"><a href="text/weeks/week-05.txt">All of week 5 as one text file</a> <small>(notes + assignment + transcript, 209 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-05.txt">Text</a> &middot; <a href="notes/week-05.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_05_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_05_Assignment_Solution.pdf">PDF</a> <small>(9 pp, 204 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 54&ndash;74</b> <a href="text/transcripts/Week_05_Transcript_Lec54-74.txt">Text</a> &middot; <a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf">PDF</a> <small>(165 pp, 14.2 MB)</small></li>
+  </ul>
+  <details><summary>21 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=2">Lecture 54: Spatial Segregation: An Introduction</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=9">Lecture 55: Spatial Segregation: Simulation of the Schelling Model</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=14">Lecture 56: Spatial Segregation: Conclusion</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=16">Lecture 57: Schelling Model Implementation-1 (Introduction)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=21">Lecture 58: Schelling Model Implementation-2 (Base Code)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=35">Lecture 59: Schelling Model Implementation-3 (Visualization, Boundary and Internal Nodes)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=50">Lecture 60: Schelling Model Implementation-4 (Getting a List of Unsatisfied Nodes)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=58">Lecture 61: Schelling Model Implementation-5 (Shifting Unsatisfied Nodes, Final Graph)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=65">Lecture 62: Chapter 5 - Positive and Negative Relationships (Introduction)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=67">Lecture 63: Structural Balance</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=75">Lecture 64: Enemy&#x27;s Enemy is a Friend</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=83">Lecture 65: Characterizing the Structure of Balanced Networks</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=88">Lecture 66: Balance Theorem</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=94">Lecture 67: Proof of Balance Theorem</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=99">Lecture 68: Introduction to Positive and Negative Edges</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=105">Lecture 69: Outline of Implementation</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=112">Lecture 70: Creating Graph, Displaying It and Counting Unstable Triangles</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=124">Lecture 71: Moving a Network from an Unstable to Stable State</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=145">Lecture 72: Forming Two Coalitions</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=156">Lecture 73: Forming Two Coalitions (contd.)</a></li><li><a href="2_Transcripts/Week_05_Transcript_Lec54-74.pdf#page=160">Lecture 74: Visualizing Coalitions and the Evolution</a></li></ul></details>
+</section>
+<section class="week" id="week-6" data-text="pagerank &amp; link analysis web graph, points-distribution &amp; random-walk pagerank, degreerank the web graph collecting the web graph equal coin distribution random coin dropping google page ranking using web graph implementing pagerank using points distribution method-1 implementing pagerank using points distribution method-2 implementing pagerank using points distribution method-3 implementing pagerank using points distribution method-4 implementing pagerank using random walk method-1 implementing pagerank using random walk method-2 degreerank versus pagerank">
+  <h2>Week 6 <span>PageRank &amp; Link Analysis</span></h2>
+  <p class="blurb">web graph, points-distribution &amp; random-walk PageRank, DegreeRank &middot; Lectures 75&ndash;86</p>
+  <p class="all"><a href="text/weeks/week-06.txt">All of week 6 as one text file</a> <small>(notes + assignment + transcript, 133 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-06.txt">Text</a> &middot; <a href="notes/week-06.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_06_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_06_Assignment_Solution.pdf">PDF</a> <small>(10 pp, 218 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 75&ndash;86</b> <a href="text/transcripts/Week_06_Transcript_Lec75-86.txt">Text</a> &middot; <a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf">PDF</a> <small>(82 pp, 5.4 MB)</small></li>
+  </ul>
+  <details><summary>12 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=2">Lecture 75: The Web Graph</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=8">Lecture 76: Collecting the Web Graph</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=17">Lecture 77: Equal Coin Distribution</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=23">Lecture 78: Random Coin Dropping</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=29">Lecture 79: Google Page Ranking Using Web Graph</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=32">Lecture 80: Implementing PageRank Using Points Distribution Method-1</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=37">Lecture 81: Implementing PageRank Using Points Distribution Method-2</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=48">Lecture 82: Implementing PageRank Using Points Distribution Method-3</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=60">Lecture 83: Implementing PageRank Using Points Distribution Method-4</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=67">Lecture 84: Implementing PageRank Using Random Walk Method-1</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=70">Lecture 85: Implementing PageRank Using Random Walk Method-2</a></li><li><a href="2_Transcripts/Week_06_Transcript_Lec75-86.pdf#page=78">Lecture 86: DegreeRank versus PageRank</a></li></ul></details>
+</section>
+<section class="week" id="week-7" data-text="cascading behaviour &amp; diffusion coordination game q=b/(a+b), cascades vs clusters, collective action we follow why do we follow? diffusion in networks modeling diffusion modeling diffusion (continued) impact of communities on diffusion cascade and clusters knowledge, thresholds and the collective action introduction to the programming screencast (coding 4 major ideas) the base code coding the first big idea - increasing the payoff coding the second big idea - key people coding the third big idea - impact of communities on cascades coding the fourth big idea - cascades and clusters">
+  <h2>Week 7 <span>Cascading Behaviour &amp; Diffusion</span></h2>
+  <p class="blurb">coordination game q=b/(a+b), cascades vs clusters, collective action &middot; Lectures 87&ndash;100</p>
+  <p class="all"><a href="text/weeks/week-07.txt">All of week 7 as one text file</a> <small>(notes + assignment + transcript, 150 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-07.txt">Text</a> &middot; <a href="notes/week-07.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_07_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_07_Assignment_Solution.pdf">PDF</a> <small>(9 pp, 217 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 87&ndash;100</b> <a href="text/transcripts/Week_07_Transcript_Lec87-100.txt">Text</a> &middot; <a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf">PDF</a> <small>(120 pp, 8.1 MB)</small></li>
+  </ul>
+  <details><summary>14 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=2">Lecture 87: We Follow</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=8">Lecture 88: Why Do We Follow?</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=15">Lecture 89: Diffusion in Networks</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=18">Lecture 90: Modeling Diffusion</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=24">Lecture 91: Modeling Diffusion (continued)</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=29">Lecture 92: Impact of Communities on Diffusion</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=40">Lecture 93: Cascade and Clusters</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=47">Lecture 94: Knowledge, Thresholds and the Collective Action</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=54">Lecture 95: Introduction to the Programming Screencast (Coding 4 Major Ideas)</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=60">Lecture 96: The Base Code</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=72">Lecture 97: Coding the First Big Idea - Increasing the Payoff</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=88">Lecture 98: Coding the Second Big Idea - Key People</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=94">Lecture 99: Coding the Third Big Idea - Impact of Communities on Cascades</a></li><li><a href="2_Transcripts/Week_07_Transcript_Lec87-100.pdf#page=109">Lecture 100: Coding the Fourth Big Idea - Cascades and Clusters</a></li></ul></details>
+</section>
+<section class="week" id="week-8" data-text="hubs, authorities &amp; pagerank as a matrix repeated improvement, hits, eigenvector convergence, markov matrices introduction to hubs and authorities (a story) principle of repeated improvement (a story) principle of repeated improvement (an example) hubs and authorities pagerank revisited - an example pagerank revisited - convergence in the example pagerank revisited - conservation and convergence pagerank, conservation and convergence - another example matrix multiplication (prerequisite 1) convergence in repeated matrix multiplication (prerequisite 1) addition of two vectors (prerequisite 2) convergence in repeated matrix multiplication - the details pagerank as a matrix operation pagerank explained">
+  <h2>Week 8 <span>Hubs, Authorities &amp; PageRank as a Matrix</span></h2>
+  <p class="blurb">repeated improvement, HITS, eigenvector convergence, Markov matrices &middot; Lectures 101&ndash;114</p>
+  <p class="all"><a href="text/weeks/week-08.txt">All of week 8 as one text file</a> <small>(notes + assignment + transcript, 124 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-08.txt">Text</a> &middot; <a href="notes/week-08.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_08_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_08_Assignment_Solution.pdf">PDF</a> <small>(8 pp, 202 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 101&ndash;114</b> <a href="text/transcripts/Week_08_Transcript_Lec101-114.txt">Text</a> &middot; <a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf">PDF</a> <small>(72 pp, 3.7 MB)</small></li>
+  </ul>
+  <details><summary>14 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=2">Lecture 101: Introduction to Hubs and Authorities (A Story)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=6">Lecture 102: Principle of Repeated Improvement (A Story)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=10">Lecture 103: Principle of Repeated Improvement (An Example)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=14">Lecture 104: Hubs and Authorities</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=20">Lecture 105: PageRank Revisited - An Example</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=24">Lecture 106: PageRank Revisited - Convergence in the Example</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=28">Lecture 107: PageRank Revisited - Conservation and Convergence</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=30">Lecture 108: PageRank, Conservation and Convergence - Another Example</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=34">Lecture 109: Matrix Multiplication (Prerequisite 1)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=41">Lecture 110: Convergence in Repeated Matrix Multiplication (Prerequisite 1)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=48">Lecture 111: Addition of Two Vectors (Prerequisite 2)</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=54">Lecture 112: Convergence in Repeated Matrix Multiplication - The Details</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=63">Lecture 113: PageRank as a Matrix Operation</a></li><li><a href="2_Transcripts/Week_08_Transcript_Lec101-114.pdf#page=67">Lecture 114: PageRank Explained</a></li></ul></details>
+</section>
+<section class="week" id="week-9" data-text="power laws &amp; rich-get-richer bell curve vs power law, barabási–albert, erdős–rényi, attack survivability, long tail introduction to power law why do normal distributions appear? power law emerges in www graphs detecting the presence of power law rich get richer phenomenon summary so far implementing rich-getting-richer phenomenon (barabasi-albert model)-1 implementing rich-getting-richer phenomenon (barabasi-albert model)-2 implementing a random graph (erdos-renyi model)-1 implementing a random graph (erdos-renyi model)-2 forced versus random removal of nodes (attack survivability)">
+  <h2>Week 9 <span>Power Laws &amp; Rich-Get-Richer</span></h2>
+  <p class="blurb">bell curve vs power law, Barabási–Albert, Erdős–Rényi, attack survivability, long tail &middot; Lectures 115&ndash;125</p>
+  <p class="all"><a href="text/weeks/week-09.txt">All of week 9 as one text file</a> <small>(notes + assignment + transcript, 161 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-09.txt">Text</a> &middot; <a href="notes/week-09.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_09_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_09_Assignment_Solution.pdf">PDF</a> <small>(10 pp, 231 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 115&ndash;125</b> <a href="text/transcripts/Week_09_Transcript_Lec115-125.txt">Text</a> &middot; <a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf">PDF</a> <small>(94 pp, 4.6 MB)</small></li>
+  </ul>
+  <details><summary>11 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=2">Lecture 115: Introduction to Power Law</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=9">Lecture 116: Why Do Normal Distributions Appear?</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=14">Lecture 117: Power Law Emerges in WWW Graphs</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=21">Lecture 118: Detecting the Presence of Power Law</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=26">Lecture 119: Rich Get Richer Phenomenon</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=33">Lecture 120: Summary So Far</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=36">Lecture 121: Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-1</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=42">Lecture 122: Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-2</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=68">Lecture 123: Implementing a Random Graph (Erdos-Renyi Model)-1</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=72">Lecture 124: Implementing a Random Graph (Erdos-Renyi Model)-2</a></li><li><a href="2_Transcripts/Week_09_Transcript_Lec115-125.pdf#page=82">Lecture 125: Forced Versus Random Removal of Nodes (Attack Survivability)</a></li></ul></details>
+</section>
+<section class="week" id="week-10" data-text="epidemics on networks branching model, r₀, sir/sis, percolation, the cobweb proof rich get richer - a possible reason rich get richer - the long tail epidemics - an introduction introduction to epidemics (contd.) simple branching process for modeling epidemics simple branching process for modeling epidemics (contd.) basic reproductive number modeling epidemics on complex networks sir and sis spreading models comparison between sir and sis spreading models basic reproductive number revisited for complex networks percolation model analysis of basic reproductive number in branching model (problem statement) analyzing basic reproductive number 2 analyzing basic reproductive number 3 analyzing basic reproductive number 4 analyzing basic reproductive number 5">
+  <h2>Week 10 <span>Epidemics on Networks</span></h2>
+  <p class="blurb">branching model, R₀, SIR/SIS, percolation, the cobweb proof &middot; Lectures 126&ndash;142</p>
+  <p class="all"><a href="text/weeks/week-10.txt">All of week 10 as one text file</a> <small>(notes + assignment + transcript, 183 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-10.txt">Text</a> &middot; <a href="notes/week-10.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_10_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_10_Assignment_Solution.pdf">PDF</a> <small>(9 pp, 226 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 126&ndash;142</b> <a href="text/transcripts/Week_10_Transcript_Lec126-142.txt">Text</a> &middot; <a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf">PDF</a> <small>(107 pp, 6.3 MB)</small></li>
+  </ul>
+  <details><summary>17 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=2">Lecture 126: Rich Get Richer - A Possible Reason</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=11">Lecture 127: Rich Get Richer - The Long Tail</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=19">Lecture 128: Epidemics - An Introduction</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=27">Lecture 129: Introduction to Epidemics (contd.)</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=30">Lecture 130: Simple Branching Process for Modeling Epidemics</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=38">Lecture 131: Simple Branching Process for Modeling Epidemics (contd.)</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=43">Lecture 132: Basic Reproductive Number</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=49">Lecture 133: Modeling Epidemics on Complex Networks</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=54">Lecture 134: SIR and SIS Spreading Models</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=68">Lecture 135: Comparison Between SIR and SIS Spreading Models</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=74">Lecture 136: Basic Reproductive Number Revisited for Complex Networks</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=79">Lecture 137: Percolation Model</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=85">Lecture 138: Analysis of Basic Reproductive Number in Branching Model (Problem Statement)</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=89">Lecture 139: Analyzing Basic Reproductive Number 2</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=96">Lecture 140: Analyzing Basic Reproductive Number 3</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=100">Lecture 141: Analyzing Basic Reproductive Number 4</a></li><li><a href="2_Transcripts/Week_10_Transcript_Lec126-142.pdf#page=104">Lecture 142: Analyzing Basic Reproductive Number 5</a></li></ul></details>
+</section>
+<section class="week" id="week-11" data-text="the small-world effect milgram, six degrees, watts–strogatz, decentralized search, kleinberg&#x27;s exponent small world effect - an introduction milgram&#x27;s experiment the reason the generative model decentralized search - i decentralized search - ii decentralized search - iii">
+  <h2>Week 11 <span>The Small-World Effect</span></h2>
+  <p class="blurb">Milgram, six degrees, Watts–Strogatz, decentralized search, Kleinberg&#x27;s exponent &middot; Lectures 143&ndash;149</p>
+  <p class="all"><a href="text/weeks/week-11.txt">All of week 11 as one text file</a> <small>(notes + assignment + transcript, 97 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-11.txt">Text</a> &middot; <a href="notes/week-11.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_11_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_11_Assignment_Solution.pdf">PDF</a> <small>(8 pp, 216 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 143&ndash;149</b> <a href="text/transcripts/Week_11_Transcript_Lec143-149.txt">Text</a> &middot; <a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf">PDF</a> <small>(50 pp, 2.4 MB)</small></li>
+  </ul>
+  <details><summary>7 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=2">Lecture 143: Small World Effect - An Introduction</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=10">Lecture 144: Milgram&#x27;s Experiment</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=16">Lecture 145: The Reason</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=22">Lecture 146: The Generative Model</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=25">Lecture 147: Decentralized Search - I</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=30">Lecture 148: Decentralized Search - II</a></li><li><a href="2_Transcripts/Week_11_Transcript_Lec143-149.pdf#page=38">Lecture 149: Decentralized Search - III</a></li></ul></details>
+</section>
+<section class="week" id="week-12" data-text="how to go viral: search, cores &amp; cascades myopic search, k-shell decomposition, independent cascade, coreness &amp; pseudo-cores programming illustration - small world networks: introduction base code making homophily based edges adding weak ties plotting change in diameter programming illustration - myopic search: introduction myopic search myopic search comparison to optimal search time taken by myopic search pseudocores: introduction how to be viral who are the right key nodes? finding the right key nodes (the core) coding k-shell decomposition coding cascading model coding the importance of core nodes in cascading pseudo core">
+  <h2>Week 12 <span>How to Go Viral: Search, Cores &amp; Cascades</span></h2>
+  <p class="blurb">myopic search, k-shell decomposition, independent cascade, coreness &amp; pseudo-cores &middot; Lectures 150&ndash;166</p>
+  <p class="all"><a href="text/weeks/week-12.txt">All of week 12 as one text file</a> <small>(notes + assignment + transcript, 199 KB)</small></p>
+  <ul class="items">
+    <li data-kind="notes"><b>Study notes</b> <a href="text/notes/week-12.txt">Text</a> &middot; <a href="notes/week-12.html">Notebook page</a></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <a href="text/solutions/Week_12_Assignment_Solution.txt">Text</a> &middot; <a href="1_Assignment_Solutions/Week_12_Assignment_Solution.pdf">PDF</a> <small>(9 pp, 213 KB)</small></li>
+    <li data-kind="transcripts"><b>Transcript, Lectures 150&ndash;166</b> <a href="text/transcripts/Week_12_Transcript_Lec150-166.txt">Text</a> &middot; <a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf">PDF</a> <small>(141 pp, 8.9 MB)</small></li>
+  </ul>
+  <details><summary>17 lectures</summary><ul class="lecs"><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=2">Lecture 150: Programming Illustration - Small World Networks: Introduction</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=11">Lecture 151: Base Code</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=14">Lecture 152: Making Homophily Based Edges</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=27">Lecture 153: Adding Weak Ties</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=31">Lecture 154: Plotting Change in Diameter</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=34">Lecture 155: Programming Illustration - Myopic Search: Introduction</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=40">Lecture 156: Myopic Search</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=56">Lecture 157: Myopic Search Comparison to Optimal Search</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=62">Lecture 158: Time Taken by Myopic Search</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=74">Lecture 159: PseudoCores: Introduction</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=79">Lecture 160: How to Be Viral</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=83">Lecture 161: Who Are the Right Key Nodes?</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=85">Lecture 162: Finding the Right Key Nodes (the Core)</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=96">Lecture 163: Coding K-Shell Decomposition</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=108">Lecture 164: Coding Cascading Model</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=123">Lecture 165: Coding the Importance of Core Nodes in Cascading</a></li><li><a href="2_Transcripts/Week_12_Transcript_Lec150-166.pdf#page=136">Lecture 166: Pseudo Core</a></li></ul></details>
+</section>
+
+<footer>
+  <a href="https://github.com/PML2405/social-networks">GitHub repository</a> &middot; <a href="manifest.json">manifest.json</a> &middot; <a href="sitemap.xml">sitemap.xml</a> &middot; <a href="notes/index.html">Notebook-style notes index</a>
+  <p>Lecture numbers follow the NPTEL transcript (1&ndash;166).</p>
+</footer>
+</main>
+<script>
+(function(){
+  var weeks=[].slice.call(document.querySelectorAll('.week')),q=document.getElementById('q'),btns=[].slice.call(document.querySelectorAll('.bar button'));
+  var kind='all';
+  function apply(){
+    var s=q.value.trim().toLowerCase();
+    weeks.forEach(function(w){
+      w.hidden = s && w.getAttribute('data-text').indexOf(s)<0;
+      var ul=w.querySelector('.items');
+      ul.className='items'+(kind==='all'?'':' hide-'+['notes','solutions','transcripts'].filter(function(k){return k!==kind}).join(' hide-'));
+    });
+  }
+  q.addEventListener('input',apply);
+  btns.forEach(function(b){b.addEventListener('click',function(){kind=b.getAttribute('data-f');btns.forEach(function(x){x.setAttribute('aria-pressed',x===b)});apply();});});
+})();
+</script>
 </body>
 </html>

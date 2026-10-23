@@ -1,0 +1,311 @@
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 8 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Playlists and Songs: Hubs and Authorities
+Case Study
+An engineer at a music-streaming service wants to score both songs and the playlists that feature them. The
+setup is a directed graph: a playlist points to each song it features. Two roles emerge. A playlist acts as a hub
+a collection that points outward to content while a song acts as an authority something that is pointed at.
+Intuitively, a good playlist is one that features good songs, and a good song is one that is featured by good
+playlists. The definition is therefore recursive, and the engineer scores it by the principle of repeated
+improvement.
+The procedure assigns every node two numbers and updates them together. In each round, a hub's score is
+set to the sum of the authority scores of the songs it points to, and an authority's score is set to the sum of
+the hub scores of the playlists that point to it; after each round both sets of scores are normalized. The
+engineer notes that in a fully general directed graph this is not limited to a neat split into “only playlists” and
+“only songs”: every node carries both kinds of score at the same time.
+Running the update repeatedly, the engineer observes that the scores settle: the relative proportions
+between nodes stop changing, even though the raw numbers are rescaled each round. This convergence is
+guaranteed for any graph one always reaches a stable point. The same idea once underpinned the rating of
+“news lists” in the late 1990s, where a list was trusted to the extent that it pointed to genuinely good
+articles.
+Questions 1–10
+Q1.  [MCQ]  In this model, what distinguishes a hub from an authority?
+A.  A hub points outward to content (a playlist); an authority is pointed at (a song).
+B.  A hub is pointed at by others; an authority points outward to other nodes.
+C.  A hub and an authority are simply two names for the very same single score.
+D.  A hub is any node with no out-links; an authority is any node with no in-links.
+Answer:  A
+Reference:  Lecture 104 – Hubs and Authorities (≈00:39–02:40)
+Solution:  A hub points outward (a playlist that features songs), and an authority is the thing pointed at (a
+song). The roles are reversed in one option, they are not the same number, and they are defined by
+pointing, not by having zero links.
+
+Q2.  [MCQ]  Under the principle of repeated improvement, how are the two scores updated each round?
+A.  A hub's score becomes the count of every node in the whole graph, and an authority's score likewise.
+
+[p.2]
+B.  Each score is replaced by its single largest neighbour score and then left fixed thereafter.
+C.  A hub's score becomes the sum of authority scores it points to; an authority's, the hub scores pointing
+in.
+D.  A hub's score becomes the sum of the hub scores it points to, and the authorities are ignored.
+Answer:  C
+Reference:  Lecture 102–103 – Principle of Repeated Improvement
+Solution:  Each hub takes on the total authority score of what it points to, and each authority takes on the
+total hub score of what points to it — the two roles feed each other. It is not a node count, not a single
+maximum, and it does mix hubs with authorities (not hubs with hubs).
+
+Q3.  [MCQ]  Which statement best captures the recursive idea behind the scores?
+A.  A song is a good authority purely because a large number of playlists feature it.
+B.  A playlist is a good hub if it features many songs, however obscure those songs are.
+C.  A song's score depends only on how many other songs it happens to resemble in style.
+D.  A song scores well when good playlists feature it, and good playlists feature good songs.
+Answer:  D
+Reference:  Lecture 104 – Hubs and Authorities (≈00:39–end)
+Solution:  The quality of a song depends on the quality of the playlists featuring it, which in turn depends on
+the songs they feature — a mutually recursive definition. Raw counts of playlists or songs, and stylistic
+resemblance, miss this importance-weighted recursion.
+
+Q4.  [MCQ]  In a fully general directed graph (not a clean playlist-vs-song split), how many scores does each
+node carry?
+A.  One score only, decided by whether the node has more incoming links or more outgoing links.
+B.  Two scores: a hub score for what it points to and an authority score for who points to it.
+C.  One shared score that every node in the same community ends up holding in common.
+D.  Three scores: a hub score, an authority score, and a separate node-degree score.
+Answer:  B
+Reference:  Lecture 104 – Hubs and Authorities (≈01:11–04:00)
+Solution:  In a general directed graph every node both points and is pointed at, so it carries two scores at
+once — a hub score and an authority score. It is not reduced to one score, not shared across a community,
+and there is no separate third degree score in this method.
+
+Q5.  [Match the following]  Match each term in Column A with its description in Column B.
+Column A (term)
+Column B (description)
+1. Hub
+a. its score is the sum of the hub scores pointing to
+it
+2. Authority
+b. relative scores stop changing as the update
+repeats
+
+[p.3]
+3. Repeated improvement
+c. its score is the sum of the authority scores it
+points to
+4. Convergence
+d. alternately update hub and authority scores,
+normalizing each round
+
+A.  1-a, 2-c, 3-d, 4-b
+B.  1-c, 2-a, 3-b, 4-d
+C.  1-c, 2-a, 3-d, 4-b
+D.  1-c, 2-d, 3-a, 4-b
+Answer:  C (1-c, 2-a, 3-d, 4-b)
+Reference:  Lectures 102–104 – Repeated improvement and convergence
+Solution:  A hub's score is the sum of the authority scores it points to (1-c); an authority's score is the sum
+of the hub scores pointing to it (2-a); repeated improvement alternately updates and normalizes the two
+score sets (3-d); and convergence is when the relative scores stop changing (4-b).
+
+Q6.  [MCQ]  What does it mean for the hub and authority scores to “converge”?
+A.  Every node ends up with exactly the same score as every other node in the graph.
+B.  The relative proportions between nodes' scores stop changing as the update repeats.
+C.  The raw scores grow without bound, doubling on every successive iteration.
+D.  All hub scores fall to zero while the authority scores keep rising each round.
+Answer:  B
+Reference:  Lecture 104 – Hubs and Authorities (≈05:53–end)
+Solution:  Convergence here means the proportions between nodes settle — if one node holds half as much
+as another, it keeps doing so — even as the numbers are rescaled. The scores do not all become equal, do
+not blow up (that is what normalizing prevents), and hubs do not collapse to zero.
+
+Q7.  [MCQ]  Why are the scores normalized after every round of updates?
+A.  To force every node's score to land at exactly one, removing all differences.
+B.  To keep the raw scores from growing without bound, since only proportions matter.
+C.  To convert the directed graph into an undirected one before the next round.
+D.  To discard the authority scores so that only the hub scores remain in play.
+Answer:  B
+Reference:  Lecture 103 – Principle of Repeated Improvement (An example)
+Solution:
+Summing neighbour scores each round would make the numbers grow indefinitely, so
+normalizing rescales them while preserving the relative proportions that actually carry the ranking. It does
+not equalise the scores, change the graph's direction, or delete the authority scores.
+
+[p.4]
+Q8.  [MCQ]  Playlist X features songs P and Q; playlist Y features songs Q and R. Starting every score at 1,
+what is the (un-normalized) authority score of song Q after one update?
+A.  0, because Q is cancelled out by appearing on two different playlists.
+B.  1, because each authority score is capped at one before normalizing.
+C.  3, the number of distinct songs across both of the playlists combined.
+D.  2, since Q is featured by both X and Y, each contributing a hub score of 1.
+Answer:  D
+Reference:  Lecture 103 – Principle of Repeated Improvement (An example)
+Solution:  An authority's score is the sum of the hub scores pointing to it. Q is featured by both X and Y,
+each with hub score 1, so Q's authority score is 1 + 1 = 2 (P and R get 1 each). It is not cancelled, not capped
+at one, and not the count of distinct songs.
+
+Q9.  [MCQ]  For which graphs is this repeated-improvement process guaranteed to converge?
+A.  For any directed graph — the hub and authority scores always reach a stable point.
+B.  Only for graphs in which every hub points to exactly the same set of authorities.
+C.  Only for undirected graphs, since direction would prevent the scores from settling.
+D.  Only for graphs that contain no cycles of any kind among their nodes.
+Answer:  A
+Reference:  Lecture 104 – Hubs and Authorities (≈05:53–end)
+Solution:  The principle of repeated improvement is guaranteed to converge for any graph — the scores
+always reach a stable set of proportions. It does not require identical hubs, undirected edges, or acyclic
+structure.
+
+Q10.  [MSQ]  Which statements about hubs and authorities are correct? (Select all that apply.)
+I.   A hub's score is the sum of the authority scores of the nodes it points to.
+II.  In a general directed graph, each node has both a hub and an authority score.
+III. The scores are normalized each round, and the proportions converge.
+IV.  A node's authority score depends only on its number of out-links.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, II, III
+D.  I, III
+Answer:  C (statements I, II, III)
+Reference:  Lectures 102–104 – Hubs and authorities
+Solution:  A hub aggregates the authority scores it points to (I), each node carries both scores (II), and the
+normalized scores converge in proportion (III). An authority score reflects who points in (in-links and their
+hub scores), not the node's out-links, so IV is false.
+
+[p.5]
+Comprehension 2 — PageRank Revisited: Resource-Sharing as a Matrix Operation
+Case Study
+Returning to PageRank, an instructor reframes it as a resource-sharing process on a directed graph and then
+as a matrix operation. Each of the n nodes starts with an equal share, 1/n, of the total. In every round, a
+node hands its current value out along its links, split equally among the nodes it points to. Because nothing
+leaves the network, the values always sum to 1 a conservation law, like conservation of energy and after
+enough rounds the shares stop changing, so the process converges to a stable assignment.
+A concrete graph on three nodes A, B, C has the links A→C, B→A, B→C, and C→B. Starting from an equal
+1/3 each and applying the sharing rule, one can follow how the shares shift from one round to the next and
+where they finally settle (remembering that B, with two out-links, splits its value between the two nodes it
+points to).
+The instructor then shows this sharing step is exactly multiplication by a matrix M whose entry in row i,
+column j is the share that node j sends to node i. This M turns out to be a Markov matrix, and the iteration
+is just repeated multiplication of the share vector by M. A key fact from linear algebra makes the
+convergence inevitable: repeatedly applying a matrix to any starting vector drives it toward the eigenvector
+of the largest eigenvalue, and the special structure of a Markov matrix pins down a single limiting
+assignment, the same no matter where the shares start.
+Questions 1–10
+Q1.  [MCQ]  How does the resource-sharing version of PageRank begin, and what happens each round?
+A.  Each node starts with 1 full point, and each round it simply keeps whatever its in-links bring.
+B.  Each node starts with 1/n of the total and splits its value equally along its out-links.
+C.  Each node starts with 1/n and passes all of its value to a single random neighbour.
+D.  Only the highest-degree node starts with value, which then trickles out to the others.
+Answer:  B
+Reference:  Lecture 105 – PageRank Revisited: An example (≈01:09–03:24)
+Solution:  Every node begins with an equal share 1/n, and each round it divides its current value equally
+among the nodes it points to. It does not start at 1, does not send everything to one random neighbour, and
+the value is spread evenly, not hoarded by one node.
+
+Q2.  [MCQ]  Why do the node values always sum to 1 throughout the process?
+A.  Because the values are re-scaled to sum to 1 by hand after every single round.
+B.  Because each node's value is capped at 1/n so the total can never exceed one.
+C.  Because the highest-value node is reset to absorb any shortfall in the total.
+D.  Because value only moves along edges and never leaves the network — conservation.
+Answer:  D
+
+[p.6]
+Reference:  Lecture 107 – Conservation and Convergence (≈00:05–end)
+Solution:  The shares are merely passed along edges, never created or destroyed, so the total is conserved
+at 1 — the instructor likens it to conservation of energy. No manual rescaling, per-node cap, or top-node
+reset is involved.
+
+Q3.  [MCQ]  On the three-node graph (A→C, B→A, B→C, C→B), starting from 1/3 each, what is the value at
+C after one round?
+A.  1/6, the value handed from a single one of C's in-links.
+B.  1/3, unchanged from the equal starting share each node was given.
+C.  1/2, since C collects all of A's value plus half of B's value.
+D.  2/3, the combined value of every node that B happens to point to.
+Answer:  C
+Reference:  Lecture 105 – PageRank Revisited: An example (≈03:24–end)
+Solution:  C receives all of A's 1/3 (A points only to C) and half of B's 1/3 (B splits between A and C), giving
+1/3 + 1/6 = 1/2. The other values are 1/6 for A and 1/3 for B that round.
+
+Q4.  [MCQ]  The three-node process converges to A = 0.2, B = 0.4, C = 0.4. Which reading is correct?
+A.  B and C end up ranked equally and ahead of A, and the three shares sum to 1.
+B.  A ends up ranked highest, since it started by giving its value straight to C.
+C.  The three shares converge but no longer add up to 1 once they have settled.
+D.  All three nodes converge to one third each, exactly as they began the process.
+Answer:  A
+Reference:  Lecture 106 – Convergence in the Example (≈04:49–end)
+Solution:  The stable shares are A = 0.2, B = 0.4, C = 0.4: B and C tie for the top and A is lowest, and 0.2 + 0.4
++ 0.4 = 1 as conservation requires. A is not highest, the total stays 1, and the shares move away from the
+equal start.
+
+Q5.  [MCQ]  Once the sharing step is written as multiplication by the matrix M, what is special about M?
+A.  Every row of M sums to 1, which makes M a symmetric adjacency matrix.
+B.  Each column of M sums to 1 — a column-stochastic (Markov) matrix.
+C.  M has all entries equal, so every node sends the same share everywhere.
+D.  M is its own inverse, so applying it twice returns the original vector.
+Answer:  B
+Reference:  Lecture 114 – PageRank Explained (≈03:09–04:36)
+Solution:  M's entry (i, j) is the share node j sends to node i, and since j hands out all of its value, each
+column sums to 1 — a column-stochastic, or Markov, matrix. Its columns (not rows) sum to 1, its entries are
+not all equal, and it is not its own inverse.
+
+[p.7]
+Q6.  [MCQ]  Why does repeatedly multiplying the share vector by the Markov matrix M converge to a unique
+result?
+A.  Because every possible starting vector is already an eigenvector of M, so nothing ever changes.
+B.  Because M shrinks every vector toward the origin until all of its entries reach zero.
+C.  Because M's largest eigenvalue is 1, so the iteration is driven to its eigenvalue-1 eigenvector.
+D.  Because the result depends entirely on the starting vector, giving a different limit each time.
+Answer:  C
+Reference:  Lecture 114 – PageRank Explained (≈04:36–end)
+Solution:  Repeated multiplication drives any vector toward the eigenvector of the largest eigenvalue; for a
+Markov matrix that eigenvalue is exactly 1, so the shares converge to M's eigenvector for eigenvalue 1 no
+matter where they start. Not every vector is an eigenvector, M does not collapse vectors to zero, and the
+limit does not depend on the start.
+
+Q7.  [Arrange in order]  Arrange the steps of viewing PageRank as a matrix operation in the correct order.
+Steps (in scrambled order):
+(i)   Start from the uniform vector with 1/n in every entry.
+(ii)  Repeatedly multiply the current vector by M.
+(iii) Build the Markov matrix M whose columns each sum to 1.
+(iv)  Read off the stable vector as the PageRank scores.
+(v)   Stop once the vector reaches M's eigenvector for eigenvalue 1.
+A.  iii → i → ii → v → iv
+B.  i → iii → ii → v → iv
+C.  iii → ii → i → v → iv
+D.  iii → i → v → ii → iv
+Answer:  A (iii → i → ii → v → iv)
+Reference:  Lectures 113–114 – PageRank as a matrix operation
+Solution:  Build the Markov matrix M with columns summing to 1 (iii), start from the uniform 1/n vector (i),
+repeatedly multiply by M (ii), stop when the vector reaches M's eigenvector for eigenvalue 1 (v), and read
+off that stable vector as the scores (iv).
+
+Q8.  [MCQ]  A Markov matrix has largest eigenvalue 1 and all others smaller. Why does that force
+convergence under repeated multiplication?
+A.  In the eigenvector basis, the smaller eigenvalues' powers vanish, leaving only the eigenvalue-1
+direction.
+B.  Because a largest eigenvalue of 1 means every eigenvalue equals 1, so the vector never changes at all.
+C.  Because the eigenvalues below 1 grow fastest under repeated powers and so take over the result.
+D.  Because the matrix has no eigenvectors, so the iteration must settle on the average of all entries.
+Answer:  A
+Reference:  Lecture 112 – Convergence in Repeated Matrix Multiplication: The Details
+
+[p.8]
+Solution:  Express the start as a combination of eigenvectors; raising M to a high power scales each
+component by its eigenvalue to that power. Components with eigenvalue below 1 vanish, leaving only the
+eigenvalue-1 direction. The other options misstate the eigenvalues or deny that M has eigenvectors.
+
+Q9.  [MCQ]  The convergence argument rests on a prerequisite about adding vectors. What is it?
+A.  Adding two vectors of the very same length together always yields exactly the zero vector.
+B.  Adding any two of the vectors reverses both of their directions at the very same moment.
+C.  The sum of two of the vectors is always perpendicular to each of the two originals.
+D.  A big vector plus a small vector gives a result close to the big vector's direction.
+Answer:  D
+Reference:  Lecture 111 – Addition of Two Vectors (Prerequisite 2)
+Solution:  When a large-amplitude vector is added to a small one, the resultant points close to the large
+vector — which is why the dominant eigenvalue's term determines the limiting direction. Equal-length
+vectors need not cancel, addition does not reverse directions, and the sum is not generally perpendicular to
+the parts.
+
+Q10.  [MSQ]  Which statements about PageRank as a matrix operation are correct? (Select all that apply.)
+I.   The node values are conserved, summing to 1 throughout the process.
+II.  The sharing step is multiplication by a Markov matrix whose columns sum to 1.
+III. The shares converge to the eigenvector for eigenvalue 1, regardless of the start.
+IV.  The final shares depend on the starting vector, so each run gives a different ranking.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III, IV
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 107–114 – Conservation, convergence, and the matrix view
+Solution:  Conservation keeps the total at 1 (I), the step is multiplication by a column-stochastic Markov
+matrix (II), and the shares converge to the eigenvalue-1 eigenvector independent of the start (III). Because
+the limit is independent of the start, IV is false.
+
+End of Week 8 Question Paper  —  20 questions  •  2 comprehensions

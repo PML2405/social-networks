@@ -1,0 +1,167 @@
+# week|lecture|title|printed_page_in_full_transcript
+1|1|Introduction|8
+1|2|Answer to the puzzle|19
+1|3|Introduction to Python-1|27
+1|4|Introduction to Python-2|51
+1|5|Introduction to Networkx-1|80
+1|6|Introduction to Networkx-2|91
+1|7|Social Networks: The Challenge|137
+1|8|Google PageRank|143
+1|9|Searching in a Network|146
+1|10|Link Prediction|149
+1|11|The Contagions|152
+1|12|Importance of Acquaintances|154
+1|13|Marketing on Social Networks|156
+2|14|Introduction to Datasets|158
+2|15|Ingredients Network|165
+2|16|Synonymy Network|169
+2|17|Web Graph|172
+2|18|Social Network Datasets|175
+2|19|Datasets: Different Formats|178
+2|20|Datasets: How to Download?|192
+2|21|Datasets: Analyzing Using Networkx|206
+2|22|Datasets: Analyzing Using Gephi|234
+2|23|Introduction: Emergence of Connectedness|247
+2|24|Advanced Material: Emergence of Connectedness|252
+2|25|Programming Illustration: Emergence of Connectedness|260
+2|26|Summary to Datasets|281
+3|27|Introduction|283
+3|28|Granovetter's Strength of Weak Ties|286
+3|29|Triads, Clustering Coefficient and Neighborhood Overlap|290
+3|30|Structure of Weak Ties, Bridges, and Local Bridges|300
+3|31|Validation of Granovetter's Experiment Using Cell Phone Data|307
+3|32|Embeddedness|311
+3|33|Structural Holes|317
+3|34|Social Capital|320
+3|35|Finding Communities in a Graph (Brute Force Method)|328
+3|36|Community Detection Using Girvan Newman Algorithm|344
+3|37|Visualizing Communities Using Gephi|352
+3|38|Tie Strength, Social Media and Passive Engagement|366
+3|39|Betweenness Measures and Graph Partitioning|374
+3|40|Strong and Weak Relationship - Summary|383
+4|41|Introduction to Homophily - Should You Watch Your Company?|390
+4|42|Selection and Social Influence|399
+4|43|Interplay Between Selection and Social Influence|409
+4|44|Homophily - Definition and Measurement|424
+4|45|Foci Closure and Membership Closure|438
+4|46|Introduction to Fatman Evolutionary Model|442
+4|47|Fatman Evolutionary Model - The Base Code (Adding People)|446
+4|48|Fatman Evolutionary Model - The Base Code (Adding Social Foci)|461
+4|49|Fatman Evolutionary Model - Implementing Homophily|477
+4|50|Quantifying the Effect of Triadic Closure|487
+4|51|Fatman Evolutionary Model - Implementing Closures|491
+4|52|Fatman Evolutionary Model - Implementing Social Influence|507
+4|53|Fatman Evolutionary Model - Storing and Analyzing Longitudinal Data|519
+5|54|Spatial Segregation: An Introduction|531
+5|55|Spatial Segregation: Simulation of the Schelling Model|538
+5|56|Spatial Segregation: Conclusion|543
+5|57|Schelling Model Implementation-1 (Introduction)|545
+5|58|Schelling Model Implementation-2 (Base Code)|550
+5|59|Schelling Model Implementation-3 (Visualization, Boundary and Internal Nodes)|564
+5|60|Schelling Model Implementation-4 (Getting a List of Unsatisfied Nodes)|579
+5|61|Schelling Model Implementation-5 (Shifting Unsatisfied Nodes, Final Graph)|587
+5|62|Chapter 5 - Positive and Negative Relationships (Introduction)|594
+5|63|Structural Balance|596
+5|64|Enemy's Enemy is a Friend|604
+5|65|Characterizing the Structure of Balanced Networks|612
+5|66|Balance Theorem|617
+5|67|Proof of Balance Theorem|623
+5|68|Introduction to Positive and Negative Edges|628
+5|69|Outline of Implementation|634
+5|70|Creating Graph, Displaying It and Counting Unstable Triangles|641
+5|71|Moving a Network from an Unstable to Stable State|653
+5|72|Forming Two Coalitions|674
+5|73|Forming Two Coalitions (contd.)|685
+5|74|Visualizing Coalitions and the Evolution|689
+6|75|The Web Graph|695
+6|76|Collecting the Web Graph|701
+6|77|Equal Coin Distribution|710
+6|78|Random Coin Dropping|716
+6|79|Google Page Ranking Using Web Graph|722
+6|80|Implementing PageRank Using Points Distribution Method-1|725
+6|81|Implementing PageRank Using Points Distribution Method-2|730
+6|82|Implementing PageRank Using Points Distribution Method-3|741
+6|83|Implementing PageRank Using Points Distribution Method-4|753
+6|84|Implementing PageRank Using Random Walk Method-1|760
+6|85|Implementing PageRank Using Random Walk Method-2|763
+6|86|DegreeRank versus PageRank|771
+7|87|We Follow|776
+7|88|Why Do We Follow?|782
+7|89|Diffusion in Networks|789
+7|90|Modeling Diffusion|792
+7|91|Modeling Diffusion (continued)|798
+7|92|Impact of Communities on Diffusion|803
+7|93|Cascade and Clusters|814
+7|94|Knowledge, Thresholds and the Collective Action|821
+7|95|Introduction to the Programming Screencast (Coding 4 Major Ideas)|828
+7|96|The Base Code|834
+7|97|Coding the First Big Idea - Increasing the Payoff|846
+7|98|Coding the Second Big Idea - Key People|862
+7|99|Coding the Third Big Idea - Impact of Communities on Cascades|868
+7|100|Coding the Fourth Big Idea - Cascades and Clusters|883
+8|101|Introduction to Hubs and Authorities (A Story)|895
+8|102|Principle of Repeated Improvement (A Story)|899
+8|103|Principle of Repeated Improvement (An Example)|903
+8|104|Hubs and Authorities|907
+8|105|PageRank Revisited - An Example|913
+8|106|PageRank Revisited - Convergence in the Example|917
+8|107|PageRank Revisited - Conservation and Convergence|921
+8|108|PageRank, Conservation and Convergence - Another Example|923
+8|109|Matrix Multiplication (Prerequisite 1)|927
+8|110|Convergence in Repeated Matrix Multiplication (Prerequisite 1)|934
+8|111|Addition of Two Vectors (Prerequisite 2)|941
+8|112|Convergence in Repeated Matrix Multiplication - The Details|947
+8|113|PageRank as a Matrix Operation|956
+8|114|PageRank Explained|960
+9|115|Introduction to Power Law|966
+9|116|Why Do Normal Distributions Appear?|973
+9|117|Power Law Emerges in WWW Graphs|978
+9|118|Detecting the Presence of Power Law|985
+9|119|Rich Get Richer Phenomenon|990
+9|120|Summary So Far|997
+9|121|Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-1|1000
+9|122|Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-2|1006
+9|123|Implementing a Random Graph (Erdos-Renyi Model)-1|1032
+9|124|Implementing a Random Graph (Erdos-Renyi Model)-2|1036
+9|125|Forced Versus Random Removal of Nodes (Attack Survivability)|1046
+10|126|Rich Get Richer - A Possible Reason|1059
+10|127|Rich Get Richer - The Long Tail|1068
+10|128|Epidemics - An Introduction|1076
+10|129|Introduction to Epidemics (contd.)|1084
+10|130|Simple Branching Process for Modeling Epidemics|1087
+10|131|Simple Branching Process for Modeling Epidemics (contd.)|1095
+10|132|Basic Reproductive Number|1100
+10|133|Modeling Epidemics on Complex Networks|1106
+10|134|SIR and SIS Spreading Models|1111
+10|135|Comparison Between SIR and SIS Spreading Models|1125
+10|136|Basic Reproductive Number Revisited for Complex Networks|1131
+10|137|Percolation Model|1136
+10|138|Analysis of Basic Reproductive Number in Branching Model (Problem Statement)|1142
+10|139|Analyzing Basic Reproductive Number 2|1146
+10|140|Analyzing Basic Reproductive Number 3|1153
+10|141|Analyzing Basic Reproductive Number 4|1157
+10|142|Analyzing Basic Reproductive Number 5|1161
+11|143|Small World Effect - An Introduction|1165
+11|144|Milgram's Experiment|1173
+11|145|The Reason|1179
+11|146|The Generative Model|1185
+11|147|Decentralized Search - I|1188
+11|148|Decentralized Search - II|1193
+11|149|Decentralized Search - III|1201
+12|150|Programming Illustration - Small World Networks: Introduction|1214
+12|151|Base Code|1223
+12|152|Making Homophily Based Edges|1226
+12|153|Adding Weak Ties|1239
+12|154|Plotting Change in Diameter|1243
+12|155|Programming Illustration - Myopic Search: Introduction|1246
+12|156|Myopic Search|1252
+12|157|Myopic Search Comparison to Optimal Search|1268
+12|158|Time Taken by Myopic Search|1274
+12|159|PseudoCores: Introduction|1286
+12|160|How to Be Viral|1291
+12|161|Who Are the Right Key Nodes?|1295
+12|162|Finding the Right Key Nodes (the Core)|1297
+12|163|Coding K-Shell Decomposition|1308
+12|164|Coding Cascading Model|1320
+12|165|Coding the Importance of Core Nodes in Cascading|1335
+12|166|Pseudo Core|1348

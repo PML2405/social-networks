@@ -1,0 +1,826 @@
+# Social Networks (NPTEL, IIT Ropar, Prof. S. R. S. Iyengar)
+# Week 11: The Small-World Effect
+# Lectures 143-149
+# Website: https://pml2405.github.io/social-networks/   Repo: https://github.com/PML2405/social-networks
+
+This file has three parts, in order: (A) the student's handwritten-style study NOTES, (B) the weekly ASSIGNMENT / question paper with solutions, (C) the full lecture TRANSCRIPTS. The notes are a condensed re-teach of the lectures; the transcript is the authority.
+
+==============================================================================
+PART A - STUDY NOTES (Week 11)
+==============================================================================
+
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 11 — The Small-World Effect
+
+Lectures 143–153 · six degrees of separation, Milgram's letters, the Watts–Strogatz model (homophily + weak ties), decentralized search and Kleinberg's magic exponent — then we build a small-world network in NetworkX.
+
+🧠 the big picture, first
+
+Take any two people on Earth — they're joined by a chain of only about **six** acquaintances. Milgram showed this in 1967 with forwarded letters ("six degrees of separation"). It feels impossible for 6-billion-plus people, but it isn't: with ~100 friends each, friends-of-friends explode as $100^{\text{hops}}$ and cover the world in ~10 steps. **Watts & Strogatz (1998)** explained the structure: most of your ties are local (homophily — a grid/ring of near neighbours), plus a few long-range weak ties. Add just a handful of long links to a ring and its diameter collapses. Even more striking, Milgram's forwarding is a **decentralized (myopic) search**: nobody sees the whole graph, yet greedily passing "toward" the target still finds a short path — and **Kleinberg** showed it works best when long links follow $1/d^{\,k}$ with $k$ = the grid's dimension ($k=2$ for a plane).
+
+### 📒 what's inside Week 11
+
+- Is the world connected? — the six-degrees question
+- Milgram's experiment & why 6 isn't crazy
+- The reason: homophily + weak ties (Watts–Strogatz)
+- Decentralized search & Kleinberg's exponent
+- Coding a small-world network
+
+LECTURE 143
+
+## Is the world connected?
+
+Ram in Delhi wants to reach Jennifer in Los Angeles
+
+## 1 The friendship graph of the world
+
+Back in 1970 (no internet), **Ram** in Delhi wants to reach **Jennifer** in Los Angeles, whom he doesn't know. He can't contact her directly, but maybe he knows someone who knows someone… who knows Jennifer. Model the whole world as a graph: nodes = people, an edge between two people if they know each other — the friendship graph of the world.
+
+Two questions follow: **(1)** Is this graph even **connected** (is there a path between any two people)? **(2)** If so, how **long** is that path on average? The surprising answers: yes, it's connected — and any two people are separated by only about six hops.
+
+📖 the chain
+Ram → Mike (London) → Peter (Boston, originally from LA) → Monica (LA, Jennifer's friend) → Jennifer. Nobody knew Jennifer directly, yet each person forwarded to someone likely closer to her — and a short chain appeared. That "few hops" number, observed across the whole world, is the small-world effect.
+
+- What two questions define the "small-world" problem in graph terms?
+(1) Is the world's friendship graph **connected** (a path between any two people)? (2) If so, what is the average **distance** (number of hops) between two people?
+
+LECTURE 144
+
+## Milgram's experiment & why 6 isn't crazy
+
+forwarded letters, and exponential reach
+
+## 2 Six degrees of separation
+
+In **1967**, Milgram ran the actual experiment. He gave a letter to a random person $P_1$, who had to get it to a random target $P_2$ (whose address was written on it) — but **not by mailing it directly**. $P_1$ had to hand it to an acquaintance they thought was closer to $P_2$; that person did the same, and so on. Surprisingly, most letters arrived — in about **six steps on average**. Published in Psychology Today, this became six degrees of separation.
+
+🤔 counterintuitive… at first
+Over 6 billion people, yet only 6 hops apart? That sounds impossible — one number is huge, the other tiny. The world is **big** (billions of people) but **small** (six people connect any two).
+
+✍️ why 6 is actually reasonable (exponential reach, lecture 144)
+- Say you have **100** friends (level 1).
+- Each of them has 100 friends → level 2 has $100^2 = 10{,}000$.
+- Level 3 has $100^3$, … level $i$ has $100^{\,i}$.
+- By level 10 that's $100^{10}$ — far more than the world's population. $$ \boxed{\text{friends-of-friends grow exponentially — 10 hops blankets the planet}} $$
+
+So a small hop-count reaching everyone is not paradoxical — exponential growth exhausts billions in a single-digit number of levels.
+
+- What was the rule Milgram's participants had to follow, and what did he find?
+Forward the letter only to a personal acquaintance you believe is closer to the target (never mail it directly). Most letters reached the target in about **6** hops on average — "six degrees of separation."
+
+- Why isn't "6 hops among billions" a contradiction?
+Because reach grows exponentially: with 100 friends each, level $i$ has $100^i$ people, so ~10 levels already exceed the world population. Short chains can still cover everyone.
+
+LECTURES 145–146
+
+## The reason: homophily + weak ties
+
+the Watts–Strogatz model — a lattice with a few long links
+
+## 3 A grid, rewired
+
+In **1998**, Watts and Strogatz redid the experiment on email networks and gave the reason. Two ingredients we've already met:
+
+📖 the two ingredients
+- Homophily — you mostly befriend people **near** you (same locality, school, club). Picture people on a **grid/ring**, each linked to close neighbours.
+- Weak ties — a few of your friends are **far away** (another city, country, continent). These long-range links are the shortcuts.
+
+Most of your edges stay inside your "territory" (homophily); a couple jump outside it (weak ties). Those couple of long jumps are what make the world small.
+
+#### ring lattice + weak-tie shortcuts
+
+grey ring = local (homophily) ties; coral chords = a few long-range weak ties.
+
+⚙️ the Watts–Strogatz generative model
+- Put all nodes on a **cycle (ring)**; connect each to its nearest few neighbours (a lattice) — pure homophily.
+- Randomly rewire a small fraction (say ~1%) of edges: pick an edge, remove it, and reconnect it to a random node — creating a long-range "teleportation" shortcut.
+
+The result has the small-world property: high local clustering and tiny distances between any two nodes. Nobody literally "rewires" in real life — it just captures the fact that each of us has a couple of far-away friends.
+
+- What two ingredients did Watts & Strogatz identify, and which one creates the shortcuts?
+**Homophily** (mostly local, near-neighbour ties) and **weak ties** (a few long-range links). The weak ties are the shortcuts that shrink distances.
+
+- Describe the Watts–Strogatz generative model in one line.
+Start from a ring lattice (each node linked to nearby neighbours), then randomly rewire a small fraction of edges into long-range links — yielding short paths plus high clustering.
+
+LECTURES 147–149
+
+## Decentralized search & Kleinberg's exponent
+
+finding a short path with only local knowledge
+
+## 4 Search with no map
+
+The most fascinating part of Milgram's experiment isn't that a short path exists — it's that people **found** it without a map. Each holder of the letter knows only their own friends, not the global graph, yet by passing it to whoever seems "closest" to the target, the letter arrives. That's a decentralized search — no central authority, just local decisions.
+
+📖 what makes it remarkable
+- It's a **search algorithm** running on the friendship graph.
+- It's **local (greedy)**: each person only forwards to their best-looking neighbour — no one has the global picture.
+- Yet the collective, cooperative effort delivers the letter in ~6 hops. (Because it's short-sighted, it's also called **myopic search** — coded next week.)
+
+### Kleinberg's magic exponent
+
+Does decentralized search always work well? It depends on **how** the long-range links are distributed. Model a person's chance of having a far friend $v$ at grid-distance $d$ as proportional to $1/d^{\,k}$, and tune the exponent $k$.
+
+probability of a long-range link at distance d
+
+$$ P(u \sim v)\;\propto\;\frac{1}{d(u,v)^{\,k}} $$
+
+read it as: "the farther a node is, the less likely it's your friend — and $k$ controls how fast that drops." $k=0$ → all distances equally likely (links go anywhere — you overshoot the target); large $k$ → almost no long links (you crawl neighbour-by-neighbour). There's a sweet spot in between.
+
+🚌 the bus-route / metro intuition
+Plan a city's transit: you can't run a line between every pair of the 100 stops. If your lines are all **super-long express** hops ($k$ too small), you shoot past your stop and must backtrack. If they're all **tiny local** hops ($k$ too big), you change trains endlessly. The efficient design has routes at every scale — some short, some medium, some long — so you can always halve your remaining distance.
+
+🏁 the result
+Plot the myopic-search path length against $k$ and it bottoms out at a special value: $k = 2$ for a 2-D grid (and $k = 1$ for a 1-D line) — in general, $k$ equal to the **dimension** of the space. At that exponent, decentralized search is fastest (paths $\sim \log$-scale). This is Kleinberg's theorem; the full proof is optional but the take-away is: navigability needs long links spread across all distance-scales.
+
+- Why is Milgram's experiment described as a "decentralized" (local) search?
+No participant knows the entire friendship graph — each only knows their own acquaintances and greedily forwards to the one seeming closest to the target. Short paths emerge from purely local decisions, with no central coordinator.
+
+- If long links follow $P\propto 1/d^{k}$, what value of $k$ makes decentralized search most efficient on a 2-D grid, and what goes wrong for $k$ too small or too large?
+$k = 2$ (the grid's dimension). Too small ($k\to0$): links are uniformly long, so you overshoot and backtrack. Too large: almost no long links, so you inch along locally. $k=2$ balances links across all scales for fastest navigation.
+
+LECTURES 150–153
+
+## Coding a small-world network
+
+a ring, homophily ties, and a few weak ties in NetworkX
+
+## 5 Building it in NetworkX
+
+Now construct a 1-D small-world network: a **ring** of nodes with local (homophily) edges, plus a handful of random long-range **weak ties**. Start with the nodes:
+
+ring.py — basepython
+
+```
+import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()
+G.add_nodes_from(range(50))     # 50 nodes labelled 0..49
+nx.draw(G)
+plt.show()
+```
+
+**Homophily edges:** connect each node to **2 neighbours on each side** of the ring. The subtlety is wrap-around — node 49's "right neighbour" is node 0.
+
+homophily edgespython
+
+```
+def add_homophily_edges(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    for i in range(n):
+        # left neighbours i-1, i-2 wrap automatically (Python negative indexing)
+        G.add_edge(nodes[i], nodes[i - 1])
+        G.add_edge(nodes[i], nodes[i - 2])
+        # right neighbours i+1, i+2 must be wrapped by hand
+        for step in (1, 2):
+            target = i + step
+            if target > n - 1:      # went past the last node → wrap to the front
+                target = target - n
+            G.add_edge(nodes[i], nodes[target])
+```
+
+⚠️ the wrap-around bug (the one the professor hit live)
+- **Left** indices `i-1`, `i-2` are safe — Python's negative indexing already wraps (`nodes[-1]` is the last node).
+- **Right** indices `i+1`, `i+2` can exceed `n-1` and cause an `IndexError`. Fix: if `target > n-1`, set `target = target - n` (so $n\to0$, $n{+}1\to1$).
+- Define `n = G.number_of_nodes()` before using it — forgetting this throws "name n is not defined."
+
+**Weak ties:** add long-range links by picking two distinct random nodes and joining them. Calling it once adds one weak tie.
+
+weak tiespython
+
+```
+import random
+
+def add_long_link(G):                       # one weak tie
+    v1 = random.choice(list(G.nodes()))
+    v2 = random.choice(list(G.nodes()))
+    while v1 == v2:                          # avoid a self-loop
+        v2 = random.choice(list(G.nodes()))
+    G.add_edge(v1, v2)
+
+G = nx.Graph()
+G.add_nodes_from(range(100))
+add_homophily_edges(G)
+for _ in range(10):                         # add 10 weak ties
+    add_long_link(G)
+```
+
+Building the ring is O(n) (a constant number of edges per node); each weak tie is O(1). Note the professor's simplification: instead of true rewiring (delete one edge, add one), he just **adds** weak ties — on a big graph the edge count barely changes, but the diameter still plummets (that experiment opens Week 12).
+
+- Why do the left-neighbour indices `i-1`, `i-2` need no wrap-around fix, but `i+1`, `i+2` do?
+Python's negative indexing already wraps (`nodes[-1]` is the last node), so the left side is fine. Positive indices past `n-1` run off the end and raise `IndexError`, so you must wrap them with `target = target - n`.
+
+- In `add_long_link`, what is the `while v1 == v2` loop for?
+To guarantee the two randomly chosen endpoints are different, so you never add a self-loop (an edge from a node to itself).
+
+- The professor adds weak ties instead of true rewiring. Why is that an acceptable shortcut?
+True rewiring deletes one edge and adds one; just adding a weak tie changes the edge count only slightly on a large graph, yet still injects the long-range shortcuts that shrink the diameter — the effect we care about.
+
+### The world is huge yet tiny: mostly-local ties plus a few long-range weak ties give short paths that even a blind, greedy search can find.
+
+Next week: watch the diameter collapse as weak ties are added, and code the myopic search itself.
+
+— end of Week 11 · Six degrees, Watts–Strogatz & decentralized search ✏️
+↑ back to contents
+
+==============================================================================
+PART B - ASSIGNMENT & SOLUTIONS (Week 11)
+==============================================================================
+
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 11 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Six Hops to Anyone: The Small-World Effect
+Case Study
+A researcher, Leila, revisits a classic question on a modern messaging app: if you pick two strangers
+anywhere in the world, how many people stand between them in the chain of acquaintances? To test it she
+seeds many participants with a token addressed to a distant target person and asks each holder to forward
+it only to a single acquaintance they believe is somehow closer to the target — never directly to the target.
+She then records, for the tokens that arrive, how many forwarding steps the chain took.
+Most arriving chains turn out to be remarkably short — only a handful of steps on average. At first this
+seems impossible: the world holds billions of people, so surely a stranger must be very far away. Yet Leila
+reasons about reach level by level: if each person has, say, a hundred acquaintances, and each of those has
+a hundred more, the tally he can reach swells many times over with each new level, so the whole
+population is covered after only a few of them. The world is enormous and tiny at the same time.
+To explain why such short chains exist, Leila draws on two ideas. People mostly befriend others who are
+near them or like them, which packs the network into tight local clusters. But a few of everyone's ties reach
+far outside their immediate circle — to a different city, profession, or country. It is this small minority of
+long-range ties, laid over the dense local clustering, that stitches the distant clusters together and makes the
+whole world reachable in only a few hops.
+Questions 1–10
+Q1.  [MCQ]  What did the original version of this experiment (Milgram's) find about the chains that reached
+the target?
+A.  They reached the target through a direct connection in fewer than three steps every time.
+B.  They showed there was no measurable typical number of steps between two people.
+C.  They took about six forwarding steps on average, the “six degrees” result.
+D.  They reached the target only after passing through more than a hundred steps.
+Answer:  C
+Reference:  Lecture 144 – Milgram's Experiments (≈00:08–end)
+Solution:  Milgram observed that the chains that arrived took roughly six steps on average — the celebrated
+“six degrees of separation.” They did not arrive in under three steps, the average was clearly measurable,
+and the count was around six rather than in the hundreds.
+
+Q2.  [MCQ]  Why is the “only a few hops” result less surprising once Leila reasons level by level?
+A.  Because the number of people reachable multiplies at every level, covering the population fast.
+B.  Because a central directory quietly connects every participant straight to the target person.
+
+[p.2]
+C.  Because almost everyone in the world already knows the target person personally to begin with.
+D.  Because each person has only one acquaintance, so the chain is forced to stay extremely short.
+Answer:  A
+Reference:  Lecture 144 – Milgram's Experiments (≈07:16–end)
+Solution:  Reach grows multiplicatively: a hundred acquaintances, each with a hundred more, gives ten
+thousand at two steps and so on, so the whole population is covered within a few levels. There is no central
+directory, strangers are not already known, and people have many acquaintances, not one.
+
+Q3.  [Match the following]  Match each term in Column A with its description in Column B.
+Column A (term)
+Column B (description)
+1. Small-world property
+a. a long-range tie reaching outside one's local
+cluster
+2. Homophily
+b. forwarding using only knowledge of one's own
+contacts
+3. Weak tie
+c. any two nodes are joined by a surprisingly short
+path
+4. Decentralized search
+d. the tendency to befriend nearby or similar people
+
+A.  1-c, 2-d, 3-a, 4-b
+B.  1-d, 2-c, 3-b, 4-a
+C.  1-c, 2-a, 3-d, 4-b
+D.  1-c, 2-d, 3-b, 4-a
+Answer:  A (1-c, 2-d, 3-a, 4-b)
+Reference:  Lectures 143–147 – Small-world effect, homophily, weak ties, search
+Solution:  The small-world property is the short-path fact (1-c); homophily is befriending nearby or similar
+people (2-d); a weak tie is a long-range link out of one's cluster (3-a); and decentralized search forwards
+using only local knowledge (4-b).
+
+Q4.  [MCQ]  According to Watts and Strogatz, which two ingredients together produce the small-world
+effect?
+A.  Dense local clustering from homophily, plus a few long-range weak ties between clusters.
+B.  A complete graph in which every person is directly connected to every other person.
+C.  Purely random connections everywhere, with no local clustering of any kind at all.
+D.  A central hub that every single person in the world must connect to directly.
+Answer:  A
+Reference:  Lecture 145 – The Reason (≈00:07–end)
+Solution:  Watts and Strogatz attributed the effect to homophily, which creates tight local clusters,
+combined with a few weak ties that bridge those clusters. It does not require a complete graph, it is not
+purely random (clustering remains), and there is no universal central hub.
+
+[p.3]
+Q5.  [MCQ]  Leila runs the snippet below on her reconstructed acquaintance network. What does it report?
+import networkx as nx​
+L = nx.average_shortest_path_length(G)​
+print(L)
+A.  The largest number of acquaintances that any single person in the network has.
+B.  The total count of people in the network, regardless of how they are connected.
+C.  The average number of hops on the shortest path between pairs of people.
+D.  The fraction of a person's acquaintances who are themselves acquainted.
+Answer:  C
+Reference:  Lecture 143 – Small World Effect: An Introduction (≈10:00–end)
+Solution:  average_shortest_path_length returns the mean shortest-path distance over all pairs of nodes —
+the typical number of hops, which the small-world effect predicts is small. It is not the maximum degree,
+not the node count, and not the clustering coefficient.
+
+Q6.  [Statement type]  Consider the two statements about the small-world experiment and decide their truth.
+Statement I: The experiment found an average of about six hops between two random people.
+Statement II: This short average shows that the world's acquaintance network is disconnected.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  C
+Reference:  Lectures 143–144 – Small-world effect and Milgram
+Solution:  The first statement is correct: the average chain length was about six. The second is wrong: a
+short average path actually shows the network is connected — reachable in few hops — not disconnected.
+So the first holds and the second fails.
+
+Q7.  [MCQ]  What role do the few long-range weak ties play in producing short chains?
+A.  They lock everyone inside their own local cluster, lengthening the chains between clusters.
+B.  They bridge distant clusters, providing shortcuts that sharply reduce path lengths.
+C.  They duplicate the existing local ties, adding no new shortcuts to the network at all.
+D.  They disconnect the network into isolated pieces with no path between most people.
+Answer:  B
+Reference:  Lecture 145 – The Reason (≈04:55–end)
+Solution:  Weak ties act as bridges between otherwise distant clusters, creating shortcuts that collapse long
+local detours into a few hops. They do not trap people locally, they are not redundant copies of local ties,
+and they connect rather than disconnect the network.
+
+[p.4]
+Q8.  [MCQ]  What does homophily contribute to the structure of the acquaintance network?
+A.  A guarantee that no two acquaintances of a person are ever acquainted with each other.
+B.  A perfectly uniform network in which every person has an identical set of acquaintances.
+C.  Ties formed only with the most distant strangers, leaving no local connections at all.
+D.  Dense clusters of ties among nearby or similar people, rather than ties spread at random.
+Answer:  D
+Reference:  Lecture 145 – The Reason (≈02:47–end)
+Solution:  Homophily — befriending nearby or similar people — packs ties into dense local clusters rather
+than scattering them at random. It does not make everyone identical, it is not about distant strangers, and it
+tends to make a person's acquaintances acquainted, not the reverse.
+
+Q9.  [MSQ]  Which statements about the small-world effect are correct? (Select all that apply.)
+I.   Two random people are typically separated by only a few hops.
+II.  Homophily creates dense local clustering in the network.
+III. A few long-range weak ties act as shortcuts between clusters.
+IV.  The short chains prove the friendship network is disconnected.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 143–145 – Small-world effect and its reasons
+Solution:  Short separation (I), homophily-driven clustering (II), and weak-tie shortcuts (III) are all correct.
+Short chains show the network is connected, not disconnected, so IV is false.
+
+Q10.  [MCQ]  Leila calls the result “counterintuitive but true.” What is the counterintuitive contrast?
+A.  The world has only a few people, yet the chains between them are surprisingly long.
+B.  The world has billions of people, yet any two are separated by only about six hops.
+C.  The world is small in population, and accordingly the chains are also very short.
+D.  The world is large in population, and the chains are correspondingly enormous.
+Answer:  B
+Reference:  Lecture 144 – Milgram's Experiments (≈05:35–end)
+Solution:  The surprise is that despite billions of people — a huge world — any two are linked by only about
+six hops, so the world is at once big and small. The other options misstate either the population size or the
+chain length.
+
+[p.5]
+Comprehension 2 — Simulating a Small World and Routing Through It
+Case Study
+A developer builds the Watts–Strogatz generative model and then routes messages across it. The
+construction begins with a ring lattice: the nodes are placed on a cycle and each one is wired to a handful of
+its closest neighbours on the ring — the homophily links. A small fraction of edges is then rewired at
+random (equivalently, a few extra long-range edges are added), and these shortcuts are the weak ties that
+turn the lattice into a small-world network with short average path lengths.
+On a richer two-dimensional grid, the long-range links are not placed uniformly. A node is joined to a
+far-away node with a probability that falls off with the grid distance d between them, governed by a
+clustering exponent: the chance of a link is proportional to 1/d raised to that exponent. Tuning the
+exponent controls how reachable distant nodes are, and the developer notes there is a particular value of
+the exponent at which routing on the grid works best.
+Routing itself uses decentralized (“myopic”) search. A node holding the message looks only at its own
+neighbours, estimates each neighbour's distance to the target along the lattice — without knowing its
+neighbours' long-range links — and forwards to whichever neighbour is closest to the target, repeating until
+the message arrives. Because it sees only local structure, this greedy routing need not trace the globally
+shortest path, yet across growing networks the number of hops it uses grows slowly. Key fragments:
+import networkx as nx, random​
+ ​
+# ring lattice of n nodes, each joined to its nearest neighbours, then rewired​
+G = nx.watts_strogatz_graph(n, k_near, p_rewire)​
+ ​
+# myopic step: forward to the neighbour closest to the target on the lattice H​
+def best_neighbor(G, H, current, target):​
+    return min(G.neighbors(current),​
+               key=lambda x: nx.shortest_path_length(H, x, target))
+Questions 1–10
+Q1.  [MCQ]  How does the Watts–Strogatz construction begin, before any rewiring?
+A.  With a complete graph in which every node is already joined to every other node.
+B.  With a ring lattice in which each node is joined to a few of its nearest neighbours.
+C.  With an empty graph of isolated nodes and no edges of any kind between them.
+D.  With a star in which every node is joined only to one central hub node.
+Answer:  B
+Reference:  Lecture 146 – The Generative Model (≈01:11–end)
+Solution:  The model starts from a ring lattice — nodes on a cycle, each linked to a few nearest neighbours
+— representing local homophily ties. It does not start complete, empty, or as a star; the shortcuts are added
+only later by rewiring.
+
+[p.6]
+Q2.  [MCQ]  What does the random rewiring (a small rewiring probability) accomplish?
+A.  It removes all local ties, leaving a purely random graph with no clustering left.
+B.  It adds a few long-range shortcuts that sharply shorten the average path length.
+C.  It joins every pair of nodes, turning the lattice into a complete graph at once.
+D.  It leaves the lattice unchanged, since rewiring a few edges has no measurable effect.
+Answer:  B
+Reference:  Lecture 146 – The Generative Model (≈01:11–end)
+Solution:  Rewiring a small fraction of edges introduces a few long-range shortcuts (weak ties) that collapse
+long detours, giving the small-world property of short average paths while keeping most local clustering
+intact. It neither erases all local ties, nor completes the graph, nor leaves paths unchanged.
+
+Q3.  [MCQ]  In the grid model, a node links to a far-away node with probability proportional to which
+quantity (d is the grid distance, q the clustering exponent)?
+# probability that node u links to a far node v, distance d apart:​
+p_link  ∝  1 / (d ** q)
+A.  d raised to the power q, so farther nodes are more likely to be linked.
+B.  q raised to the power d, growing sharply as the distance increases.
+C.  1 divided by d raised to the power q, so farther nodes are less likely.
+D.  d multiplied by q, the distance scaled by the clustering exponent.
+Answer:  C
+Reference:  Lectures 148–149 – Decentralized Search II–III (≈16:15–end)
+Solution:  The link probability is proportional to 1/d^q, so the chance of a long-range tie falls as the distance
+d grows — nearby far-nodes are more likely than very distant ones. The other forms make distant links more
+likely, grow with distance, or scale linearly.
+
+Q4.  [Arrange in order]  Arrange the steps of one myopic (decentralized) search in the correct order.
+Steps (in scrambled order):
+(i)   Among those neighbours, find the one whose lattice distance to the target is smallest.
+(ii)  Start at the source node holding the message.
+(iii) Forward the message to that closest neighbour and make it the current node.
+(iv)  At the current node, look only at its own immediate neighbours.
+(v)   Repeat until the current node is the target, then report the path.
+A.  ii → iv → i → iii → v
+B.  iv → ii → i → iii → v
+C.  ii → i → iv → iii → v
+D.  ii → iv → iii → i → v
+Answer:  A (ii → iv → i → iii → v)
+Reference:  Lectures 147–148 – Decentralized Search I–II
+
+[p.7]
+Solution:  Start at the source (ii), look only at the current node's own neighbours (iv), pick the neighbour
+closest to the target on the lattice (i), forward to it and advance (iii), and repeat until the target is reached
+(v).
+
+Q5.  [MCQ]  What makes decentralized (myopic) search a “local” method?
+A.  Each node knows the entire global network and computes the true shortest path directly.
+B.  A central controller inspects the whole graph and tells each node exactly where to forward.
+C.  Each node knows only its own neighbours and forwards to the one closest to the target.
+D.  Each node forwards the message to a neighbour chosen uniformly at random each time.
+Answer:  C
+Reference:  Lecture 147 – Decentralized Search I (≈01:55–end)
+Solution:  Myopic search is local because each holder knows only its own contacts and greedily forwards to
+the neighbour it judges closest to the target — no global map and no central authority. It is neither globally
+informed, centrally directed, nor random.
+
+Q6.  [Statement type]  Consider the two statements about myopic (decentralized) search and decide their
+truth.
+Statement I: Myopic search always returns the globally shortest path between source and target.
+Statement II: Myopic search uses only local information about the current node's own neighbours.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  D
+Reference:  Lectures 147–148, 156 – Decentralized / myopic search
+Solution:  The first statement is wrong: being greedy and local, myopic search can return a longer path than
+the true shortest one. The second is correct: it relies only on the current node's own neighbours. So the first
+fails and the second holds.
+
+Q7.  [MCQ]  When the current node estimates a neighbour's distance to the target, which links does it use?
+A.  Only the lattice (homophily) links, ignoring the neighbour's unknown long-range ties.
+B.  All links including the neighbour's long-range ties, which it always knows in full.
+C.  Only the neighbour's long-range ties, ignoring every lattice link in the network.
+D.  A randomly chosen half of all the links present in the entire network each time.
+Answer:  A
+Reference:  Lecture 155 – Myopic Search Introduction (≈03:13–end)
+Solution:  Distances are judged along the lattice only, because a node does not know its neighbours'
+long-range ties; that is why the search is short-sighted. It cannot use unknown long-range ties, cannot
+ignore the lattice, and does not sample links at random.
+
+[p.8]
+Q8.  [MCQ]  For efficient decentralized search on a two-dimensional grid, which clustering exponent works
+best?
+A.  An exponent of 0, making every far-away node equally likely to be linked.
+B.  An exponent of 4, so that almost no long-range links are ever formed.
+C.  An exponent of 1, which is the best value for a one-dimensional ring, not a grid.
+D.  An exponent of 2, balancing short-range and long-range links on the grid.
+Answer:  D
+Reference:  Lecture 149 – Decentralized Search III (≈20:43–end)
+Solution:  On a two-dimensional grid the search-path length is minimised when the clustering exponent
+equals 2, the value that balances links across all distance scales. An exponent of 0 makes far links uniform, 1
+is the optimum for a one-dimensional ring, and 4 suppresses long-range links almost entirely.
+
+Q9.  [MCQ]  As the network size n grows, how does the number of hops used by myopic search behave?
+A.  It grows in direct proportion to n, doubling whenever the network doubles in size.
+B.  It grows roughly like log n, increasing only slowly as the network gets larger.
+C.  It stays fixed at exactly six hops no matter how large the network becomes.
+D.  It grows like n squared, exploding far faster than the network itself grows.
+Answer:  B
+Reference:  Lecture 158 – Time Taken by Myopic Search (≈11:33–end)
+Solution:  Experiments show the myopic search path length grows roughly logarithmically with n — slowly
+— not linearly. It is neither a fixed six hops nor a quadratic blow-up.
+
+Q10.  [MSQ]  Which statements about the model and its search are correct? (Select all that apply.)
+I.   Watts–Strogatz starts from a ring lattice and rewires a few edges.
+II.  Myopic search forwards to the neighbour closest to the target on the lattice.
+III. On a 2-D grid the best clustering exponent for search is 2.
+IV.  Myopic search always finds the globally shortest path.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 146–149, 156–158 – WS model and myopic search
+Solution:  The ring-lattice-plus-rewiring construction (I), greedy local forwarding (II), and the optimal grid
+exponent of 2 (III) are all correct. Myopic search is not guaranteed to be optimal, so IV is false.
+
+End of Week 11 Question Paper  —  20 questions  •  2 comprehensions
+
+==============================================================================
+PART C - LECTURE TRANSCRIPTS (Week 11, Lectures 143-149)
+==============================================================================
+=== LECTURE 143: Small World Effect - An Introduction (Week 11, transcript PDF page 2) ===
+
+[p.2] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 143 Small World Effect – An Introduction
+
+(Refer Slide Time: 00:07)
+
+Let us start with the brand-new chapter by name the Small World Effect, you would have heard of this or experienced this more than many times in your life although it comes quite counterintuitive a fact. It is indeed quite experienced by many of us, you will indeed you will in fact, realise that all that I am going to talk right now in this chapter is nothing, but obvious. But then the looking at the science part of it is actually less obvious although, it is obvious in the sense that it is intuited. So, let us start with a nice question as and always; assume you are let us say in India in some part of let us say Delhi and you have this question let us say your name is Ram R a m Ram and the question is there is someone at Los Angeles by name Jennifer, whom you would like to contact right. So, how will you contact this person called Jennifer? Assume, it was back in let us say in 1970 where you would not make use of something called the internet, you would know nothing about Jennifer who is at Los Angeles.
+
+[p.3] So, what you do you badly want to contact Jennifer for some business requirement and Jennifer cannot be contacted directly. So, what you will do is you will try to contact Jennifer through someone ok, you will find someone who possibly might know Jennifer. And, you will request this someone to put in touch with you, put in touch Jennifer with you right. Now, how feasible is this? It all boils down to you knowing someone who knows someone who knows Jennifer; this may or may not be the case, but surely something in me tells me that there possibly is someone.
+
+(Refer Slide Time: 02:40)
+
+Let us say there is someone that Ram knows and that someone might know someone else and that someone might know someone else and someone else so on and so forth. A long chain like this might know Jennifer. Let me put the ovals here which represents the nodes which represent people here. So, the idea is Ram might know someone who knows someone who knows someone who knows someone and so on and finally Jennifer. Now, this sounds a little funny to me, it is funny that these 2 people are indeed connected which 2 people Ram and Jennifer, are they even connected is my big question. They may or may not be connected right, they may or may not be connected; may or may not be connected. So, now let us try doing this experiment and see whether the world is connected or not. What do I mean by that?
+
+[p.4] (Refer Slide Time: 04:09)
+
+By that I mean in case I take any 2 random people in the world, assuming that I take 2 people someone from here someone from here, some place in the world. Some place of some rather a person some person 1 from this part of the world and some other person. Let me let me use some other colour here some other person 2 in some other part of the world. So, let us ask this question do you think this person knows someone, who knows someone who knows someone so on and so forth ok. Who knows person 2, is this true that let me just connect these dots? Do you think the world is connected; is the world connected is the world connected like this? What I am trying to ask. In other words, denoted in terms of graph theory, all I am asking is if I were to take the entire world right.
+
+[p.5] (Refer Slide Time: 05:11)
+
+And if I were to consider all possible people over here and where between any 2 people let us say person 1 and person 2, you put an edge; you put an edge. If this person if they if they know each other if they know each other. Now, if you keep putting such edges between people here alright so on and so forth; so, on and so forth alright. What kind of a network will you get? Is this network connected? If this is connected then between any 2 people that you might possibly pick there exists a path maybe right, there exists a path like this. But, in case it is disconnected there may not be a path between any 2 vertices. Now, the question that I am trying to ask for fun say is the graph, is the friendship graph of the world connected right. This is the friendship graph of the world friendship graph is this connected. Now, of what use this such a question right in the first place; why anyone would bother to ask or answer such a question. So, let us get back to our question of Jennifer you would trying to know someone some person 1.
+
+[p.6] (Refer Slide Time: 06:58)
+
+Let us say I will call him Ram here in from New Delhi trying to contact someone by name Jennifer in Los Angeles right. So, how would he even try contacting someone who might know Jennifer, what Ram will do is Ram is from Delhi he has a friend in let us say London ok. So, this friend of his is in London someone by name Mo someone by name Mike is in London. And Ram knows him first-hand and he request Mike, Mike can you please put me to someone called Jennifer from Los Angeles. Now, here is a point to think. Ram thinks Mike might know someone who knows Jennifer, it is too much of a coincidence if Mike knows Jennifer first-hand right that that may not really be possible. But Ram still wants to explore the possibility of contacting Mike and requesting him to get him in touch with Jennifer. He knows for sure that Mike may not know Jennifer right.
+
+[p.7] (Refer Slide Time: 08:35)
+
+But still he would he would you like to give it a try and ask Mike, Mike do you know someone in Los Angeles who might know Jennifer and then Mike says well dude I do not know anyone in of course, Ram knows Mike and asks Mike do you know someone in Los Angeles by name Jennifer. And, Mike says I do not know anybody in Los Angeles, but I know someone in Boston ok. I know someone in Boston ok, this place is Boston by name by name Peter ok. Someone called Peter alright and he says this Peter is actually from Los Angeles although he stays in Boston he might know Jennifer ok. And, Mike does in fact, contact Peter. So, initially Ram contacts Mike and Mike contacts Peter and asks Peter could you please help me get in touch with someone called Jennifer in Los Angeles who works for so and so company. And, Peter says although I am from Los Angeles I do not know anyone by name Jennifer in so and so area, but I know someone in that area who might know this person called Jennifer and that person’s name is Monica and she is actually from Los Angeles ok. And, Peter contacts Monica and Monica it so, happens that Monica indeed stays very close to Jennifer’s place and she happens to be Jennifer’s friend. And, Monica says yeah I do know Jennifer and this is how the connection from Jennifer to Monica to Peter to Mike to Ram has ok. It is surprising that is the connectivity only 1 from here to here, from here to here was 2, from here to here was 3, from here to here was 4. I told you a
+
+[p.8] story, this is actually a story this may not be true, a story of someone by name Ram in Delhi who wants to contact someone by name Jennifer in Los Angeles and gets through by asking a friend called Mike who asks a friend called Peter, who asks a friend called Monica. Right, is this always true that we can find anyone whom we want in a few hops like this, let us say here is 4 hops. By hops I mean 1 friend and then second friend, third friend and then the fourth friend; is it always true that we can find someone through this quick single digit hops in this case it was 4. Is it always a small number as you know in the previous slide, we indeed asked this question? Is it at all connected, if it is connected, we can ask for distance between 2 people it is may not be connected? Now, here goes the big question the friendship network that we were discussing is it connected, if it is connected what the distance between 2 people on an average is. So, this is the big question. The answer for this is a big yes.
+
+(Refer Slide Time: 11:49)
+
+Yes, we are indeed connected, yes, we are what is connected the world is connected the world is connected; connected in what sense? Connected in a very surprising sense, that any 2 people of your choice if you take in the world. Let us say a person 1 and person 2 it is known that these 2 people are separated by 1 2 3 4 let me push this fellow this side 5 and 6 a in just 6 hops. You know which means a person here let me call him P1 person here P1 knows this person P2 through intermediate people let us say A1 A2 A3 A4 A5 and
+
+[p.9] the sixth person is the person you are you are. So, 1 this is a 1 hop, this is 1 hop, this is second hop, and this is the third hop, fourth hop, fifth hop, sixth hop. So, 1 2 3 4 5 6, in 6 connections any 2 people in the world are connected. So, this is not actually exactly 6 by 6, I mean on an average it is 6 between any 2 people and this is what scientist have observed, note this they have observed. Now, this is observed word that I said is slightly absurd you see. How can anyone even conduct such an experiment and conclude that there are 6 intermediary people between any 2 people on an average; does not sound true you see even if it is true how would you go about checking it correct. So, if I say the average number of friends per person in the world is let us say 200 ok, it could be a ridiculous statement just like that made up right. How would you substantially a validate it correct. Similarly, if I say any 2 people in the world are connected by near 6 hops on an average so, this is average; how will anybody validate such a claim. So, we will see in our next lecture how exactly the scientist validated this claim and why it is actually true.
+
+=== LECTURE 144: Milgram's Experiment (Week 11, transcript PDF page 10) ===
+
+[p.10] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 144 Milgram’s Experiments
+
+(Refer Slide Time: 00:08)
+
+So, back in 1967, a scientist by name Milgram took a bold step to try executing this experiment of finding out whether the friendship network in the world is connected at all. If you take two people let us say P1 and P2 in the world, are they connected through several people in between or is the world of friendship networks disconnected? So, he took a bold step and conducted a very neat experiment.
+
+[p.11] (Refer Slide Time: 00:52)
+
+All that he did was he choose a person P1 and gave a letter to this person P1 had a letter which the which with this person P1 was supposed to pass this on to a person P2 in some other part of the world. And P1 and P2; obviously, did not know each other’s. They were pick uniformly at random let us say. And P1 was supposed to deliver this letter to P2; now given that P1 did not know P2. Now there is another rule here the address of P2 is specified in the letter, but P1 cannot post it to P2 directly. He cannot post it to be directly, instead he is asked to pass it on to someone whom he might know who might in tern know P2 or he may not know P2. All that P1 should do is pass it on to some other persons let us say A1 whom P1 might know, whom P1 suspects that this A1 might know P2 and this A1 should then pass it on to P2. Again, the same story, he may not know P2. So, what she does is he chooses someone. This particular A1 chooses someone exactly the way P1 did and sends this letter to A2 asking him to pass this letter to the destination which is P2. This goes on and on; this goes on and on, he might suspect that it might indeed take a reverse direction and it might reach somewhere else. Now can this happen. I do not think this can happen because when A2 tried giving the letter to A3. He gave it in such a way that he chooses A3 in such a way that A3 was someone who sort of was close to P2 if not new P2 personally, was locationally region wise close to P2.
+
+[p.12] If you remember the previous example, people passed on the letter to the next person they knew who might possibly be closer to P2 then what they are. So, this reversal thing may not happen mostly does not happen right. So, what does A3 do here? A3 intern sends it to another friend of his namely A4 and A4 sends it to some other friends let us say A5 and A5 sends it to some other friend namely A6 and A6 might know P2 and A6 will send it to P2. Milgram observe that surprisingly most of the letters that he sent they started with of course, the source like this and then reached the destination. In this entire thing happened in 6 steps on an average. I repeat these 6 steps are on an average and Milgram observed this, and he published this article in a magazine called psychology today and this magazine did; then this article did attract a whole lot of attention back then.
+
+(Refer Slide Time: 04:49)
+
+And people did not believe that this was true that any two people in the world are simply separated by a mere 6 hops. By 6 hops I mean with 6 friends, they can always connect any two people; absolutely any two people can be connected. Pick any person A another person another person B, you will observe that there are 6 people separating them and again as I told you, this is on an average 6 hops. And Milgram did this daring experiment and published these results. Now, what was this to say? What is this obvious or is it counter intuitive ok?
+
+[p.13] (Refer Slide Time: 05:35)
+
+It is indeed counter intuitive, why is it counter intuitive? Let us see the counter intuitive part first. This is counter intuitive because the world as you know has roughly it say what is the best what you know, the population of world is more than 6 billion people. Out of this 6 billion people all that we are saying is any 2 people are connected by just 6 hops that is unbelievable right. Just 6 people separate each other. That is unbelievable because this looks like two huge a number and this looks like too small a number right. So, what is happening here? We this is the counter intuitive part of it. The world is big the world is big, but it is surprisingly, but is surprisingly small as well at the same time; surprisingly small by small we mean of course, the world is big because it is 6 billion people. But then the world is small because it is 6 people who separate any two people right. So, if you want to know someone in the world, it is not difficult for you can indeed know them through a friend’s friend’ s friend’ s friend’s friend right. Let us see why it is actually not counter intuitive? It is not so counter intuitive. In fact, let us see what is behind this idea, how exactly this happens.
+
+[p.14] (Refer Slide Time: 07:16)
+
+So, assume this is you and you have some say 100 friends. So, you have some say 100 friends and then each one of your friends they intern have 100 friends each, 100 friends each, 100 friends each so on. As you node the next step when each person has 100 friends, it turns out to be 100 into 100 which is 10,000 friends. And as this keeps going on and on so, each of your 10.000 friends will have 100 friends each and so on and so forth right. It each level has so, what is the number of friends at this level. It is what was the number of friends the second level, let me try writing it square instead, 100 square friends. The next level will be the 100 square each one of them will have 100 friends. So, it will be 100 cube and so on. Let us say at the 10th level like this at the 10th level, you will have 100. So, as you can see this let us call this level 1, let us call this level 1. So, level 1 has 100 friends, level 2 has 200 1002 friends, level 3 has 1003 friends and so on; 10th level you have 10010 friends that is a huge number. And as you can see, if you want someone from let us say that this person, you want know someone in the world right you can should just sort of slight down the slope of people. And the height of this as you know as I told you, 10th level is simply 10 hops down. So, you a for people will know every single person in the world in this in a span of this let us say, 10 steps down right. It is not counter intuitive 10 is a small number as you can see
+
+[p.15] right. This here sort of grows exponentially. It comes down exponentially right. So, that is the reason why you will be exhausting the entire world’s population. If you look at your friends, your friend’s friends, your friend’s friends and so on. So, we saw that it is indeed counter intuitive given that it is 6 billion, but any 2 people are separated by 6 hops said Milgram right; Milgram said this and this is indeed counter intuitive. But when we see it properly in a different lens, we observed that is not all that counter intuitive. It is indeed sort of obvious.
+
+=== LECTURE 145: The Reason (Week 11, transcript PDF page 16) ===
+
+[p.16] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 145 The Reason
+
+(Refer Slide Time: 00:07)
+
+In the year 1998, this experiment was redone, and it saw a fresh look by a couple of scientists by name Watts and Strogatz. It is in fact, popularly called the Watts Strogatz model which will be seeing very soon. So, they reconducted this experiment on email networks, email networks and observed the small world phenomena on email networks as well, they observed the small world phenomena. It was not way to surprising for them and they went ahead and proposed that their possible reason why this is happening is because of two concepts which we indeed saw already which is homophily and the concept of weak ties. The first nice explanation was indeed given by Watts and Strogatz they said the reason why the small world is being observed is mainly because of two concepts; homophily and weak ties. Let us dwell deep into their explanations, what exactly was the reasoning that.
+
+[p.17] (Refer Slide Time: 01:40)
+
+They supplied they said in a given network of course there are many nodes, there are several edges connecting them, correct. So, they proposed that these edges are actually sort of grid like structures right, the grid like structures. Then this is like our locality in your place. So, you live in a locality and these are the friendships that you have made; obviously, you would have made more friends, more friends who are geographically close to you, more who are geographically close geographically close right and less people who are geographically away from you correct. So, instead of seeing it as a graph, let us modulate as a grid. So, what do I mean by that?
+
+[p.18] (Refer Slide Time: 02:47)
+
+Let me just write down that this is my locality. These are let us say the houses or my the way this could be a school or college, an office or whatever, so, all I am trying to say is let us have a very simplistic model of representing people as white dots and their friendships as edges and each person has some friends in his neighbourhood ok. He makes friends in his neighbourhood because of homophily right. People who stay together in the same locality probably share some characteristics and they become friends with their immediate neighbours right. So, now, such a thing probably happens because of homophily as we saw. But then, but then a person who is here might make friends with a person who is here. So, this person might make friends with a person here. So, let me draw a red line here right. So, imagine this was a huge let us say 100 cross 100 grid 100 cross 100 grid and some two extremal points are becoming friends like this. This is very much possible right, you might no friends only in your locality, but you do know some friends away from you as well right. So, Watts and Strogatz proposed that it is because of the homophily and weak ties that in a grid like this while most of your friends are your neighbours on the grid you tend to some of us tend to make friends with far away people as well and this is what is leading to the small world phenomena as observed by us and what is that let me explain.
+
+[p.19] (Refer Slide Time: 04:55)
+
+So, when a person is asked to deliver a letter to another person, P1 is asked to deliver letter to another person P2, P1 will indeed give that letter to his someone of his neighbours, but then he does not give it to any random neighbour. He gives it to that neighbour he thinks is close to the destination right. He gives it to that neighbour who is close to the destination possibly right and this keeps happening right. But then 1 might know someone who is not his neighbour but is someone who is staying far away from him who might be very close to P2 alright. So, this is what happens. So, when let us say this is one region this is another region this is another region. When you are trying to send a piece of information or let us say a letter or whatever you call it through your people whom you are close to you probably will stay in this shell, you probably will stay in this city. But some people do have links to outside the city and they will pass on the letter to people outside the city and again once it goes outside the city it probably will stay there because of homophily. But then some one person might know someone from this world rather this country or this continent and the letter will indeed reach this particular place which initially was not the case as you saw. We were just roaming around here and then we came here and then we roamed around here a little and then we saw that there was a path to the next country and we entered here and then slowly it reaches the desired destination ok, from the
+
+[p.20] source it reaches the desired destination. Mainly, because of two things as I told you which is homophily and the notion of weak ties. By weak ties I mean the at edges such as this we have studied already right. It has these two things that lead to let me write that down once again.
+
+(Refer Slide Time: 07:26)
+
+Homophily and it is not just homophily that leads to small world phenomena, homophily coupled with weak ties that result in such a phenomenon from occurring. Now, anybody can hypothesis something like this. How do we know this is true, is this true, is this true? By let us been observed in many networks that this is indeed true that several networks have what is called these clusters like this right and nodes exhibit a homophily, they make friends with many people who are like them, but then there are friends who are outside the territory as well. So, let me illustrate it well.
+
+[p.21] (Refer Slide Time: 08:15)
+
+This is you, you will have many friends who are like you inside your territory, but a few of them will be outside the territory right, outside the territory. Some of them will be, most of them will be inside the territory. By territory I mean your zone homophily and a couple of them will be outside your territory. It is this couple of them couple of those friends that each one of us have would results in the small world phenomena right that makes the world really closely connected.
+
+=== LECTURE 146: The Generative Model (Week 11, transcript PDF page 22) ===
+
+[p.22] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 146 The Generative Model
+
+Scientific theories like any other theories are sometimes hypothesized. By hypothesis we make something that is proposed to be true proposed as true for which we may not have complete scientific evidence. So, this was one such proposal where Watts and Strogatz observed it and said homophily and weak ties could be the reason why this is happening right.
+
+(Refer Slide Time: 00:28)
+
+Then they said we will now give a generative model for this. By generative model we mean the following. A generative model stands for a way in which you can construct such graphs, an algorithm or a method through which you can construct such graphs. What do we mean by such graphs? Graphs with the property that we are discussing graphs with small world properties. So, there proposal was this.
+
+[p.23] (Refer Slide Time: 01:11)
+
+First consider a cycle ok, put all the nodes on a circle like this cycle like this whatever, so, how many wire you want. And then start drawing edges to their nearest neighbors. Let us say something like this. So, everybody is friends with let us say the next two people adjacent to them. So, let me try explaining it. This chap will be a friends with him and him, this chap will be a friends with him, this chap will be a friends with him and so on and so on, right; so on and so forth. So, now what watt since Strogatz model suggested is that start with this is very similar to a grid that we saw right. Start with a grid where you know people who are geographically close to you right and then and then there is a just head that you should randomly re wire; sounds little technical, but let me explain in a minute what; that means. Randomly re wire a few edges by that we mean taken edge here of your choice whatever you want. Let us say I will remove this edge as you saw I remove this edge and I am going to randomly put it back as well ok, I will randomly put it back, it can be between any two edges, I do this kind of re wiring. So, there is a probability that we can associated with that kind of re wiring. I will say I will do some 1 percent of the edges that I have, I will randomly rewiring re wire them; that is called the random re wiring probability. It was observed that whenever we did something like this, the resultant network was indeed a small world network. What do I mean by that? As I have been explaining this is the kind of network where you will
+
+[p.24] observe that any two nodes are in fact, very close to each other. You take a billion nodes here and then repeat this and you will observe that give a negative nodes there is a very short distance between them; this is called the Watts Strogatz generative model. You can probably try writing a code for this and then check whether it really works. The way it is shown here, you will be surprised to see that it indeed works and that is the motivation for why the world is big yet too small.
+
+=== LECTURE 147: Decentralized Search - I (Week 11, transcript PDF page 25) ===
+
+[p.25] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The small World Effect Lecture - 147 Decentralized Search – I
+
+Fine, we saw how the world is connected.
+
+(Refer Slide Time: 00:13)
+
+The world is way to big on one side and we saw it is actually also small in a different sense right: big in one sense, small in another sense. What is more important here; this experiment let us we collect. So, there were two people, anywhere in the world, they are connected by some 6 links right: 6 links. I am sure you people now see the point and you sort of appreciated, but what is more worthy of being appreciated is not the fact that given any two people in the world they are connected by near 6 links right 1, 2, 3, 4 links a more interesting fact it is the following. In the Milgram experiment if you observe, it is actually a search algorithm. It was the search algorithm, why so? You see that a person is holding a letter here and does not know who is here and he supposed to find a path on the friendship graph of the world right. There are so many people over here; he needs to find how to get to the reach this person here right. It is indeed a search algorithm.
+
+[p.26] (Refer Slide Time: 01:55)
+
+What is more fascinating? What is more fascinating about the Milgram’s experiment is the fact that it is a very collaborative attempt. People use a sort of a very local approach, a local algorithm by a local method. We mean they do not know of the global picture in the graph right. So, in the few friendship network: a person here only knows who his friends are and has no clue of who could be the friends of this destination person. He has local this person has local he has only a few friends here. Now he done very intelligently passes on the letter to someone of his friends hoping that it will reach the destination and they someone friend sends it to another friend hoping that it will reach the destination. So, a point to note here is this is indeed a search algorithm. And what is so fascinating about this is that it uses a local method, he does not know the entire graph given here. Nobody knows entire graph, they only know one’s friends and they just pass on the information to one of his friends, right. And then surprisingly Milgram notes that it finally, reaches the destination. It reaches the destination and the approach is completely local. I hope you understand what I mean by the word local. By local I mean a person who has the let us say the letter right now, only things about passing it on the most eligible friend of his; hoping that this chain will continue. And finally, help the letter reach the destination. It is a very local algorithm; it is indeed very fascinating to see how this works.
+
+[p.27] (Refer Slide Time: 04:17)
+
+Imagine there are 6 billion people as I was telling the population of the world is more than 6 billion people in this world. And some random person when you take and give a letter to him and ask him to make this letter reach, you take a random person and ask him to help this letter reach the destination the destination. Although, he has no clue how to do this, he somehow manages to give it the impetus. He gives a push to it and every single person does the same thing right; every single person does the same thing. And finally, it was observed that in roughly 6 hops, you reach the destination is in that a sort of misty. Mystifying that without anybody knowing the entire graph, they all are cooperating and helping the letter reach the destination. Now, our question is how this happens. How? Is it even it looks unbelievable, does it even happen right? So, if we went to write a computer simulation, what would we write? What coding would we do to see that this indeed is true? You remember the generative model that we discuss in the previous session, the generative model called the Watts Strogatz generative model right. We showed you how to generate such graphs which have what is called the small world property, right. It is called the small world property which means any two people are connected by surprisingly a smaller number of links. Now, let us slowly understand how exactly this search algorithm gets executed and how exactly it is so local. Nobody knows the global picture at they ensure that within 6 links, the letter reaches the destination.
+
+[p.28] (Refer Slide Time: 06:45)
+
+So, assume let us take as an example a real world scenario where this is you. And this is let us say some someone in some part of let us say Africa and you badly want to contact this person for some business, and you have no clue how to contact him. Again, an assumption is we are in the let’s say 60s and 70s where there was no internet. Nowadays it is quite easy. Although the same phenomena happen; it is not as difficult as it sounds in this example right. If you were want to contact someone in Africa, how would you go about? You will ask someone, again the same story and ask them to help you with someone who might possibly know this person in Africa who might know someone who might know someone in this place called whatever in Africa and so on. And surprisingly as I have been repeating, this helps you reach the destination. This way I mean this has this has sort of this has been one of the most counterintuitive facts in graph theory ever that not only is the world connected look at this. First point is not only is the world connected, it is surprisingly connected in the sense that in 6 links we can go reach the destination; how awesome is that. And the third and the most fascinating fact is that the search algorithm that people use to go find the destination is a local method. By local method I mean I repeat by a local method, I mean nobody has the global picture; nobody knows who is friends with whom, but they just do their local job. All that the person needs to do is to ensure that he sends it to the
+
+[p.29] immediate neighbour and this every person follows the same protocol. And finally, it goes and reaches the definition. Whereas now see the how of this algorithm, how exactly this works. This goes by the name decentralized search and we will see more of it right now.
+
+(Refer Slide Time: 09:03)
+
+Decentralised search, it is actually self explanatory as you would have realised. Centralised means there is central authority; decentralized means there is no central authority still you are able to search.
+
+=== LECTURE 148: Decentralized Search - II (Week 11, transcript PDF page 30) ===
+
+[p.30] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 148 Decentralized Search – II
+
+So, we asked a question in the previous lecture, the question is how is this happening?
+
+(Refer Slide Time: 00:11)
+
+How is the search happening on the small world network? Right, it is very intriguing you see I mean how can someone just pass on a piece of information to someone else and in 6 hops you can reach the destination anywhere in the world, the reason actually is pretty simple. In fact, we gave a intuition of it in one of the previous lectures; we are going to go in detail with it right now. As you know in the real-world network you know how its it happens how a real-world network is created, we saw the Watts-Strogatz model right. There are several nodes and several links. How do links form? Assume this is you, how will you make friends? You will basically be friends with your immediate neighbors, your classmate, your schoolmate maybe your gym partner, you’re the person whom you know in your painting club or may be in your biking club and so on and so forth. You know the local people really well, but then as you know there are some people who
+
+[p.31] might know someone outside their locality right. So, whenever you are asked to send a piece of information let us say to some other part of the globe. All you will do is you will choose one of those friends of yours who probably is closer to this destination, who is possibly closer to this destination. And that person in turn chooses another person, another person and this person might see you see how and why, how and why probably he was chosen. Why did this fellow chose this fellow? Probably because this fellow here this guy might actually know this guy or someone in this particular region that is why this fellow chose this fellow, while he actually knew maybe several people. He purposefully chose him of all people to send right he knew several people, but right he knew several people. But he chose to send it to only this person that is because he suspects this person might really know someone from this region.
+
+(Refer Slide Time: 02:51)
+
+Did you think this happens, if you want to send a piece of parcel to someone in Afghanistan or let us say someone in Dubai or someone in some Arab country. You probably will know a friend of yours in your college who is from one of these countries right. And, you may want to send it to this friend and ask him to send it to someone in let us say Dubai which will help the packet reach the destination, which is probably in one of those Arabian countries right.
+
+[p.32] So, that is the whole idea behind this local algorithm, where a person starts from here and then intelligently tries to reduce the distance on the destination. We all have a sense of what is the destination, how close we are getting, and we try to achieve it. So, now how do we simulate and see this?
+
+(Refer Slide Time: 03:49)
+
+We first take a Watts-Strogatz model. Now, before anything let us go back to the previous slide and then see. So, this kind of edges actually common in the Watts- Strogatz generative model that I told you which depicts the real world networks; you see basically we make friends with our localities in our localities people who are around us. But, then couple of links will actually be to outside places example this fellow although is friends from, is friends with people who are close to him right next to him; he might also have a couple of friends outside. This fellow might have couple of friends outside, this person might have someone person outside, 2 friends outside, someone outside this always happens you see. So, let us say if we have a person here with some links inside a lot of links will; obviously, be in his locality itself, but a few links will actually be outside. Isn’t that true? We know a lot of people in our country, but we also do you know let us say 1 or 2 percent of our friends will be outside our country. They form as you all know what is called the weak ties, they form the weak ties and how would we simulate this algorithm
+
+[p.33] on such a network? Let me let me revise what has happened so far. All I have stated is there is homophile because, of which we are friends with people who are right next us. There is also the weak ties that we have because, it is only intuitive that 1 or 2 percent of us will always have some friends outside the country, outside our geographic location correct and that is what makes passing of this packet becomes very easy. How do we simulate and see this? I will just be, just to complete I will write this as these are this constitutes homophile ok. How do we program this and see it? What we should initially do is, I will give this as an exercise problem for you all you should be able to do it. In case you are unable to do it please let us know we will help you out.
+
+(Refer Slide Time: 06:17)
+
+So, first thing is we need to generate a network with small world property, we know how to generate that. This is called the Watts-Strogatz model, where if you remember you take nodes right, you take nodes and you put edges to your immediate neighbours, who are geographical closer to you correct. So, this goes on like this other if it is closer to you this happens for on every single node here so on and so on and so on because, these are all connected like this so on. And, you do what is called some random rewiring, isn’t it? You do what is called the random rewiring. So, what you do is everybody’s friends with their locality people only their immediate neighbors, but a few people random rewiring means you take some 1 percent of the friendships and shift them randomly; you resort of relocate them randomly right we have
+
+[p.34] discussed this before. So, if there was a node from let us say here to here you basically remove it and then put it somewhere from here to here. That way this becomes what is called let us say a teleportation channel; a person who is here might only know people in his local neighborhood, but then by this random rewiring what you do is you connect him to a person who is otherwise geographically far away from him. And that is what the Watts-Strogatz model tells you, for you to get this small world property in such a random rewiring should happen. What do you mean by, what do you mean by random rewiring should happen? Who makes it happen? The point here this is how the real-world network functions. So, you might ask me who does random rewiring, nobody does random rewiring. This is how it you know things are I told you the fact that you have a couple of people right outside your geographical location, while most of your friends are, we within your geographical location. You might have a couple of friends outside your country, outside your continent right and that is equivalent of the random rewiring here right. When such a thing happens, we can actually try implementing our own search algorithm.
+
+(Refer Slide Time: 09:13)
+
+So, what we do is the following, we are first you are asked to go from a source node s, let us say a source node s and a target node t and a target node t ok. And, then what you do is I will write the second point you should go from s to t, s to you have to go to t and what you do is you will go to t, this direction, this direction, this direction. So, what you
+
+[p.35] do is you pass on you find that you find all nodes of s, you see s is of course, adjacent to many nodes. But you are on the lookout for that node which might be closer to t. As I have stated before as I have stated before there is this always this couple of people who are connected outside couple of your friends who are outside your geographical location. So, you might find you may not find, but certainly amongst these friends of s that you have, some one of them would probably be close to t right. Someone would possibly be close to t and will pick that person who is close to t close to t and pass on the letter to him as simple as that, will pass on the letter to this very person right. And, as you know this sort of continuous and goes on. Now, let us think about this algorithm for a minute. What if this s is you ok, you are this s and t is in Australia, but you have friends see as you are in India and you need to send something to Australia? How does search algorithm work? Let me try to confuse you people with a question here. What if s has all his friends in India with a couple of friends outside and that friend who is outside is let us say one from Indonesia and one from United States of America right. If you were to pass any of these; if you were to pass the letter to any of the people within India either you are not sure it will to go to Australia correct. But, at the same time if you try passing it to Indonesia or we should type United States you will be you will go further away from it right. So, like going further away from t if you were to pass it to some someone else right. So, this random rewiring may not; this random rewiring may not necessarily guarantee you teleportation points, as I was telling you to nodes of your choice. So, that you can send the letter easily correct; these weak ties may not really connect you to the desired destination. They may not take you close right? they may not take you close. So, how does search still work? Right, it still works right we then in that case you know we just pass on the information to anyone here who is anyone here, who is close to t; he could be a fellow from India itself. Or if the closest is actually someone from Indonesia to t we of course, do pass it to that person right. But, the question here is may be it would get complicated all the more complicated and you may not reach the destination at all, you might go away and away
+
+[p.36] from the destination well and fact is this never happens and the reason follows. So, what we will do is let us take a grid ok.
+
+(Refer Slide Time: 13:37)
+
+Just take a 4 cross 4 grid like this right and then complete the grid. So, every node has so many friends and as you can see a person has 4 neighbors and assume they are people on all the sides; it is a huge grid it is a huge grid. And, this represents that you are friends with; you are friends with these 4 people 1 2 3 not the one I am sorry yeah you are friends with these 4 people. But, then you are also friends with a couple of people away from you something like that right. So, assume every person let me write that down every person makes friends, I am writing it slowly because it is important. This better sink into our minds every person makes friends with his or her immediate neighbors right. It will be necessarily be the 4 neighbors which are these, he might make friends with the nearest neighbors who are let us say 2 distance away from him. So, he might be friends with him 2 distance away, 2 distance away, 2 distance away etcetera. In his vicinity he makes friends, a couple of links is always way outside his vicinity which is far away ok. Let us assume this is the friendship network in 2 dimension and I will even write a code let us say to define what exactly are these green lines here. What exactly are these green lines? They are links to far away nodes. Let us come out with the way in which we
+
+[p.37] define these far away nodes ok. Let us come out with a way in which we define these far away nodes. So, how we define it?
+
+(Refer Slide Time: 16:15)
+
+What I do is I pick a node far away from this node and then I put an edge with probability. Let us say 1 over distance between this is u and this is v, distance between u comma v to the power of k.
+
+=== LECTURE 149: Decentralized Search - III (Week 11, transcript PDF page 38) ===
+
+[p.38] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+The Small World Effect Lecture - 149 Decentralized Search – III
+
+(Refer Slide Time: 00:05)
+
+So, K here equals 1 2 0 1 2 3 here denotes that you are rewiring, basically your friendship that u maintains with people who are not in his neighbourhood. The friendship that u maintains is sort of it is based on the distance of that node from u; further away the node less probable is a use u being friends with them. For example, let us say the this is a node which is some 10 units 10 distance away from u and this one is some 20 distance away from u. So, this is less probable, and this is more probable ok, that is what this distance function captures and for a fixed K. So, what do you mean by this? If the distance is let us say 5 here let me let me write that down. So, if this distance is let us say 5 units and this one is 10 units, the probability of u being friends with v is more than the probability of u being friends with this person ok. Let me give him some name, let me call him w this person let its call let us say this node is called w ok.
+
+[p.39] The probability of u being friends with v is a lot more because, it is closer just 5 unit away; 5 units I mean 5 edges away; it is not just 1 edge ok. In case u and v are 5 edges away then you put an edge between u and v based on a probability function ok. What is the probability function here? Nothing it is very simple you judge whether you want to put an edge or not by looking at the distance from u. This is far away from u this is 10 units far away from u. This is 5 units closer to u, this is more probable to become a neighbour of u, v is more probable to become neighbour of u than w. What decides this? It is this equation that decides this. So, 1 over if you let us say assume I K equals 2 then 1/52 is the probability of u being adjacent to v. And, 1/102 is the probability of u being adjacent to w that is if K equals 2. If K equals 1 then 1/5 is a probability of v being adjacent to u and 1 over 10 is a probability of w being adjacent to u ok. Let us not worry much about this fact, let us only observe the following all I am saying here is there is a node here. And he is of course, friends with his immediate neighbours, a few of his immediate neighbours alright; very clear till here.
+
+(Refer Slide Time: 03:09)
+
+And all that I was saying before is that he also takes part in being friends with far away people, far away people let us say a few of them. Few friends are far away people for him, but then that friendship simply depends on the distance ok. By that I mean further away they are less probable that this person is friends with him. Who decides it? I am
+
+[p.40] going to decide it based on the inverse of the distance. So, if let us say in plain English language if this is some 5 kilometres away. This is 20 kilometres away, the probability of friendship here is rare probability of friendship here is a more probable ok. So, I once I give you a nice example you will realise what is the happening here, what is the motivation for this distance function alright. So, here goes the right motivation; assume there is a city you are a city planner.
+
+(Refer Slide Time: 04:27)
+
+Let us assume you are a city plan, and this is the city and here is the centre of the city alright and you may want to go to different places here. These are all different locations, for the time being just forget the graph here. We are not talking about a graph; we are just talking about let us say we are planning a newly built city. The city is newly built, I am planning some road networks here, public transport here to be precise; planning let us plan some public transport here. So, now assume this is your house and this is some market a supermarket or a shopping complex. So, whatever you want, now you want to go from here from your house, you would like to go to market. Of course, you can take your car and then go, but the point is you would like to use public transport. There are so many locations here, as you can see there are let us say 100’s of locations here. You cannot basically put a bus a public transport bus from any node to any other node here; from your home to market you may not have a bus. So, let
+
+[p.41] us say you may want to go from your home to let us say some other place and to some other place and then reach the market. So, buses do not ply between any 2 locations. Now, here is the question if you were to decide what should be the bus routes, if you were to decide the bus routes what will be the locations from which you will um deploy a bus right. Assume every single location has the same amount of people and the requirement for them to travel is also the same, what exactly will you do? How will you plan the bus routes? Right, assume you have some 100 such locations here, there are 100 such red points whatever you are seeing here 100 such locations. So, whatever points you are seeing here assume there are 100 such points and you cannot simply put buses from any point to every other point right that is not feasible that is not practical.
+
+(Refer Slide Time: 07:09)
+
+So, what you do is this; assume this is the city all you do is you there is a central bus stand, let us say this is the central bus stand right. And, then from here you will have a bus go this place, this place, this place, this place, this place and this place right. These are the several locations where your buses go right and then, do you see something here? Do you see that? There are concentric circles here and you are trying to ensure that you have a bus for every possible concentric circle correct. So, what do I mean by this? By this I mean, if you let us let us now take a grid which is easy on the mind.
+
+[p.42] (Refer Slide Time: 08:01)
+
+Assume there are some locations here, you would not sure that there is a um bus that goes to concentric circles to concentric circles. So, what do I mean by that? By that I mean from this centre let us say from the centre there are buses which go just to the next location, next to next location, next to next location, next to next location so on, so on and so forth ok. You will try to cover all possible locations from here correct, all possible locations. I am not drawing it well, but you basically you are getting the right intuition right. So, that you are you are basically covering all possible areas in the place and the bus will go there and from there you may want to take another bus.
+
+[p.43] (Refer Slide Time: 09:03)
+
+Simply very simply stated, assume there is a metro service where you need to go to let us say this place ok. Metro starts from this is the start and this is the end, let us say it is linear it is just it is a straight like this and you need to go here. You need to go here, but a metro train goes to this location and let us say it goes to this location ok, these 2 locations let us assume. But then you may want to get down here and then take another metro to another station, but that station goes a little further away and from here you can always come back to another station. And that station probably takes you to further away place, there are probably isn’t any metro from here to here. So, as you can see you need to reach this place starting from this place, but the metros are very weirdly distributed. Some superfast metros you know that they do not they do not stop they do not stop; from here you directly take you here. And, then from here you can only come here and from here maybe there is train to this place and there is not a train to this place. See it is complicated, how would you come then? So, then you would probably take a metro to this place and then travel to this place and then travel to this is place. You know how to take a detour here; you see this is how things work.
+
+[p.44] (Refer Slide Time: 11:05)
+
+That is because if your reach is high, by that I mean see if you have long routes people may want to come back from at ok. If you only have shorter routes let us see what happens.
+
+(Refer Slide Time: 11:15)
+
+If there is a shorter route from S to E exactly the same thing ok, let me just that replicate this and then put it here so, that it is easy for us to work. I will copy paste this and let me give you another scenario where every single route is fairly short ok, it is fairly short. So, what we do in that case? That that comes with another baggage of problems right; let me
+
+[p.45] once again copy paste this in this and then pasting and then I am going to tell you that, what if this were not the paths let me remove these paths now. And, I need to go these to same destination right, I need to come and reach here right. I am going to start here, but then the metros are all like this now, there is there is a metro to this place and then another metro to this place.
+
+(Refer Slide Time: 12:15)
+
+And then from here there is another metro this place so on and so forth. Here to here and then again from here to here alright. You know how to do a whole lot of toggling; you see a whole a hell lot of toggling you may have to do from here and then to here and then there is a metro to this place right. So, you may have to do a lot of jumps here, it this is a very strenuous process right. This is a very strenuous process, as you can see. Why is that, there is a no there is no quick way of coming from here to here right. If there are some 100 locations here you cannot put 100 choose to 100 c 2, let me write that down you cannot put 100 c 2 number of um trains or buses in this on this road. You can only put a few buses or trains between stations correct. This the above one has a problem that, if you put superfast trains you may have to go ahead and then come back while, here you may have to do a lot of hops it is a lot of waste of time; you see you need to get in to a bus and then another bus and then another bus and so on, you need to do a lot of hops. What is the ideal way to construct um metro service here right um? So, what we will do is, if you observe this problem in this is the 1
+
+[p.46] dimensional, you see starting from here and going to here. If you see the same problem in 2 dimensions, if you see the same problem let us say assume you write a square or a circle you represent a city right.
+
+(Refer Slide Time: 14:05)
+
+We have exactly the same problem that when you want to put buses from one locality to the other right, it is a huge issue from where to where will you put from where to where will you put. So, let us do one thing assume you were to write program you accomplish this. So, what will you do? You will first generate a small world network.
+
+(Refer Slide Time: 14:55)
+
+[p.47] Let us say a small world network with some rewiring probability ok; p is the rewiring probability; you will indeed get some graph here right you will get some graph here right. So, let me let us write that down I get some graph here right, I get some graph here. Let us say a huge graph here correct and then I can go from any node to any node right node. But I must ensure that I can go from any node here to any other node here, from any source to any target I should be able to go from this source target that should be able to go. And, I want my edges to facilitate this that the whole point edges to facilitate this. So, how does a small world network look like? It will have a lot of edges to its immediate neighbours geographically ok. Look at this is this is a city and a closer the vertices more are the possibility of edges, but then here and there I do put edges to further away nodes to ok. Now, what I will do is let me assume that I put I put um 10 I take 100 cross 100 grid right, 100 cross 100 grid whatever this was, if you remember a huge grid.
+
+(Refer Slide Time: 16:33)
+
+I will take here 100 cross 100 grid, then what I do is I um I basically will do this I will let me write that down; it is it is a slightly involved. You will understand it better if you get the next 2 minutes of my explanation. So, this is a 100 cross 100 grid let us say right and every single node here, let us say every single node here is adjacent to some let me say 10 nodes 10 nearest nodes; whatever they are on the grid alright 10 nearest neighbours.
+
+[p.48] What I mean by that? So, all these people are maybe at 2 levels ok, let us say some a 1 2 3 4 5 6 7 8, let us say some 20 neighbours 20 nearest neighbours ok. This is the homophile part 20 neighbours and then it also is adjacent to a few nodes further away and this is decided based on the probability function 1 over to the K, where K can be 0 1 2 etcetera as I told you right. What should be the ideal value of K? If I were to run this experiment on a 100 cross 100 grid right and I will choose first K equals 0, what will happen? When K is 0, this entire thing will be 1 which means it will be the same probability with which you will be picking vertices further away; its uniform distribution that can be dangerous you see. Why? You will randomly put roads between 2 nodes then you may have to go longer distances and then come back into if you want to come to the destinations alright; it may not really serve your purpose. If you put K equals 1 then node that is 10 units away and the node that is 20 units away 10 units is more probable because, it will become 1 over 10 probability 20 units with will be a lot improbable, because it be 1/20 ok. Now, instead I take K equals 2 this be then it becomes let us say assume this was 10 units and 15 units so, 20 units whatever anything you want. Then if you pick K is equal 2 this becomes, the probability of this being friends will be 1/102, the probability of this being friends will be 1/152. But, then again there is a problem there would not be very further away nodes because, 1/152 is 1/225 and that is a very small number, which means a node that is 15 units away by units as you all know, I mean the number of edges the shortest path length. If a node is 15 distance away then the probability of that being friends is 1/152, but a node that is 10 units away is 1/102 which is 1/100. This is more probable; this is very less probable than what it is used to be when K equals to 1. As you can say if K is equals to 3 or more nodes that are far away becomes very in probable and navigation becomes difficult for you to go from a source to a target. So, here goes our question we were talking about simulation right continuing our discussion.
+
+[p.49] (Refer Slide Time: 20:43)
+
+If you were to go from a given source to a target T target node T and you are considered different K. K is K equals to 0, K equals 1, K equals 2, 3, 4 and assume you draw this plot ok. Assume you draw this plot of this y axis versus the x axis right and then you will plot, what are the path lengths. If you put on x axis you put K which is basically 0 1 2 3 4 etcetera ok, 1 2 3 4 5 and so on. And, on y axis you put the let us say the distance, the distance covered when you take the check the typical such algorithm. When you when you go to the next node and then you check how far is the target and you go to the next node that is closest to the target and so on. When you do this, you will observe that when K equals 0, K equals 1, K equals 2 etcetera the plot looks like this ok. It let me write nicely, the plot has the observation is at 2 it says something. The distance is minimum now what, but do I mean by distance? By distance I mean you need to the destination you can go and reach quickly. If the rewiring probability is 1/dK, where K is 2 when K is let us say 3 the distance is slightly more as you can see. When K is let us say 4, then the distance is a lot more as you can see ok. I hope you are understanding what I mean by this distance. By this distance I mean the path length of the process, when you want to go from the source to the target it is a longer path if you were to choose K as 4. If you were to choose K as 2 the shortest the path from S to T, what do you mean by what do I mean by path from S to T? The same way Milgram experiment, when you take a node and you go to
+
+[p.50] the next node which is closest to be on the grid ok; of all the neighbours you choose that node that is closest to T on the grid. That is what we have been discussing all this while right. And this particular algorithm will tell you, this particular programming exercise will tell you that a K equals 2 is the best possible value for K. Whenever, the rewiring probability that you are considering is given as 1 over d to the K right. So, if this is sort of a hand waving that I have done here. In fact, that is a very beautiful proof for this saying that K equals 2 for grid and K equals 1 for 1 dimension. And textbook describes it, it is very nicely described with some very basic probability you can understand it completely. Let me know if you have not understood yet, I will help you out understanding it. But, this will be out of your own interest; this will not be part of the course examination. But, the idea here is simple idea here is that you use K to sort of decide on whether you will make friends with nodes that are further away right. And, when you make friends with nodes that further away a lot more then you are in trouble; a lot less you are in trouble. The perfect balance is when you choose K equals 2 ok. In fact, we will be showing you programming exercise; we will be explaining this in detail. It will become probably clear to you, then. As of now just know that this is curve is how it looks like and for 2 the distance is the shortest.

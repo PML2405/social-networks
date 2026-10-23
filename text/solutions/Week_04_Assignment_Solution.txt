@@ -1,0 +1,331 @@
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 4 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Birds of a Feather: Homophily, Selection and Influence
+Case Study
+A campus wellness team studies how a student community forms friendships and how habits spread
+through it. Two forces interest them. Sometimes people befriend others who are already similar to them;
+sometimes people first become friends and then grow similar by picking up each other’s habits. The team
+also knows that friendships don’t form only through mutual friends — shared activities and group
+memberships pull people together too.
+They recall a striking result from the course: traits such as obesity, and even happiness, can behave like
+contagions, spreading along the friendship network rather than staying with one person. To quantify how
+alike two people are, they use a simple overlap measure: the number of interests the two share divided by
+the total number of distinct interests between them. They also want to test, for a whole network, whether
+similar people befriend each other more often than chance would predict.
+For their worked examples they keep two cases in mind. First, two students Anita and Bina: Anita’s interests
+are {chess, hiking, jazz} and Bina’s are {hiking, jazz, baking, cycling}. Second, a club of 20 students made of
+10 first-years and 10 final-years, with 30 friendships in total, of which 9 join a first-year to a final-year.
+Questions 1–10
+Q1.  [MCQ]  The proverb “birds of a feather flock together” names which phenomenon, as defined in the
+course?
+A.  Homophily — the tendency of similar people to form friendships with one another.
+B.  Betweenness — the tendency of certain edges to lie on many shortest paths.
+C.  Triadic closure — the tendency of a graph to fill in until it is fully connected.
+D.  Embeddedness — the count of common friends shared along a single edge.
+Answer:  A
+Reference:  Lecture 44 – Homophily: Definition and measurement (≈01:31)
+Solution:  Homophily is the principle that people who are alike tend to befriend one another — exactly the
+“birds of a feather” proverb. Betweenness, triadic closure, and embeddedness are different structural
+notions from earlier in the course.
+
+Q2.  [Match the following]  Each scenario in Column A illustrates one mechanism in Column B. Match them.
+Column A (scenario)
+Column B (mechanism)
+1. Two students who both already speak French
+start talking and become friends
+a. Membership closure
+
+[p.2]
+2. After becoming friends with a smoker, a student
+takes up smoking
+b. Selection
+3. Two strangers who attend the same yoga class
+become friends
+c. Foci closure
+4. A student brings an existing friend along to her
+music club
+d. Social influence
+
+A.  1-d, 2-b, 3-a, 4-c
+B.  1-b, 2-d, 3-c, 4-a
+C.  1-b, 2-d, 3-a, 4-c
+D.  1-a, 2-c, 3-d, 4-b
+Answer:  B (1-b, 2-d, 3-c, 4-a)
+Reference:  Lecture 42 – Selection and Social Influence; Lecture 45 – Foci and Membership Closure
+Solution:  Befriending an already-similar person is selection (1-b). Changing a habit because of a friend is
+social influence (2-d). Meeting through a shared activity/focus is foci closure (3-c). Bringing a friend into a
+focus you belong to is membership closure (4-a).
+
+Q3.  [MCQ]  Using the overlap (similarity) measure, how similar are Anita {chess, hiking, jazz} and Bina
+{hiking, jazz, baking, cycling}?
+A.  2/7 ≈ 0.29
+B.  2/3 ≈ 0.67
+C.  3/4 = 0.75
+D.  2/5 = 0.40
+Answer:  D
+Reference:  Lecture 43 – Interplay between Selection and Social Influence (≈03:22–04:35)
+Solution:  Similarity = (shared interests) ÷ (all distinct interests). Shared = {hiking, jazz} = 2; the union {chess,
+hiking, jazz, baking, cycling} = 5. So the measure is 2/5 = 0.40.
+
+Q4.  [MCQ]  For the club of 20 (10 first-years, 10 final-years) with 30 friendships, 9 of which are cross-year,
+homophily is computed as 1 − (actual cross-year edges) ÷ (expected cross-year edges). With a 50–50 split
+the expected cross-year fraction is one-half. What is the homophily value?
+A.  1 − 9/15 = 0.40
+B.  1 − 9/30 = 0.70
+C.  1 − 9/9 = 0.00
+D.  9/30 = 0.30
+Answer:  A
+Reference:  Lecture 44 – Homophily: Definition and measurement (≈09:25–13:03)
+Solution:  With a 50–50 split, a random friendship is cross-year half the time, so the expected number of
+cross-year edges is half of 30 = 15. The measure is 1 − actual/expected = 1 − 9/15 = 1 − 0.6 = 0.40. A positive
+value indicates homophily — fewer cross-group ties than chance.
+
+[p.3]
+Q5.  [MCQ]  How should the sign of the measure 1 − (actual ÷ expected) cross-group edges be interpreted?
+A.  Positive means heterophily; zero means homophily; negative means random mixing.
+B.  Positive means homophily; zero means chance-level mixing; negative means heterophily.
+C.  The value always stays between 0 and 1, and larger always indicates more random mixing.
+D.  Only the magnitude of the value matters; its sign carries no real meaning at all.
+Answer:  B
+Reference:  Lecture 44 – Homophily: Definition and measurement (≈13:03–14:31)
+Solution:  Fewer cross-group edges than expected makes the fraction small and the measure positive —
+homophily. If cross-group edges match expectation, the measure is 0 — random mixing. If there are more
+cross-group edges than expected (as in the actor–actress party), the measure goes negative — heterophily.
+
+Q6.  [MCQ]  In the Wikipedia study of editors’ similarity over time around their first interaction, what
+distinguishes selection from social influence?
+A.  Selection is the rise in similarity after they first interact; influence is the rise before it.
+B.  Selection and influence are identical and cannot be told apart from the similarity curve.
+C.  Selection is the rise before contact; influence the rise after; on Wikipedia selection was steeper.
+D.  Neither selection nor influence produces any measurable change in the similarity curve.
+Answer:  C
+Reference:  Lecture 43 – Interplay between Selection and Social Influence (≈13:49–15:21)
+Solution:  Plotting average similarity against time around first contact, similarity climbs before contact —
+similar people select each other to interact — and climbs further after, as interaction makes them more
+similar (influence). On Wikipedia the pre-contact (selection) rise was steeper than the post-contact
+(influence) rise; other datasets, like obesity, can show the reverse.
+
+Q7.  [MCQ]  The team recalls the contagion findings (Christakis and Fowler). Which statement is correct?
+A.  Only obesity is contagious; happiness was shown not to spread through the network at all.
+B.  Happiness spreads only to a person’s direct friends and reaches no one beyond them.
+C.  Contagion effects appeared only in online networks and never in real friendships.
+D.  Both obesity and happiness are contagious; happiness was found to spread up to three levels out.
+Answer:  D
+Reference:  Lecture 41 – Introduction to Homophily (≈01:40–04:23)
+Solution:  The longitudinal studies found obesity to be contagious and happiness to spread through the
+friendship network up to three levels out — your happiness is associated with your friends’, their friends’,
+and their friends’ friends’. This is precisely what made the result so striking.
+
+Q8.  [MCQ]  What distinguishes foci closure from membership closure?
+A.  Foci closure: a friend joins your club; membership closure: two strangers meet at the same club.
+B.  Foci closure: people meet through a shared focus; membership closure: you join a friend’s focus.
+
+[p.4]
+C.  They are simply two different names for exactly the same single closure mechanism.
+D.  Both require a common friend and are really just special cases of triadic closure.
+Answer:  B
+Reference:  Lecture 45 – Foci Closure and Membership Closure (≈00:47–02:31)
+Solution:  Foci closure forms a friendship between two people because they share a focus (a club, a class).
+Membership closure runs the other way: a person becomes a member of a focus because a friend already
+belongs. Triadic closure is the third, distinct kind — friendship via a common friend.
+
+Q9.  [MSQ]  Which statements about selection and social influence are correct? (Select all that apply.)
+I.   Selection means choosing friends who are already similar to you.
+II.  Social influence means becoming similar to friends after the friendship forms.
+III. Two people of the same social status becoming friends is an example of selection.
+IV.  Taking up a friend’s habit of eating junk food after befriending them is an example of selection.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lecture 42 – Selection and Social Influence
+Solution:  Selecting already-similar friends (I) and growing similar after befriending (II) are the definitions;
+same-status people befriending is selection because the similarity precedes the friendship (III). Picking up a
+friend’s junk-food habit happens after the friendship forms, so it is social influence, not selection — making
+IV false.
+
+Q10.  [MSQ]  Which statements about homophily and closures are correct? (Select all that apply.)
+I.   A homophily value of 0 means cross-group friendships occur at exactly the chance-expected rate.
+II.  Triadic, foci, and membership closure are three distinct ways friendships (or memberships) can form.
+III. A negative homophily value indicates heterophily — more cross-group ties than chance.
+IV.  Homophily can only ever be measured on networks split exactly 50–50 into two groups.
+A.  I, II, III
+B.  I, II, IV
+C.  II, III, IV
+D.  I, IV
+Answer:  A (statements I, II, III)
+Reference:  Lecture 44 – Homophily; Lecture 45 – Closures
+Solution:  A measure of 0 is chance-level mixing (I), the three closures are distinct formation routes (II), and
+a negative value is heterophily (III). The 50–50 split just makes the expected cross-group fraction a clean
+one-half; the measure generalises to any split using the appropriate expected fraction, so IV is false.
+
+[p.5]
+Comprehension 2 — The Fatman Evolutionary Model
+Case Study
+To watch homophily, closure and social influence act together, a student builds a simulated city in
+NetworkX. The city starts as 100 “person” nodes, each given a random BMI, plus five “focus” nodes — a
+gym, an eat-out place, a movie club, a karate club, and a yoga club. Each node carries two attributes: name
+(which holds the BMI for a person, or the focus’s label) and type (either 'person' or 'foci'). Initially every
+person is linked to exactly one randomly chosen focus; foci are never linked directly to one another.
+Three rules then drive the evolution. Homophily: two people are more likely to befriend when their BMIs
+are close, with the connection probability falling as the BMI gap grows. Closure: two nodes are more likely
+to link the more common neighbours they share, where a shared neighbour can be a person (triadic
+closure) or a focus (foci/membership closure). Social influence is captured indirectly through the foci —
+each round, a person attached to the gym loses a little weight while a person attached to the eat-out place
+gains a little, and membership closure keeps pulling friends into the same foci.
+Probabilities are realised with the usual trick: draw a uniform random number in [0,1] and act only if it falls
+below the target probability. The model runs for several rounds, each round applying homophily, then
+closure, then the weight change, and the network is saved after each round so its evolution can be analysed
+later. Key fragments:
+import networkx as nx, random, math​
+ ​
+# assign a random BMI and a type to each person​
+G.node[v]['name'] = random.randint(15, 40)​
+G.node[v]['type'] = 'person'​
+ ​
+# homophily: closer BMIs -> higher link probability​
+p = 1.0 / (abs(G.node[u]['name'] - G.node[v]['name']) + 1000)​
+if random.random() < p:​
+    G.add_edge(u, v)​
+ ​
+# closure: k common neighbours -> probability 1-(1-p)^k​
+k = len(set(G.neighbors(u)) & set(G.neighbors(v)))​
+prob = 1 - math.pow(1 - p, k)
+Questions 1–10
+Q1.  [MCQ]  How is each person node initialised in the model?
+A.  name is set to 'person', while the type attribute holds a random BMI value.
+B.  name holds a random integer BMI from 15 to 40, and type is set to 'person'.
+C.  Both name and type are set to the very same random BMI integer value.
+D.  name is a random float in [0,1], and the type attribute is left unused.
+Answer:  B
+Reference:  Lecture 47 – Fatman Model: Adding people (≈05:16–08:31)
+
+[p.6]
+Solution:  Each person gets name = random.randint(15, 40) (its BMI) and type = 'person'. The attribute
+name deliberately holds the BMI for a person and the label for a focus, so a single attribute is meaningful for
+both node kinds; type distinguishes the two.
+
+Q2.  [MCQ]  Homophily uses p = 1 / (|BMI_u − BMI_v| + 1000). For two people with BMIs 22 and 27, what is
+p, and why is the +1000 there?
+A.  p = 1/1005 ≈ 0.000995; the +1000 avoids divide-by-zero and scales every probability down.
+B.  p = 1/5 = 0.2; the +1000 is what makes equal-BMI pairs certain to connect each round.
+C.  p = 5/1000 = 0.005; the +1000 is included in the formula to raise the probability.
+D.  p = 1000/5 = 200; the +1000 is itself the connection probability between the pair.
+Answer:  A
+Reference:  Lecture 49 – Fatman Model: Implementing Homophily (≈00:53–03:16)
+Solution:  |22 − 27| = 5, so p = 1/(5 + 1000) = 1/1005 ≈ 0.000995. The +1000 serves two purposes: it
+prevents a divide-by-zero when two BMIs are equal (gap 0), and it shrinks every probability so the network
+gains edges gradually rather than all at once.
+
+Q3.  [MCQ]  The code does `if random.random() < p: G.add_edge(u, v)`. Why does this realise an event of
+probability p?
+A.  Because random.random() always returns exactly the value p on each call.
+B.  Because random.random() yields integers, which only rarely fall below p.
+C.  Because a uniform draw in [0,1] lands below p with probability exactly p.
+D.  Because the strict comparison quietly rounds the value of p up to one.
+Answer:  C
+Reference:  Lecture 49 – Fatman Model: Implementing Homophily (≈03:16–04:55)
+Solution:  random.random() draws a uniform real number in [0,1]. The chance it lands in the sub-interval [0,
+p) is exactly p, so adding the edge only when the draw is below p makes the edge appear with probability p
+— the standard way to simulate a probabilistic event.
+
+Q4.  [MCQ]  Closure uses probability 1 − (1 − p)^k, where p is one common neighbour’s contribution and k is
+the number of common neighbours. If p = 0.1 and two people share k = 3 common neighbours, what is the
+connection probability?
+A.  0.300
+B.  0.729
+C.  0.100
+D.  0.271
+Answer:  D
+Reference:  Lecture 50 – Quantifying Triadic Closure; Lecture 51 – Implementing Closures
+Solution:  1 − (1 − 0.1)^3 = 1 − 0.9^3 = 1 − 0.729 = 0.271. More common neighbours raise the probability
+(each independently ‘fails’ to connect them with probability 1 − p, and all k must fail for them to stay
+unconnected).
+
+[p.7]
+Q5.  [MCQ]  In the closure code, k = len(set(G.neighbors(u)) & set(G.neighbors(v))). What does k count?
+A.  The count of neighbours shared by u and v (their neighbour-set intersection).
+B.  The combined total of all the neighbours of u and of v taken together.
+C.  The total number of edges that are present in the whole graph G.
+D.  The shortest-path distance that separates the two nodes u and v.
+Answer:  A
+Reference:  Lecture 51 – Fatman Model: Implementing Closures (≈09:57–11:33)
+Solution:  Converting each neighbour list to a set and taking & gives the intersection — the nodes adjacent
+to both u and v. Its length is the count of common neighbours, which feeds the closure formula. A common
+neighbour may be a person (triadic closure) or a focus (foci/membership closure).
+
+Q6.  [MCQ]  When applying closure, why must at least one of the two chosen nodes be a person (i.e. both
+cannot be foci)?
+A.  Because foci nodes are never assigned any name attribute in the first place.
+B.  Because two person nodes can never share any common neighbour between them.
+C.  Because the whole graph would otherwise immediately become completely disconnected.
+D.  Because foci are never linked to each other, so two foci can’t close into a friendship.
+Answer:  D
+Reference:  Lecture 51 – Fatman Model: Implementing Closures (≈03:38–05:03)
+Solution:  Foci are only ever connected to persons, never to each other, so a friendship edge between two
+foci is meaningless in the model. Closure is therefore applied only to pairs where at least one node is a
+person — person–person (triadic, or foci closure via a shared focus) or person–foci (membership closure).
+
+Q7.  [MCQ]  How is social influence implemented through the foci each round?
+A.  Every person’s BMI is reset to a brand-new random value at the start of each round.
+B.  Every person attached to any focus at all gains one unit of BMI each round.
+C.  Gym neighbours lose 1 BMI (floored at 15); eat-out neighbours gain 1 BMI (capped at 40).
+D.  Foci nodes change their own BMI based on the members currently attached to them.
+Answer:  C
+Reference:  Lecture 52 – Fatman Model: Implementing Social Influence (≈00:20–03:18)
+Solution:  Each round, neighbours of the gym lose 1 BMI (floored at 15) and neighbours of the eat-out place
+gain 1 BMI (capped at 40). Combined with membership closure pulling friends into the same foci, this
+indirectly produces social influence — your friend joins your gym and starts losing weight too.
+
+Q8.  [Arrange in order]  Arrange the steps of building and running the model in the correct order.
+Steps (in scrambled order):
+(i)   Add the five focus nodes (gym, eat-out, movie, karate, yoga).
+(ii)  Create the graph and add 100 person nodes.
+
+[p.8]
+(iii) Each round, apply homophily, then closure, then change BMIs (social influence).
+(iv)  Link each person to exactly one randomly chosen focus.
+(v)   Assign each person a random BMI and type 'person'.
+A.  v → ii → i → iv → iii
+B.  ii → v → i → iv → iii
+C.  ii → i → v → iv → iii
+D.  ii → v → iv → i → iii
+Answer:  B (ii → v → i → iv → iii)
+Reference:  Lectures 47–52 – Fatman Model build order
+Solution:  First create the graph with 100 person nodes (ii), then assign each a random BMI and type (v),
+then add the five foci (i), then connect each person to one random focus (iv). Only after the city is set up
+does the simulation loop run — each round applying homophily, closure, then the BMI change (iii).
+
+Q9.  [MCQ]  To analyse the evolution, the network is saved after each round and reloaded later. Which
+functions and observation are correct?
+A.  Saved with nx.read_gml, reloaded with nx.write_gml; density tends to fall over the rounds.
+B.  Saved only as plain-text edge lists; the network’s density stays constant throughout.
+C.  Saved with nx.write_gml, reloaded with nx.read_gml; density tends to rise over the rounds.
+D.  Cannot be saved at all, so the network’s evolution cannot be analysed afterwards.
+Answer:  C
+Reference:  Lecture 53 – Storing and analysing longitudinal data (≈00:41–08:50)
+Solution:  Each round the graph is written with nx.write_gml('evolution_t.gml') and later read back with
+nx.read_gml. Plotting density across the snapshots shows it rising roughly steadily, because homophily and
+the three closures keep adding edges as the model evolves.
+
+Q10.  [MSQ]  Which statements about the Fatman model are correct? (Select all that apply.)
+I.   The homophily link probability is inversely related to the absolute BMI difference between two people.
+II.  The same formula 1 − (1 − p)^k is used for triadic, foci, and membership closure.
+III. Obesity is measured by counting the person nodes whose name (BMI) equals 40.
+IV.  Social influence is implemented by directly adding friendship edges between any two obese people.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 49–53 – Fatman Model
+Solution:  Closer BMIs give a higher probability — inverse in the gap (I); one closure formula serves all three
+closure types (II); and obesity is the count of nodes with BMI (name) equal to 40 (III). Social influence is
+captured indirectly through gym/eat-out membership changing BMI, not by directly linking obese people, so
+IV is false.
+
+[p.9]
+End of Week 4 Question Paper  —  20 questions  •  2 comprehensions

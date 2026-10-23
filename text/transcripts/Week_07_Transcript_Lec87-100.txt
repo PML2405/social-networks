@@ -1,0 +1,673 @@
+=== LECTURE 87: We Follow (Week 7, transcript PDF page 2) ===
+
+[p.2] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behaviour in Networks Lecture – 87 We Follow Do you think we follow each other? What do I mean by follow? So, all of us have seen ants in our home or in our backyard happily following each other.
+
+(Refer Slide Time: 00:14) One ant moving behind the next ant,ant and all of them are moving in the same way and as a kid we have tried to disturb their movement as well, but they again go and make their own line. But then do human beings follow each other? Yes, we know we do not move behind each other the way ants do. But we might be following each other in some different manner. What different manner? Let me give you some examples..examples.
+
+(Refer Slide Time: 00:48)
+
+[p.3] Assume you go to this restaurant and there are two choices. There are two things you can order: one is a burger,burger; another is a pizza. And, let us say you like pizza more, but then you look around to all the people.
+
+(Refer Slide Time: 01:05) And you see each of them is eating a burger. There is not even a single person in the restaurant who is who has ordered a pizza and he is eating it. What will you do now? Will you go and order burger or will you go ahead and order pizza?.
+
+(Refer Slide Time: 01:17)
+
+[p.4] . Let me give you another example.
+
+(Refer Slide Time: 01:25) You are going on this road and suddenly the road ends. The road gets split in two parts; one part of the road goes towards the right and other part goes towards the left. And then again you see at the people around you, and most of the people they are moving towards right. Almost everybody is taking the road towards the right. What will you do in this case? Will you go towards the right or will you be bold enough to move and go towards the left side, where nobody is going. We do not know. The answer to this question, do we follow or not, what do we do in these situations is in the clip which is coming next. .
+
+[p.5] (Refer Slide Time: 02:10) The gentle man in the elevator now is a candid subject. These folks who are entering the man with the white shirt, the lady with the trench coat and subsequently one other member of our staff will face the rear. And, you will see how this man in the trench coat tries to maintain his individuality. But, little by little looks at his watch but, he is really making an excuse for turning just a little bit more to the wall. Now, we try it once again, here is the candid subject. Here comes the candid counter staff, 3 of them at least and this man has apparently being in groups before. Now, here is a fellow with his hat on in the elevator. FirstFirst, he makes a full turn to the rear and Charlie closes the door. A moment later we will open the door, everybody has changed positions. Now, we will see if we can use now, we will see if we can use group pressure for some good. Now, in a moment on Charlie’s signal everybody turns forward. Notice they take off their hats and now do you think we could reverse the procedure watch. So, what did we see just now in the clip? So, we have seen that the person in the elevator when he looks at everybody was turned towards the wall, also turns towards the wall. And how silly howsoever silly it might sound, why will one turn towards the wall? But when we will see other people around us doing some silly stuff, because of our sense of conformity; we also tend to do the same.
+
+[p.6] (Refer Slide Time: 04:55) So, in the examples which we have discussed before, when you are in a restaurant it might occur to you; that probably everything in the restaurant except burger is spoiled and hence everybody is eating burger. Or there is an offer on burger may be some Saturday offer and everybody is getting a discount. And you might also go and order a burger. In another example when there was a road and one of it went towards left and the other one towards right. And everybody is going towards right, you might feel there is something wrong with the road towards the left maybe, some construction work is going on or it leads to let us say; some place where nobody wants to go something like that. And you mostly take the road towards the right. These are two very simple examples. But while doing almost everything in our life, we follow others our decisions are not independent.
+
+(Refer Slide Time: 05:55)
+
+[p.7] You would have encountered it again and again in your life. When you have to maybe choose a subject after 10th or you have to decide your career; we do not take this decision all by our self. We take all the feedback from our good friends, from our parents, from our teachers. And then we weigh all these options and then take a decision. So, we almost follow others in almost every aspect of our life.
+
+=== LECTURE 88: Why Do We Follow? (Week 7, transcript PDF page 8) ===
+
+[p.8] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behaviour in Networks Lecture – 88 Why do we Follow? So, we have just seen that yes, we do follow. Now I would like to ask this question to you. Should we follow?
+
+(Refer Slide Time: 00:14) Should we follow others? If everybody around me is going and jumping into a well. Should I also go and jump in the well? So, it is a very popular statement which is again and again used by your parents, when they do not want us to do something which all of our friends are doing. Let us take a more realistic example. Let us say you are writing this math’s exam.
+
+(Refer Slide Time: 00:37)
+
+[p.9] In a classroom, and the invigilator the teacher goes out for some five minutes. And everybody in this classroom gets a chance to cheat. So, you do not have enough time to copy and match the exact answers. But you have time to validate your answers. What is your result? And everybody is going around and validating their answers with each other. But then there is this question number 4 whose concept you know well. You have calculated it. And your answer is 40. And you are quite sure about it. Then when you go about to validate the answer to this question; your first friend says no my answer is 30. You go to your second friend; he says no my answer is 30 third friend 30, fourth friend 30 so on and so forth. Then mostly, a time will come where you will cut off that 40 on your sheet and write a 30 there. So, it might not be good to follow others all the time. If it is not good to follow others then, why do we follow others?
+
+(Refer Slide Time: 01:53)
+
+[p.10] . Before giving you answer to this question, I want to refine the definition of follow, not refine I want to explain in a little bit of more detail. What all kind of circumstances do you count in follow? Let us say my friend is doing something. I look at him he is doing this thing and I also start doing the same thing. It is a follow. Let us say he is smoking cigarette. I looked at him, I feel smoking cigarette is cool. And I also start smoking cigarette, I followed him. Next my friend is using some product which is really nice. I looked at him, I like the product, I also started using it. Let us say an apple iPod; he is using an apple iPod, I liked it very much. I started using it, I followed him. A third kind of follow, rather a more involved a more intrinsic one is about the information we receive from other people. How information? My friend has information, which is of interest, some information which is of interest. It can be about a recent assignment we have to submit; it can be about news related to a Hollywood or Bollywood celebrity or something else some nice information. So, when we I talk to my friends. He tells me about this information, I like the information, I believe in the information. This is also a kind of follow; I followed him.
+
+(Refer Slide Time: 03:25)
+
+[p.11] For example, let us say last night; my friend watched this Kolavari Di song. And he really liked it. Next morning, he came to me; and told me why you do not watch this video, it is very nice. And I go ahead, and I watch this video; and I also really liked it. So, I followed him. So, this is the definition of follow which we will be using. So, all these examples which I gave you come in the category of following.
+
+(Refer Slide Time: 03:55) So, the question which we were addressing was, why do we follow each other. Like we looked at some examples where we saw that we should not every time we should not be following each other’s, then why human beings do intrinsically they follow each other?
+
+[p.12] The answer is in these examples I am going to tell you. First example, one of my friend, he is in a health care industry. And he has come up with some new kind of sport shoes, which have a lot of nice feature, is what he says. But then I might not find those features to be very nice. There are a lot of sport shoes which keep on coming in the market. And all of them have nice features why should I care about this one my friend came up with? But then one nice day, one fine day, my friend comes to me and he gives me an offer. He says that Yayati, if you take my sport shoes; if you look at my sport shoes you advertise it to 5 of your friends; I will give you one pair for free. Now my mind changes just advertising it to five people; and I am getting a pair of sport shoes no matter how bad it is. I will likely do that, I will do that; I kind of followed him, I followed him for some explicit benefit for some monetary benefit. So, this kind of following we can say it is some explicit gain I am getting out of this following. Let us look at some more scenarios. Why do we follow others? Agriculture let us say it is one of the most prominent occupations in India. There is this small village; and this in the small village is a small villager.
+
+(Refer Slide Time: 05:43) Let us say Sohan, Sohan does agriculture. Sohan has friends who do agriculture; Sohan
+
+[p.13] has a very good friend. And one day suddenly sales of the crops of his friend doubles. And then Sohan is all very curious to know what happened in one day. How come his sales doubled? And then Sohan goes and ask him. And his friend tells him, that he has imported he has got some imported hybrid seeds from America which makes his crop grow at a double pace. So, he has double the crops and hence he get better sales. How did Sohan get this information? So, Sohan will need to have some friends, whom he can follow, whom he can keep asking things? And then get to know of these nice things; like about these new seeds which we talked about. So, Sohan needs to follow to get useful information. Let us talk about a different world another analogy. And this is the world of medical science. So, let us take our example; Sohan only and make him doctor Sohan here.
+
+(Refer Slide Time: 06:49) So, now, doctor Sohan is here. Again, he here needs to follow others, why? There is this very nice new vaccine which came in the market? And now the Sohan’s patients can gain out of it. So, it is Sohan’s responsibility to be updated to keep talking to other doctors, to know what all is coming in the market. So, he follows other to get this useful information about the advances in the medical field. So, he needs to follow others. So, this is the second
+
+[p.14] reason why we follow other people to get useful information. And think not always useful, but mostly useful information we follow others to get this information. So, this kind of gain which we get out of following others is the informational gain.
+
+=== LECTURE 89: Diffusion in Networks (Week 7, transcript PDF page 15) ===
+
+[p.15] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behavior in Networks Lecture – 89 Diffusion in Networks So, we have seen that we follow each other, and we have looked at why do we follow each other. Let us now take this concept of following one step further. What do I mean by one step further? It is not me who is following others; all of us are following each other. Let us take this sport shoes example.
+
+(Refer Slide Time: 00:27) My friend came up with nice sport shoes and then he gave me some offer and I kind of I adopted his sport shoes, his product of sport shoes I adopted. Then I have many more friends, they might look at me and one or two of them will then adopt these sport shoes and then their friends will looked at them and some of them might adopt these sport shoes. So, do you kind of see a network phenomena going on here.
+
+[p.16] (Refer Slide Time: 01:01) If I model this complete world as a network like this where every person in this billion of population, I represent every person as a node. And, then again like before I put an edge between two people, if they talk to each other, if they kind of follow each other they listen to each other I put an edge between them. So, this product starts from somewhere, it starts from my friend then I adopt it, then my friends adopt it, their friends adopted us and so on. So, do you see that this product is kind of travelling in this big social network? Traveling is actually a misnomer; we can actually say it is diffusing through the network. So, travelling is like when something makes a path and goes, but it is branching. So, my friend would have shared it with some people, let us say 2 people and then these 2 people if they share it with 2 people more it becomes 4. So, it is not just one path, this product is branching through this entire network and we call it diffusion. Now, one question of interest here which my friend would be very interested in how many people at the end adopt his product.
+
+(Refer Slide Time: 02:07)
+
+[p.17] So, whenever a piece of information or a product or something else diffuses in a network from person to person it starts from someplace, then hit some people; hit some more people and so on. What happens at the end? What will happen at the end, can we tell? Will this product sweep the entire population, and everybody will adopt it or it will die away quickly? Nobody will adopt it, may be very few people. How do we tell it? How do we say what happens and now; obviously, what would be coming in your mind is it actually depends upon what is traveling as well what is diffusing as well. So, let us say it was a code snippet about some algorithm I am sharing not many people would be interested, but if it is a juicy piece of gossip about some Hollywood celebrity, Bollywood celebrity or rather one of my close friends it will very quickly diffused through the network. So, yes it depends upon the product, but how do we actually quantify this complete process of a product or an information starting from some part in the network, infecting some more, getting adopted by some more and so on. So, we will look at it in detail in this chapter with the help of nice mathematical notations and conceptual entities which are coming next.
+
+=== LECTURE 90: Modeling Diffusion (Week 7, transcript PDF page 18) ===
+
+[p.18] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behaviour in Networks Lecture – 90 Modeling Diffusion So, how do we model this process of diffusion? So, let us design a simple framework for this, probably a kind of game. What kind of game? Let me again give you a scenario.
+
+(Refer Slide Time: 00:23) This is a sunny Sunday and you wake up early in the morning and you want to decide how you are going to spend the rest of your day. And, you have two options either you go to the library and finish that assignment whose deadline is coming this Wednesday, or you go outside have fun, watch movies, do shopping and enjoy your day. Obviously we would always want to do the second; obviously, we would always want to do the second sitting in library and reading a book is boring while going out and having fun is so interesting; that might be your option you go out and have fun. But, now let me broaden this picture and bring your friends in this picture. So, now you have many friends; let us say you have some 20 friends. Let me change your mind, you wake up this Sunday and you decide that you are going outside, and you are going to have fun.
+
+[p.19] But then comes into picture your 20 friends and out of these 20 friends 18 of your friends tell you that they are going to library and finishing that assignment which is coming up this Wednesday and they invite you. And, then here are your 2 friends which are asking you to come with them and go enjoy. Now, what will you do you? You might think for a moment, you might now want to go to library and finish that assignment. So, how do we weigh our options? How do you weigh your options which choice to make what to do? So, the first factor which we have seen is how much that work interests you. So, in this case let us call it a payoff.
+
+(Refer Slide Time: 02:13) There is a payoff which working in the library gives you and there is a payoff which going outside and having fun gives you. And, for you, the payoff which you get in the library is a little bit lesser, then the payoff which you get when you go outside and have fun first thing. Second thing as we saw the number of friends is important, what your friends are doing is important. So, how do we capture this notion of friends?
+
+(Refer Slide Time: 02:45)
+
+[p.20] So, let us consider one friend for simplicity, let us say just one friend in the picture. So, you have this friend Zara and both of you have to make a decision, what you both are going to do today. So, one option both Zara and you go to library and study and both of you get some payoff which is associated with studying in the library. Another option both you and Zara go outside and have fun you get another pay off which is actually high because, you enjoy more there. Remaining two options Zara goes to library and you go outside; probably you do not get any payoff because you do not go along with each other. And, second option the reverse way you sit in library Zara goes and have fun outside, again results in no payoff. So, this tie these two people they get the payoff when they do the same thing and the payoff is equal to the payoff associated with that particular thing. This was about one friend. So, if there were only if you had only this one friend Zara. So, the ideal situation ideal decision you both should have taken was to go out and have fun, but the situation is not that simple. You have lot of other friends in picture you do not just have Zara.
+
+(Refer Slide Time: 04:16)
+
+[p.21] So, let us say you have some 20 friends here and out of these 20 friends 18 want to go and study in library and 2 wants to go and have fun outside. Now, how do you weigh your option? So, it is very simple. So, if you look at every tie here you are here and your friend is here and if both of you go to library, both of you get some payoff; let us say A associated with library. Similarly, here are you and here is the another friend both of you go to the library and you both get a payoff of A and so on for all the friends. And, similarly if you look at the friends this side who are going to go and have fun outside. This is again if you go and have fun you get some payoff here, both of you get a payoff of let us say B which is associated with going outside and enjoying and similarly in this case.
+
+(Refer Slide Time: 05:12)
+
+[p.22] Now, what you will do is you will calculate the total payoff if you go to library and study what is the total payoff you get. And, if you go outside and have fun what is the total payoff you get. So, for the time being let us assume that the payoff associated with library is 2 and the payoff associated with going outside is 3. And, let us say 15 of your friends are ready to sit with you in the library and study while, 5 of your friends want to go outside and have fun. So, how much payoff do you get this side is 15 into 2, 30 and how much payoff do you get the other side when you go outside and have fun is 3 into 5, 15. So, what do you do? So, you see that you are getting a better payoff when you are sitting in the library and studying with your friends. So, you take that particular path.
+
+(Refer Slide Time: 06:15)
+
+[p.23] Let me change these parameters and ask you this, ask you a puzzle, ask you an exercise question and the question is: again assume that the payoff associated with sitting in the library and studying is 2 while, the payoff for going outside and enjoying is 3. 12 of your friends want to sit in library and study with you while, 9 of your friends want to go outside and enjoy with you. So, which action do you take in this place?
+
+=== LECTURE 91: Modeling Diffusion (continued) (Week 7, transcript PDF page 24) ===
+
+[p.24] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behavior in Networks Lecture – 91 Modeling Diffusion (Continued) So, I hope you have correctly solved it. So, the answer is very simple. Sitting in library the payoff is 2 and you have 12 friends. So, it gives you a total payoff of 24. Going outside and having fun the payoff you get is 3, but you have 9 friends. So, you get a total payoff of 27. So obviously, the second is better, and, in this case, you go outside and have fun. So, here we talked about one person how do you weigh your options. Let us define it a little bit more rigorously. So, I will use some mathematical notations.
+
+(Refer Slide Time: 00:46) So, assume that you have 2 choices, 2 actions A and B: capital A and capital B. The payoff associated with doing capital A is small a and payoff associated with doing capital B is small b. And then you have friends, so let us say B fraction of your friends have adopted capital A remaining 1 - p fraction of your friends has adopted the action
+
+[p.25] capital B. So, what is the payoff you get if you adopt capital A is p * a and what is the payoff you get if you adopt capital B is (1 – p) * b. So, simple mathematics tells me that if you want to adopt A what should happen. If you have to adopt A, if the product A has to be adopted if the action A has to be taken p * a >= (1 – p) * b, which says that p >= b/(b + a).
+
+(Refer Slide Time: 01:58) So, here you go to a value of p. So, the value of p is this much fraction of your friends have adopted A, you also adopt A. So, you kind of have a threshold here. Let us say the value of p here is 40%, 40/100; it means that if you have 100 friends if 40 of your friends adopt A, you will also adopt A you will see a very nice concept here. So, let us say this 40% is associated with going outside. If 40% of your friends come and they tell you that they are going outside, you also go outside. And for going to library it is 60%, if 60% of your friends go to library, you also go to library. So, what is happening here?
+
+(Refer Slide Time: 02:49)
+
+[p.26] Assume that you have 10 friends, out of these 10 friends 4 should go outside for you to get outside. So, let us say let us look at it sequentially. One of your friend comes and tells you that he is going outside and previously you have decided that you will study in library and then one of your friend comes and tells you that he is going to go and have fun outside. You will not be bothered much. Then second of your friend comes and then tells who is going to go outside, you will be like fine. Third of your friend comes and tells you he is going outside, you little bit feel that, so many people are going outside I should also go, but still somehow you refrain yourself because, you want to complete that assignment. But, then when now this fourth friend comes and tells you that he is going outside your mood gets completely changed you get ready and hang around with them. So, this phenomenon is known as social reinforcement. When more and more people come and tell us about something, we will tend to believe that information. Let us extend this scenario from our self to the complete network. So, in the complete network it is not just one person who is deciding what to do everybody. So, it is not just we who are looking at each other and following them. It is like everybody is looking at each other and weighing their options and getting impacted by what others are doing and they are doing something. So, how does this complete thing operate?
+
+(Refer Slide Time: 04:31)
+
+[p.27] So, for understanding it nicely let us again take the same example, there is this class of 40 people let us say and they all have the they all are friends, their friendships between them and they all have this pending assignment on Wednesday. And the entire class has decided each and every student in the class has decided that they are going to sit in the library and complete this assignment. But what happens next is there are these 2 outrageous people in this class who says that we will do the assignment later, we are going to go outside since it is a Sunday and have fun. So, the 2 nodes in this network they flip, and they change their mind from doing the assignment to going outside and having fun. And now what happens? Now everybody is kind of start changing their opinion. So, where everybody wanted to sit and work on this assignment, they look at these 2 people and see that they are going outside, the things in the class start changing. So, every person one by one looks at these 2 people; one person might look and then decide fine, these two people are going outside I will also go outside and have fun with them. And then other person and then other person, so the entire class which has actually decided to sit for the assignment and do it, people start changing their mind and many of them start going outside. So, this is how it happens.
+
+(Refer Slide Time: 05:56)
+
+[p.28] So, what do you think will happen at the end? What will, how will this network stabilize? Will everybody at the end go outside and have fun and nobody will be doing the assignment or people will keep flipping, flipping and ultimately the people who have thought of going outside and have fun they also change their mind? All of them sit together and do assignment or a third option what can be the third option? So, the third option is there emerges 2 parties in this class. So, one party goes to the library and do their assignment and second party go outside and have fun, so it is also possible.
+
+=== LECTURE 92: Impact of Communities on Diffusion (Week 7, transcript PDF page 29) ===
+
+[p.29] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behavior in Networks Lecture – 92 Impact of Communities on Diffusion
+
+(Refer Slide Time: 00:08) If we looked at this example where there was this class of 40 people. And initially everybody in the class has decided that they are going to sit in the library and complete that assignment which is pending on Wednesday, but then there were these 2 people who decided to do the assignment a little bit later and go outside and enjoy. And then we looked at since the payoff with going outside and enjoying is higher, slowly, slowly people in this class they start flipping and more and more people decide to go outside and enjoy. And then we ask these 3 questions, where will be this stability? So, when this network is changing, changing in this sense the decisions of the people are changing. So, initially everybody wanted to sit in library and study, then these 2 people want to go outside, then maybe some 4 people want to go outside and so on.
+
+(Refer Slide Time: 01:08)
+
+[p.30] So, what happened at the end? What is the convergence whether at the end everybody has decided to go outside and enjoy or these two people has kind of looked at other people and they also decide to sit in library and study; that is at the end everybody sits in the library and study. But there was a third interesting possible outcome we have looked at and it was the class gets divided in 2 parties. So, 1 party who wants to sit in the library and study and other party goes outside and enjoy. In which scenario can this third case happen that, the class gets split in 2 parties and 1 party sit in library and other party go outside. So, here I would like to take you back to a chapter on weak ties which was in week 3 and compare what is happening there. So, in the chapter on weak ties, we studied about communities.
+
+(Refer Slide Time: 02:06)
+
+[p.31] So, assume that this class has 2 really strong communities; community 1 and community 2. And this was in community 1, that these 2 people decided that they are going to go outside and enjoy. Slowly, slowly people in this community start changing their decision and slowly and slowly this entire community wants to go outside, but we still have this another community, let us say C2, where everybody is still wants to be in library and study. And then there is this weak tie between these 2 communities. So, in this community C2 currently everybody is going to library and study. So, how will people here start changing? So, these weak tie if we look at this person here, let us say Ram. So, Ram is the one of the endpoint of weak tie and somehow if Ram gets convinced to go outside then maybe people in this community also start flipping and change their decision, but you see changing Ram’s decision is difficult because, Ram is here and most of the Ram’s friends they have already decided to sit in library and study and there is only this one tie where this person is going outside and enjoying. So, you see this community has kind of trapped these phenomena of going outside inside itself and the decision does not easily gets passed to this another community. So, there are these 2 communities, 1 is going outside and enjoying and another sits in the library and study. So, till now we have looked at this example where there were 2 actions; each person can take going to library or going outside. And the same phenomena repeat itself and it is about something else. So, let us say it is about the adoption of 2 software. There is this college, let us say where everybody is using an operating system, say Windows
+
+[p.32] and then and all together new operating system very nice operating system with new features come in the market. And then a few people adopt it and then people start flipping and changing to this new software. So, this is the diffusion phenomena which happens in almost all the cases, but do you see a problem here? The problem here when any new technology diffuses on a network the actual problem is with getting started, so in the beginning when the entire population is using windows, it is risky for somebody for 1 person in this population to adopt this new operating system and start working with it. That is since it is risky, so people they resist adopting a new technology or a new innovation. So, let me give you one example. So, the example is very fictitious.
+
+(Refer Slide Time: 05:05) Let us say a scientist from NASA comes to your school and he has a big-time machine with himself and he invites anyone of you. He says that I invite one of you to come sit in my time machine and maybe go back in your life change something about it or do something or this might give you a very fruitful result, but I ask you will you be daring enough, will you take that risk of going inside and then sitting in his time machine? No, probably no, nobody will come forward.
+
+(Refer Slide Time: 05:42)
+
+[p.33] But now, imagine a world a highly technical world like we see in Hollywood movies Matrix every now and then there is time machine. People sit in this time machine go back change their future and happily enjoy their life. So, there it will not be very difficult for you to adopt this new innovation. So, the there is only the starting trouble for any product or any innovation to come in the market. We only need a few people to adopt it in the beginning and then rest of the diffusion is kind of easy, people look at each other and start following as we discussed and this innovation spreads in the network. So, how do we overcome this starting trouble? So, one way of overcoming this starting trouble is to increase the payoff associated with your product. So, as payoff increases, people see that if they adopt it they are going to get a lot of advantage. So, probably initially people will be likely to adopt it more, but that might always not be possible. So, the second very nice option is to use the key people in the network. So, instead of trying to advertise your product or your innovation to every single person in the population, you carefully choose a few key people and infect them with your idea or your innovation. What am I saying? I am saying that let us say you want a new bike that a new bike in the market probably which all of your friends are having and you want to look cool in your college and you want that new bike. Should you really go and convince your sibling, or you should you go and convince your mother? Actually no, whom should you be convincing, you should be convincing the
+
+[p.34] head of your family, your father and once if you convince your father, it does not actually matter whether your mother or your sibling is in your favor or not they look at your father and they will adopt what he is saying. So, similarly in a network if you want to advertise your product or your technology choose those key people. So, that is why this is the reason why we see a photograph of Shahrukh Khan on the Chavan Prash, Chavan Prash box or the photo of Amitabh Bachchan on the Navratna [FL] and stuff like that.
+
+(Refer Slide Time: 08:08) So, this particular thing is popularly known as viral marketing.
+
+(Refer Slide Time: 08:13)
+
+[p.35] So, given a network and given the people in this network, identify this bunch of key people, if you which if you convince your product gets spread really very, very fast. So, if you see in this example, we have many nodes many nodes, but if somehow here you convince node 12 and node 13 to adopt your idea. Probably everybody will soon start adopting it because, these 2 nodes are very well connected to rest of the network. We just looked at the importance of key people in a network. So, we looked at if we convince these key people in the network, it is beneficial to us in the way that my product or my innovation gets a way to quickly spread on this network. And, we can use this very same strategy in our previous example which we were discussing.
+
+(Refer Slide Time: 09:09)
+
+[p.36] So, we have looked at here were 2 communities and, in this community,, community C1 2 students they had decided that they are going to go outside and have fun. And slowly, slowly this entire community decides to go outside, but this community remains unaffected by the decision here. Because, there are not enough number of links here to transfer the decision and probably this weak tie is not working here because, it is a single link. And the person at the other side of this weak tie has more number of friends, who are studying in the library and not going outside. So, what we can do in this case if we want the people of this second community also to go outside and have fun. So, we looked at some key people in this community and convince them to go outside and probably we will be able to attain our objective.
+
+(Refer Slide Time: 10:09)
+
+[p.37] Here I would like to ask you a very interesting question. Do you think that when this big social network is divided into many, many communities and something is spreading on this network some product, some idea, some information is spreading on this network does the density of a community, so here we have a community do the density of this community has anything to do with? Whether this idea will spread on this community or not? What is the density of a community you will be wondering? So, density of community is mainly tells you how well connected this community is. Mathematically speaking it is the ratio of the number of edges which exist in this community divided by total possible number of edges in this community.
+
+(Refer Slide Time: 10:56)
+
+[p.38] For example, let us say there is a bunch of 5 people and they are forming a community. If they have 10 links among them, so their density the density of this community will be 10 divided by 5 choose 2. So, that is a density. So, do you think the density of a community has something to do with? Whether this information will spread in this community or not? So, I will again make this question a little bit clearer.
+
+(Refer Slide Time: 11:26) Here is this community and it is having some density and here is this entire network some information is spreading on this entire network and he is trying to enter into this community. So, does the density of this community has something to do here? Whether
+
+[p.39] this information will be able to come inside and infect these people or it has nothing to do with this? So, to help you answer this question, I tell you I will not tell you I will revise a small story most of you would be knowing. So, there was this king who was about to die and he had a big kingdom which needs to be looked after when he dies. And he had these 3 sons who always used to fight each other, and he wanted to teach them a lesson. So, when he was trying, he was on the deathbed, he asked his sons to come with a bundle of sticks, wood sticks. And then they come with a bundle of wood sticks and he gave one wood stick to each of them and asks them to break it. The first person tries breaking the wood stick it easily gets broken, second wood stick easily gets broken third one also, but then he gives them all the wood sticks together as a bundle and asks them to break it. But then it does not get broken. So, there is an important lesson that there is power in unity. What it has to do with our question? So, do you see here that this community here, if the people here kind of do not like each other or not many people are friends with each other, then if somebody will say something from outside, probably they will believe. And. they probably they will adopt this idea, but if they are good friends with each other it will be very difficult to convince them, it is very intuitive as well. So, here are these bunch of 5 people who are really, really close friends and then they have decided to sit in library and do their assignment; no matter how hard you convince them to come outside with you and enjoy they probably will not come, but if their friendship was not that strong 1 or 2 of them would come outside with you. So, do you see here the role of the density of a community in diffusion? Higher the density the difficult it is for an idea to be injected in this community.
+
+=== LECTURE 93: Cascade and Clusters (Week 7, transcript PDF page 40) ===
+
+[p.40] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute Technology, Ropar Cascading Behavior in Networks Lecture – 93 Cascade and Clusters So, we have just looked at a story and have very easily said that, if there is a community having a high density probably and piece of idea traveling through this network cannot enter this community. We intuitively know this, but now let us try to look at it mathematically and it is actually very easy. So, to prove it mathematically, let us first refine a scenario and revise our definitions. Let us refine our scenario. So, our scenario was we had this class right; previously we looked at just 2 communities.
+
+(Refer Slide Time: 00:42) We said that this class where people are deciding whether to be in library or whether to be outside and then we looked at just 2 communities. What we do now is, let us take let us make this a little bit more detailed. Instead of just having two communities let us have a lot of small, small clusters in this entire network.
+
+(Refer Slide Time: 01:01)
+
+[p.41] So, here is this class and people have made small, small clusters, it is actually what generally happens. A class is generally not split in 2 halves, people have their own bunch of friends and if it is a class of 100 people everybody has some bunch of 6 or 7 friends and people exist in small, small clusters. And now the question which we ask is, in this class there are these 2 people somewhere in some part of this network who decide to go outside and have fun. And the question which we are asking is, will this idea of going outside this decision of going outside and having fun quickly sweep the entire class or will here be a bunch of people 1 cluster who despite whatever will not be able to convince to go outside? So, despite all of the rest class despite the complete of the rest class is going outside, these people stay together and say that we are not going outside and hence this diffusion process. So, we call it a cascade. Now, whenever an idea or information diffuses, this the trajectory of this diffusion we get we call it a cascade as shown in the figure. So, we look at whether it becomes a complete cascade or not. Simply whether everybody in the class will decide to go outside and have fun or this bunch of people will not be convinced. So, this actually used to happen in our B. Tech class where it was not about sitting in library or going outside, it was about whether to have a bunk or not. So, whether to have a bunk or not and then there were 3 girls in the class whose friendship was really, really strong and they would always say that no we are not going
+
+[p.42] to go for bunk and the entire class had to cancel their decision. So, keeping this example apart, just for fun our question was whether this will be a complete cascade or not. So, for looking at it let us revise our definitions.
+
+(Refer Slide Time: 03:18) So, we have previously seen that if we look at 1 node, 1 person in this class, this person decides whether to go to library or whether to go outside based on the payoff functions and the number of friends. So, we have there come up with a value called threshold. And we have looked at if the fraction of the, fraction of these persons friends who are going outside exceeds this threshold, this person will also go outside. So, it was for, so it is 40% let us say, so it means that if 40% or more of my friends are going outside and having fun I also go outside and have fun. And if 60% of my friends have to, are sitting in library and working then I sit in library and work. So, the threshold is 40% for going outside and 60% for staying in the library and working. So, this value threshold we denote it by a number let us say q. So, q is a threshold associated with every node. So, at least q fraction of this nodes friends should be convinced, should be adopting a particular decision for this node to adopt the same decision. Now, what was our question? It was related to the cluster. So, we have these clusters in this class and in every cluster, there are some nodes and each node is having some threshold value q. So, here we are assuming that every node is having the same threshold
+
+[p.43] value q, I will come in on it later. So, every node in every cluster is having this threshold value q. Now the next important thing as we know which needs to be captured is like we call the density of the community or the amount of unity. So, here we defined something which is called the density of a cluster. What is the density of a cluster? So, I will give you a one liner let us see. So, the density of a cluster is we say that the density of a cluster is D, if you look at every node in this cluster and at least D fraction of these nodes friends is in this cluster itself. It might be a bit difficult let us look at it with an example. So, let us say that here is this cluster of 5 people. So, there are these 5 people in this cluster and let us say I say that the density of this cluster is 0.3 if I look at every person in this cluster and 30% of the friends of this person is in this same cluster. So, let us say that in this cluster everybody is having 10 friends. So, I look at this node A out of these 10 friends 3 should be inside this cluster. For B out of these 10 friends 3 should be inside this same cluster and so on for the rest 3 of the nodes. So, that is what we mean by density of a cluster. So, I hope the definition is clear now.
+
+(Refer Slide Time: 06:34) Now, I am going to give you a very weird claim and the claim says that in this network where the threshold of adoption for every person is q as we said before. Then the cascade
+
+[p.44] cannot complete itself, complete itself means starting from some nodes it cannot sweep the entire network, the cascade cannot complete itself. If there exist a cluster in this network of density greater than 1 - q. So, how trivial or nontrivial is that? How do we prove it? So, the proof is very straightforward. We will let us look at it with our example, that will make it easier.
+
+(Refer Slide Time: 07:15) For example, what did it say that threshold for going outside is 40,% threshold for staying in library and studying is 60%? And, then in this entire class having different, different clusters, these are those 2 people who decide that they are going to go outside and this idea of going outside starts diffusing on this network. Now, assume that there is this cluster of density greater than 1 - q. So, q is here 40%. Cluster of density greater than 1 - q means that, there is a cluster of density greater than 60%. What does that mean, cluster of density greater than 60%? It means that if I look at a cluster here and look at every person here 60% of their friends are in the same cluster. And we know that initially the complete class had decided to stay in library and work and here these two people have changed their mind and they said that we are going to go outside. Now this idea of going outside is diffusing through the network. And let us say while diffusing this idea comes close to this cluster. We are talking about and tries to enter this cluster.
+
+[p.45] Now, see what happens. When this idea tries to enter this cluster, there is this node So, this node since it belongs to a cluster of density 1 - q, density greater than 1 - q that is density greater than 60%. 60% of his friends are in the same cluster, which means that 60% more than 60% of its friends have already decided to sit in library and study. So, the threshold condition is not reached. For this node to go outside the number of its friends going outside, the fraction of its friends going outside and enjoying should be greater than 40%, but that cannot be achieved right. Because, 60% of its friends are already in the same cluster and have decided to stay in library and work. Similarly, this happens for the second node of this cluster, third node of this cluster. So, this cascade is unable to enter inside this cluster and hence you see our claim is achieved. So, if there is this cluster having density greater than 1 - q; no matter what this cascade which was occurring on this network cannot enter inside this cluster and hence cannot complete itself. Now I am going to give you another weird statement and let us see how we prove it. So, the first statement, the first claim which we made here was if a cascade is diffusing, if a an idea is diffusing on a network and if there is a cluster of density greater than 1 - q, then the cascade cannot complete itself.
+
+(Refer Slide Time: 10:27) Now, what am I going to say? I am going to say that I give you a network and I give you
+
+[p.46] the information about the cascade and I tell you that the cascade on this network is not complete. There is something which happened inside this network and the cascade could not complete itself, there are some nodes which did not adopt the idea; it means that if this happens that the cascade is not complete. This implies that this shows that there is a cluster of density greater than 1 - q in the network. So, it is a by implication, if you know propositional logic else, we can just leave it aside. So, it is both ways. So, I leave it as an exercise problem to prove it. It is actually very intuitive like the similar way we did this proof. Let me give you a small hint.
+
+(Refer Slide Time: 11:17) So, when this cascade is diffusing on this network and we say that the cascade is not complete, it means that there are some nodes in this network who have not adopted this idea of going outside. Why did not they adopt this idea of going outside? Because, their threshold was not reached; so, let us represent these set of nodes as set S who did not adopt your idea. So, these people who are staying in library and studying, we represent them as a set S and then one by one you examine this person. Why have this node not adopted the idea is because, its threshold is not reached, so using this you can prove this another side of the claim. So, I leave it for you to prove it.
+
+=== LECTURE 94: Knowledge, Thresholds and the Collective Action (Week 7, transcript PDF page 47) ===
+
+[p.47] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behavior in Networks Lecture – 94 Knowledge, Thresholds, and the Collective Action So, we have looked at this beautiful example till now, where there was a class and there were these 2 competing decisions, competing actions which the people in this class could have taken. So, they could have decided to go outside and enjoy, or they could have decided to sit in the library and work. Now I will give you a similar, but a little bit different situation.
+
+(Refer Slide Time: 00:31) So, we also looked at here the case where the people in this class they are sort of divided into small, small clusters, where the interaction between two clusters is very less. And the interaction inside a cluster is strong. So, which leads to the, this problem sometimes that one cluster does not adopt the idea which others are saying and goes by itself. And now let us take the same scenario and let us take the same bunch of people, the same clusters and put them in another scenario the scenario for company. So, assume that there is this multinational company and then there are these people who exist in clusters. So, here are different, different clusters of people who do not
+
+[p.48] communicate much with each other. Now assume that the manager of this company comes up with a stupid decision or a heavy decision which these people are not ready to take. So, every person in this company has a problem with his decision, but they are unable to revolt. Why? So, you see here that the people of this company here exist in clusters. So, this cluster is ready to revolt. Independently this cluster is ready to revolt. Independently this another cluster is ready to revolt, third cluster ready to revolt, all clusters are ready to revolt, but these clusters are small, and they are suspicious about whether the other clusters are ready to revolt or not. So, you see what is happening here, it is the cluster is ready to revolt, but it will be a problem if this cluster alone revolts it can be very dangerous. So, this cluster all though everybody is ready to revolt, but since this particular cluster does not know that everybody else is also ready to revolt. Because, it has a less communication with the other clusters it cannot go and revolt against a manager because of this fear of getting fired. Now, you see what is happening here. So, that is probably the reason why companies they do not allow much of the communication between different, different groups of people working there. So, it is in a sense breaking the unity, it is in a sense the divide and conquer strategy because, if you allow everybody to get united, they can take this action and revolt. But if the people live separately in different, different clusters and do not communicate much with each other it becomes difficult to revolt. Same is the scenario as so you will see here the importance of this collective decision. What do I mean by a collective decision? So, assume that now the government has come up with a policy which I am not happy with. So, what if tomorrow morning I go on the street alone and start shouting, what will happen? Either I will be declared mad or I will be put in jail, but if with me there are these 100 people revolting then it makes some sense to revolt. So, what I will be doing is I will be looking at these other people whether they are ready to revolt or not. And if I am suspicious that yes these people are not going to unite with
+
+[p.49] me I will also not go and revolt. Same is the situation of let us say people want to put some people want to put a coffee machine in an institute, but then there should be enough number of people who want that coffee machine only then this institute is going to fund for that machine. So, this kind of spatial scenario is known as collective action. So, how do we model this scenario? It is a little bit different from what we have discussed previously, but modeling it as previously is also very easy. So, how do we model it? So, for modeling it, first of all we assume that every person has an intrinsic threshold.
+
+(Refer Slide Time: 04:30) What do I mean by intrinsic threshold? So, say I have an intrinsic threshold of 8. So, it means that if including me, I say that if 8 persons are ready to revolt. So, 7 others total 8, 1 is me 7 others, so if 7 more people are ready to revolt, I will go ahead and revolt. And then there will be a threshold associated with every person. So, each of the person will have a different, different threshold. Somebody will say I need 20 people at least to go and revolt, somebody can say that I need 40 people to go and revolt. This is the first, this is the first parameter of the model that we all have an intrinsic threshold. Now how do we decide what to do? So, to decide what to do, here we kind of know: what is the threshold of our close friends. So, if I have a friend, let us say Mira, I will know that Mira is a kind of girl, she will
+
+[p.50] require at least some 15 people to go and revolt. So, here I have an idea of my threshold, I have an idea of my friend’s threshold and based on just these two ideas I have to decide whether to revolt or not. So, in the next screen cast I am going to show you 3 situations and in those 3 situations we will see whether the people they collectively revolt or not.
+
+(Refer Slide Time: 05:58) So, let us look at the screen casts for the collective behavior. So, in this screen cast we will be looking at 3 cases and we will see whether the in these 3 cases there will be a protest or not. So, what was our model? According to our model every node has a threshold which is it in like the threshold for u is 2, for v is 3 and for w is 4. And what does threshold mean? Thresholds mean that this node needs at least these many people to participate in the protest only then this node is going to participate in the protest. So, the node u needs 2 people to participate in the protest. So, 1 person 2 imputing itself, so 1 obviously will be node u and then it needs 1 more person to participate in the protest for it to participate in the protest. Let us see what happens in this case. Let us look at node w here. So, the threshold for node w is 4 and w has only 2 friends right. So, even if both friends participate in the protest, w cannot participate because, it needs at least 4 people, so w drops the idea of participating. Let us look at node v. It needs 3 people. So, node v looks at w and then it knows that w cannot participate in the protest because, its threshold is 4 and these many people are not
+
+[p.51] available. So, node v means node v now knows that w is not going to participate. So, again its threshold will not be reached, and node v drops the idea to participate. Node u only requires 2 people, right? Only requires 2 people to participate, but then node u it knows the thresholds of both nodes right. And then hence it can determine that none of this people neither v nor w is going to participate. Hence node u also decides to drop the idea of protesting. Hence the protest does not happen in this case. Let us look at another example. So, if we look at this example, we can directly look at this example and we only can tell that yes node w needs 4 people which are not available and hence the protest cannot happen in this case.
+
+(Refer Slide Time: 08:21) But if we look at this case, it seems quite easy for a protest to happen. So, any 3 nodes along this cycle can get together and do a protest; u, v and w if they get together they can do a protest, w, x and v can do a protest and so on right, u, v and x can do a protest. But then every node has some incomplete knowledge, they cannot see the entire network. For example, node u here has no idea about node x right. So, node u cannot see this entire network and then come out with the conclusion that yes, it can go get together with v and w and protest. So, let us see how it happens at the level of every individual node. So, if we look at node u. Node u knows that node v and node w. They have a threshold of 3 right. And hence they can get together and do a protest, but then the problem is node u
+
+[p.52] also knows that see, v and w both are the friends of node u and then node u knows that v and w are node friends. They do not know about each other’s thresholds. Node u knows that w has a threshold of 3 v has a threshold of 3, but then node v and w have no information about each other right. So, we do not know what they will be doing and then node u does not have any idea about the threshold of node x. So, node u can think that may be the threshold of node x is very high let us say 5. So, if the threshold of node x is very high, here it is 5 then what will happen? v might decide node to protest because, x will not be protesting because, it has a very high threshold, then v will not be protesting and then how can you know this node u protest here right. So, it is unsafe for you to participate in the protest and it drops its idea of participating. And the same thing happens with all of these three nodes v, x and w because, v does not know about w’s threshold, x does not know about u’s threshold, w does not know about v’s threshold. So, even if in this case actually they can get together and do a protest, but then when these people look at the networks from their perspective, they drop the idea of protesting.
+
+(Refer Slide Time: 10:42) Let us now look at this case right. So, we have rewired this edge from v to x to v to w and what happens in this case. Can you guess? Yes. A protest can very easily happen
+
+[p.53] here. Can happen here and these people you can see that a protest can happen here; u can look at v and w and then look at their thresholds. And then here you can be sure that yes v and w will participate because, v and w also know about each other’s threshold. So, here mainly these 3 people u, v and w can get together and go for a protest.
+
+=== LECTURE 95: Introduction to the Programming Screencast (Coding 4 Major Ideas) (Week 7, transcript PDF page 54) ===
+
+[p.54] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Cascading Behaviour in Networks Lecture - 95 An Introduction to the Programming Screencast (Coding 4 major ideas)
+
+(Refer Slide Time: 00:05)
+
+So now, we had shifting to the coding part, the programming screen cast part for the chapter Cascading Behaviour in Networks we have discussed just now. What we will be doing here in this programming screen cast is, we will be taking the major concepts that we have discussed in this chapter. So, I will be taking 4 major concepts that we have discussed in this chapter and we will be coding and validating all those 4 major concepts one by one. So, I will quickly recap these concepts for you and then we will start with the coding part.
+
+[p.55] (Refer Slide Time: 00:38)
+
+In this entire chapter we talked about a scenario and the scenario was, there is a network and on this network every person has adopted some action or some behaviour. So, every person has adopted the same action or same behaviour, and everybody was living comfortably with it on this network, but then with time comes a new idea, new action or new behaviour in this network and then, people start changing. This new idea or new behaviour starts cascading on this network. So, the example which we have discussed in the chapter is there is a network on a class people in a class, where all of them have initially decided to work in library or an pending assignment, on a pending assignment. And then, came this new idea of going outside and having fun and then slowly and slowly this idea started cascading and more and more people started going outside and having fun, instead of sitting in library and working. So, that is the exact thing which we will be talking about. So, as you can see that here is a network. Initially, all the nodes in this network were blue. So, they have adopted an action and idea, a behaviour; let us call it a blue action, blue idea or blue behaviour, but then comes in picture a red idea, a red action, a red behaviour and it wants to defuse on this network. And then we have looked at the obvious problems with this. What is the problem with this blue idea, blue sorry, what is the problem here with this red idea to defuse on this network and make all the nodes red here? The problem was, as we discussed that people find it risky to adopt a new idea or a new behaviour. They are not
+
+[p.56] comfortable shifting to a new thing specially, when all of their friends are doing the old thing. So, no node in this network actually wants to shift to this red idea; they find it risky to adopt. Then what do we do? What should this red idea do to defuse on this network? And we have looked at 2 solutions to this problem. The first solution was to increase the payoff associated with this red idea, to increase the benefits associated with this red idea. As the benefit associated with this red idea increases, more and more people start adopting it. So, you have looked at how we have modelled the entire thing with the help of pay off and number of friends. Each idea here let us be the blue one or a red one gives you a payoff. And then, based on that payoff and your number of friends which I have adopted that idea you decide, what to do right. So, you increase the payoff associated with this red idea and probably it will cascade on this network and rather cause a complete cascade. What is a complete cascade? Complete cascade is when every node in this network turns red, this red idea is adopted by all the nodes in this network, we call it a complete cascade. There will be modelling; we will be modelling it in screen cast 1 sorry. So, what we will be doing in screen cast 1 is we will take a network where everyone has adopted an old idea and then, a new idea comes which is having some payoff which is; obviously, greater than the payoff of the old idea, but still on a lower side. And, we see that with this payoff this new idea is unable to cascade on this network. It is unable to cause a complete cascade on this network. But as we keep increasing the pay off associated with this new idea finally, it creates a complete cascade. We will be looking at it in screen cast 1. So, screen cast 1 is associated with the first idea, you increase the pay off associated with this new idea.
+
+[p.57] (Refer Slide Time: 04:40)
+
+What is the second idea? What was the second idea that we discussed? The second idea was about choosing the right people. So, maybe if you start with this node here you are unable to create a complete cascade or if you start with this node here you are unable to create a complete cascade. But if you start from this node here which is very well connected to rest of the network you might end up creating a complete cascade. So, if you start with some nodes in this network, the cascade does not occur. If you start with some other nodes in this network the cascade might occur. And, I am quite sure you remember this we talked about this bike example. If you want a new buy it should not be your mother here or your siblings here which you should be convincing, it should be your father. So, this thing we will be discussing in screen cast 2 where we will again all do almost the same thing. We will have this network which on which every person has adopted an old idea and then, this new idea comes and now, we will keep the payoff associated with this new idea to be same. We are not going to change the pay off, but we are going to change the people from where this cascade starts and which show that if you start from some bunch of people, it is unable to create a complete cascade, but if you start from some other bunch of people it is able to create a cascade. So, we will be talking about it in screen cast 2.
+
+[p.58] (Refer Slide Time: 06:05)
+
+Screen cast 3: this cute idea of the effect of community on cascades. We have looked at community drapes cascades. So, here if there are 2 communities and this idea originates here; it cascades, cascades and this entire community has adopted this idea, but it is difficult for this idea to come and defuse to this community. So, one community remains with the old idea and other has adopted this new idea and we have looked at the reason for why it happens. So, we will be coding it in screen cast 3 where we will take a network having 2 communities and we will start our cascade from one community and we will see that it infects everybody in this community, but this unable to reach out to this another community.
+
+[p.59] (Refer Slide Time: 06:57)
+
+In the last part, we will be implementing the theorem we talked about. So, the theorem was, the statement was, if there is a cluster of density greater than 1 - q a complete cascade is not possible. So, many technical words here; I suggest that you go back and quickly watch what do I mean by cluster density 1 - q here. I will quickly recap it here. So, we say that there are clusters in every network and we say that a cluster is of density p, if for every node in the cluster, each and every node in this cluster has at least p fraction of their friends in the same cluster then, we call it a cluster of density p. And q here is a threshold associated with the new idea which means that, if q of my friends, q fraction of my friends or greater than q fraction of my friends adopt a particular idea, adopt this new idea, I will also adopt this new idea. So, the theorem said that if there is a cluster of density greater than 1 - q in this network then, your idea cannot defuse inside this cluster here. So, here is a cluster of density greater than 1 - q and your cascade starts from here. Even if your cascade infects all these nodes in this network, all the nodes in this network, we will see that it is unable to defuse inside this cluster. And, we have talked about the proof of this theorem in the chapter, but here we will be coding it and validating it with the help of a code. So, this will be our screen cast 4.
+
+=== LECTURE 96: The Base Code (Week 7, transcript PDF page 60) ===
+
+[p.60] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Cascading Behaviour in Networks Lecture - 96 The Base Code
+
+(Refer Slide Time: 00:05)
+
+So, we have a file here. So, I am using this file base code.py for the very first code. What we are first going to do if as and always import networkx as nx since we want to work on graphs. Next what we need is an underline network. So, for implementing anything how is action a diffusing on this network or action b diffusing on this network, how is the cascade going. So, for everything I need an underline graph. And I am going to take this underline graph as an Erdos-Renyi graph as a random graph. So, I make here Erdos-Renyi graph G = nx.erdos_renyi_graph and then I want this graph to have 10 nodes. So, first parameter is the number of nodes which is 10 and the second parameter is the probability with which an edge is represent, which is 0.5 And what I will also do is I want to use the same graph for some reasons I want to use the same underline graph for the coming up codes.
+
+[p.61] So, what I am going to do is, I will do G, I am going to store this graph as a gml file, so I use nx.write_gml and I write this graph G as random graph.gml random_graph.gml And we will be using this graph further let us just execute it.
+
+(Refer Slide Time: 01:43)
+
+(Refer Slide Time: 01:50)
+
+So, we have executed it and you can see that here we have these graph random_graph.gml. So, now, on we are using only this graph random_graph.gml ok.
+
+[p.62] (Refer Slide Time: 02:01)
+
+So, I have remove the other statements from this code we have already run it once. So, we have that graph, random_graph stored in our system. So, first I will load that graph. So, what I do is G = nx.read_gml and then I have the graph here, random_graph.gml, I have this graph here. Next what we want to do is, we want to implement the concept that initially every node in this network is having an action B associated with it and then the action A is introduced. How do you introduce action A is, by some nodes in this network flipping their status from B to A. So, implementing that is quite easy. We can implement it with the help of attributes associated with the nodes. So, initially what we will do is every node will have an attribute action and the value of this attribute action for every node will be equal to B So, we call a function for that is set_all_B (G); which mean that in your graph G for all the nodes set its action to be equals to B and then we can quickly define this function here. Define set_all_B (G) and how do we define it now we get an iterator for each in G.nodes for each in G.nodes what we have to do is set the attribute action associated with this node to be equal to B. So, what do we do is G.node each and then what is the action associated with this node it is equal to B. So, all the nodes in this network currently has this action B. Next what I want to do is I will pick some 2 nodes from this network and for those 2 nodes I want to set the action associated with them to be A. So, how do I do that? One way to do that is I will take a
+
+[p.63] list here and this list here consists of some 2 nodes. So, let us say 3 and 7 So, I want these 2 nodes 3 and 7 in this network to be the nodes which initially adopt action A. So, I want to change the attributes corresponding to these nodes, so what do I call is set_A (G, list1). So, whatever is there in list1, what all nodes are there in list1? I want to set their attribute to be equals to A. And that is again quiet simple define set_A and then I have a G here and I have a list1 here and what do I do is for each in G.node each action and what is this action is going to be is A.
+
+(Refer Slide Time: 05:23)
+
+So, I have a graph here in which all the nodes have adopted the action B except these 2 nodes which are the initial adopters 3 and 7 which are the initial adopters and I have adopted this action A and next I want to visualise this graph. So, visualising this graph is easy and let us visualise it with colours. So, we have done it previously as well. So, let us associate it a colour red with the action B and the colour green with the action A. So, initially all the nodes in this network will be red and this green behaviour will be coming and trying to spread on this network. So, for that I will need an array colour. So, let me get this array from the function get colours G and then this is simple.
+
+[p.64] So, I have a function here define colours G and what this function is going to do is I have a list here and for each in G.nodes what we are going to do is if G.node each and if the action associated with this particular node is B, which means that it should have a it should have a red colour. So, list1.append (‘red’) else list1.append (‘green’).
+
+(Refer Slide Time: 07:15)
+
+And then return list1, so, we have an array of colours here. Let us quickly visualise this graph. So, for visualise this visualising this graph we have. So, first of all we need to import the matplotlib; import matplotlib.pyplot as plt then come down then what we do is nx.draw (G) and what should be the node colour; node colour should be taken from the array colours and what should be the node size? Let us see the size of every node to be 800, so that it is be and then we do plt.show. Let us now turn this piece of code and see. A small mistake in line 15 which should be equals to equals to go back run it ok.
+
+[p.65] (Refer Slide Time: 08:18)
+
+So, you can see here there is a network and in this network initially all the nodes they were green they had adopted this behaviour B and then there are these two nodes three and seven which have been initially decided to adopt the behaviour A.
+
+(Refer Slide Time: 08:39)
+
+So, we have the graph here. Next what we want to do is if we look at this graph here you see what is going to, you see what is going to happen next this nodes 7 and 3 each node here from 0 to 9 we will look at their neighbours, we will look at their neighbours and
+
+[p.66] look at the action their neighbours are taking the payoffs and according to that re way their option; for example, this node 2 here looks at all of its neighbours. So, first it looks at it, look at its neighbours who have adopted action B. So, it looks at 1, 8, 0 and 5, so 4 nodes and then let us say the payoff associated with the action B is let us say 2, so 4 into 2 8. 8 is the payoff it gets from here and then it looks at these 2 nodes 7 and 3 and then let us say the payoff associated with this action A is 3. So, gets a payoff of 6 from here. So, it decides to remain in this state B only. And similarly, every node is going to re way this option and according to that the cascade is going to occur is this network. So, let us try to code that. So, what is now going to happen is every node is going to re way its options based on its neighbours, based on their actions and based on the payoffs of those actions as we have seen before. So, we are going to define a function now recalculate options. So, this function recalculate options will one by one look at every node in the network, look at re way its options and it will put the next it will put the decision of this node in a dictionary. So, we get a dictionary here action dictionary. So, what is this action dictionary? It is a dictionary where keys are the nodes and the values are the actions associated with these nodes. And these dictionaries we format from the function recalculate options in G.
+
+(Refer Slide Time: 10:55)
+
+[p.67] Let us see how it works. So, we define the function here recalculate options in G and we have a dictionary here let us name it dict1, this is the dictionary which will hold the decision for every node. Now, before moving in further we need to decide the playoffs associated with the action. So, let us say Payoff associated with the action A. So, let us call it small a and let us take its value to be 4 and then we have a Payoff associated with B let us say b and let us say value to be equal to 3. So, based on these payoffs so, a = 4 and b = 3, these are the payoffs associated with the 2 actions. Now for each in G.nodes, but this node is going to do is. First of all, this node needs to know how many of its neighbours have adopted the action A, how many of neighbours its neighbours have adopted the action B. So, let us say number of neighbours who have adopted the action A equals to and we call a function here find neighbours and we pass 2 parameters to this function c and G. So, c is basically c we pass it A and G. So, A is the action which we want to see how many of its neighbours have adopted this action A and G and we want to pass this node also, so each A and G. So, let us now define this function.
+
+(Refer Slide Time: 12:58)
+
+Define and instead of A, we have a character here. So, what this function is going to return in the graph G, the node each we are going to look at the neighbours of the node each and we are going to see how many of these neighbours have adopted this action c.
+
+[p.68] So, what do we do it is simple we take num to be equal to 0 and then for each I am sorry for each one in G.neighbours G.neighbours each if G.node each one and the action associated with this node is c. Then what we will do is num = num + 1 and then we return this number simple right. So, we have this num_A and similarly we can find how many of its neighbours have adopted B. So, find_neigh each and then we have this B and then we have this G right. Next what is the total payoff this node gets from adopting the behaviour A. It is nothing, but the payoff associated with this behaviour which is A multiplied by the number of its neighbours which have adopted this behaviour A and similarly what is the payoff it gets from adopting the behaviour B is nothing, but b multiplied by the number of neighbours which have adopted B. Now this node decides can easily decide whether it wants to adopt the behaviour A, or it wants to adopt the behaviour B. So, we know that if payoff associated with A is greater than or equal to pay off with B, what is going to happen is dict1 for this node which is each is going to be A, it is going to adopt A else dict1 with each is going to be B and then we return dict1.
+
+(Refer Slide Time: 15:29)
+
+So, we get here this action dictionary which tells me what the decision for the next snapshot is that the node makes. So, you see here this action dictionary it is nothing, but it tells me a next snapshot of the graph. It tells me in the next a snapshot in the next
+
+[p.69] iteration in this process what action every node would have adopted. And now we simply need to draw this graph. So, we have this snapshot stored in action dictionary. So, we want the for the next snapshot we change the attribute associated with the associated with each node based on this action dictionary. So, we do reset node attributes in G and which is based on your action dictionary right action dictionary.
+
+(Refer Slide Time: 16:25)
+
+We define it here define reset node attributes and what are the parameters G and action dictionary let us say G and action dictionary would we are going to do here if it is simple. So, for each in action dictionary for each for every key in action dictionary G.node each action, what is it going to be the value associated with that which is action dictionary each is the action. So, we have reset the node attributes here. So, our graph is ready, and we just have to visualise this graph and what do we need for visualise, we need to set the right colours of nodes and we need to draw this graph. Just simply copy and paste this node here; let us now execute it and see.
+
+[p.70] (Refer Slide Time: 17:31)
+
+So, you can see here this is the initial graph where our nodes 7 and 3 they have adopted the behaviour A and just small mistake in the spelling of neighbours ok.
+
+(Refer Slide Time: 18:02)
+
+So, this is the initial graph where these nodes 7 and 3 they were they have adopted the behaviour A and you see what happened in next iteration.
+
+[p.71] (Refer Slide Time: 18:08)
+
+Everybody reviewed their option and these node 2 nodes initially 3 and 7 which had adopt which had decided to adopt this behaviour A, they also backed off and they went back to this behaviour B. We have seen that although the payoff associated with A was high it was 4 and with B was 3, but everybody has switched back to the same condition of having adopted the behaviour B right. So, it validates that it is a actually difficult for any new behaviour or action to cascade on a network. Now, in the next screen cast will see that how as we keep increasing the payoff associated with this action A, a graph ultimately the cascading in a graph is the cascading of action A in the graph is more and rather it can create a complete cascade also.
+
+=== LECTURE 97: Coding the First Big Idea - Increasing the Payoff (Week 7, transcript PDF page 72) ===
+
+[p.72] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Cascading Behaviour in Networks Lecture - 97 Coding the First Big Idea - Increasing the Payoff
+
+(Refer Slide Time: 00:05)
+
+So, now let us experiment with this code a little bit. Everything is ready now.
+
+(Refer Slide Time: 00:11)
+
+[p.73] So, we have a system where we can define, who are the initial adopters of the action a and then, we can run an run the code and see how this action a is cascading in the network whether it dies away, or whether it persist in the network or what happens. So, for the time being what I am going to do is, I am going to set the initial adopters to be 0 and 1 in the network and I am actually, also going to change our payoffs associated with a and b.
+
+(Refer Slide Time: 00:34)
+
+So, let me keep the payoffs associated with a = 6 and with b = 5.
+
+(Refer Slide Time: 00:46)
+
+[p.74] And let us execute this code and see what is going to happen.
+
+(Refer Slide Time: 00:47)
+
+So, initially 0 and 1 in this network I have adopted the idea and then, you see it dies away. So, seems like the payoff 6 is not enough for this action a to cascade on this network right. So, what I am going to do is, I am going to increase the payoff and I am going to keep this payoff of to be 7. Let us see what happens now.
+
+(Refer Slide Time: 01:10)
+
+So, when I keep this payoff of to be 7 initially, 1 and 0 and then again, it dies away. So, the payoff 7 is also not working. Let us make it 8. I am make it 8 and then we have 0 and
+
+[p.75] 1, in 8 also it dies away ok. Let us make it 9 dies away. And let us make it 10 and then you see when I make it 10.
+
+(Refer Slide Time: 01:43)
+
+Now, although 0 and 1 they have adopted the behaviour b now, but these three nodes 2, 3 and 7, they have adopted the behaviour a. So, the behaviour is persisting.
+
+(Refer Slide Time: 02:01)
+
+Let us see in the next iteration. In the next iteration now, 0 and 1 also get back the behaviour a. So, now, you can see this behaviour a cascading on this network.
+
+[p.76] (Refer Slide Time: 02:10)
+
+And then you see some more nodes adopt the behaviour a.
+
+(Refer Slide Time: 02:14)
+
+And then finally, all the nodes adopt this behaviour a and the process ends. So, have you seen just now what happened? The, we have started with a payoff 6. So, when the payoff was 6 nothing happened 7, 8, 9, the behaviour ultimately died away, but when you made its payoff to be equal to 10, everybody in this network adopted the behaviour a. Let us try it something else also. So, let us make it 6 and 5.
+
+[p.77] (Refer Slide Time: 02:42)
+
+And let us change my initial adopters to be let us say 4 and 1 and let us see what happens now. 4 and 1 and then, 6 and then, dies away ok. Let us increase the payoff to let us say 8, 4 and 1, 6, dies away and say 9, 4 and 1 and 6 and then, dies away and then 10 ok.
+
+(Refer Slide Time: 03:06)
+
+Do you see here what is happening now in this case?
+
+[p.78] (Refer Slide Time: 03:36)
+
+So, this was what I wanted to show you. In some situations what can happen, you see 7, 6 and then, 7 and 6 in fact 4. And then, 4 in fact 7 and 6 and then, 4 and then, this and this, and this, code goes into an infinite loop. And it is going to run 100 times. It is going to run 100 times ok.
+
+(Refer Slide Time: 04:09)
+
+So, what I want to do is instead, of seeing this code to run for 100 times, I actually want to know just a simple thing. I want to know whether my cascade is complete or not.
+
+[p.79] What do I mean by my cascade is complete is, everything at the end has adopted this behaviour which is behaviour a shown in green colour or not? So, that is my only aim. So, I do not need, I do not want to see these intermediary graphs. So, I just want to see my graph once at the starting, once at the end and in addition I want to know whether my cascade is complete or not. So, we can quickly see whether my cascade is complete or not. So, we call a function c here sorry, variable c here which holds the value is my cascade complete or not; is complete cascade. So, whether this cascade which has occurred on my graph it is complete or not? And how do we know it is complete?
+
+(Refer Slide Time: 05:21)
+
+So, you see, we have used this function here, terminate 1(‘A’, G). So, this function it used to return 1. When everything in this graph has adopted the behaviour a, so, instead of using a new function, we can use the same function.
+
+[p.80] (Refer Slide Time: 05:35)
+
+So, we can use this function terminate 1(‘A’, G), which tells me whether all the nodes in my graph has adopted the behaviour a or not right.
+
+(Refer Slide Time: 05:40)
+
+What I will do is, c = terminate 1(‘A’, G) and what I want to see is, I want to print. So, if your c == 1 then, you print cascade is complete else you print cascade is incomplete. Let us run it and see now; idea1.py.
+
+[p.81] (Refer Slide Time: 06:24)
+
+And then, this is the initial graph where 4 and 1 are infecting.
+
+(Refer Slide Time: 06:29)
+
+And this keeps running. So, it shows a result at the end after 100 iterations and it shows you that the cascade is incomplete. So, this is the only result we are interested in and we need not see all the intermediate cascades. We have just introduce this here because, we will be using it in the coming up programming screen casts.
+
+[p.82] (Refer Slide Time: 06:50)
+
+Let us get started with the first idea where we must increase the payoff and see what happen. Well basically, take this code and I will just paste it in another file.
+
+(Refer Slide Time: 06:57)
+
+ And let me name this atom, let me name it as idea1.or idea1.py ok.
+
+[p.83] (Refer Slide Time: 07:15)
+
+Now, one thing here, you see here currently we are running this process manually. So, this our initial graph right, nx.draw where we set 2 nodes to have, where we set this 2 nodes 3 and 7 to have this initial, to have this behaviour a and then, we draw this graph and then we recalculate the options and then we again draw the graph. So, let us automate this process. So, what we will do if we can put this thing inside a loop right. This complete thing can be put inside a loop. So, what will happen if I put it inside a loop? So, while 1, while 1, I just keep repeating this thing. So, every time my, so, this process is now become iterative. So, we start with some initial configuration and then every node recalculates its options and then it keeps drawing the graph again and again. So, I will just quickly show you.
+
+[p.84] (Refer Slide Time: 08:24)
+
+(Refer Slide Time: 08:26)
+
+So, if I implement this here, python idea1.py, so you see what? So, this is our initial graph and then you see it will keep drawing it again, and again, and again right. Now, we can see how the cascade is growing in the network. So, currently the cascade dies at the first step itself. So, we are unable to see anything ok.
+
+[p.85] (Refer Slide Time: 08:54)
+
+So what will do is, we want to put a terminating condition here. When should my code terminate? So, for that when should my code terminate? When should this process end? So, the process should end when a complete cascade occurs whether for the behaviour a or b. So, if everything has adopted the behaviour b, behaviour a die away and if everything, every node adopts behaviour a, behaviour b dies away. So, in both of these conditions the process should come to an end; however, there is one more condition where it does not converge to either a, or b. The node keeps flipping. So, it might be, so, it goes into an infinite loop. So, what do we do for that condition is we keep a maximum iteration limit for 100? So, we do not want to see this process beyond 100 iterations. 100 is actually a big number. So, we put a terminating condition here. First of all, we take a variable flag here, flag = 0. In while 1, we recalculate this flag. It will call a function terminate G which will decide whether we terminate or not. And if our flag == 1 then we break. So, this function terminate it runs some code and if the process has to be terminated, it should set flag = 1. Let us also take a variable count here, count equals to 0 and we pass count also here. And count should increase every time ok.
+
+[p.86] (Refer Slide Time: 10:55)
+
+So, let us now define this function terminate (G, count), define terminate (G, count). What is this function going to do is, if all the nodes have adopted the behaviour a or adopted the behaviour b, we terminate it? So, we take further two values flag 1, flag 1 is terminate_1, a new function and it checks whether, so, flag 1 is going to check whether all the nodes in this network have adopted the behaviour a. All the nodes in this behaviour in this network have adopted the behaviour a and it is actually easy to check. So, we define terminate_1 here and here we have A sorry, here we have a character c and the graph G. So, what we are going to do is, we take again indicator variable flag. What we do is for each in G.nodes, for everyone should have one behaviour c. So, as soon as we find a node, if G.node each; as soon as we find a node whose action is not equal to c, but something else. It means that all the nodes in this network does not have this behaviour. We set f equals to 0 and we break. And we return f here. So, you see f is going to return a 1 only if all the nodes in this network have this behaviour character c. So, flag 1 tells me whether all the nodes in this network have this behaviour a and similarly, flag 2 tells me whether all the nodes in this network have this behaviour b. These are 2 conditions and then, we have a count also. So, count should be less than 100. So, what do we do is if your, so, we have 3 conditions?
+
+[p.87] If our flag 1 is 1 or our flag 2 is 1 or our count value is greater than 100. Now either greater than or equals to 100, what do we do is we return 1 that, you should terminate else we return 0 ok.
+
+(Refer Slide Time: 13:50)
+
+And now also ok so, first let us execute and see what is happening.
+
+(Refer Slide Time: 14:12)
+
+So, we execute it. So, we have this network where initially 7 and 3 have adopted the idea and then, this idea goes away. And you see what happened: 7 and 3 are infected and then this idea goes away. Everybody here has adopted b. So, the process stops.
+
+=== LECTURE 98: Coding the Second Big Idea - Key People (Week 7, transcript PDF page 88) ===
+
+[p.88] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Cascading Behavior in Networks
+
+Lecture – 98 Coding the Second Big Idea – Key People
+
+(Refer Slide Time: 00:05)
+
+So, now we are going to implement the second idea. What was the second idea? In the first idea we looked that increasing the payoff associated with this new action or this new behaviour can cause a complete cascade. In a second idea, we want to talk about key people right. We, are going to keep the payoff associated with a particular action same, but what we are interested in? What we are interested in looking at is, we will take this network again and we see that when we start with some particular bunch of nodes it creates a complete cascade, but we start from some other bunch of nodes, they are not able to create a complete cascade. It means that different nodes in this network have different power to create your cascade and these bunch of people which if chosen, creates your complete cascade they are known as the key people. Again, I would like to remind you about digital marketing in choosing the right set of people to popularize your idea. So, what we are going to do in the second screen cast is,
+
+[p.89] we are going to take a network and then we are going to choose different sets of initial adopters and will look at why certain sets are able to create a complete cascade, other sets are unable to create a complete cascade. So, I will take this same code and I will put it in a different file idea2.p y ok.
+
+(Refer Slide Time: 01:36)
+
+So, now what we do is, first I change my payoff let us say the payoff associated with a is 9 and with b is 5.
+
+(Refer Slide Time: 01:49)
+
+[p.90] What we want to do is, I am going to take 2 initial adopters. So, these 2 initial adopters can be any 2 nodes in the networks. So, for every possible set of 2 nodes in the network, we will start the cascade from there and we check whether this node have been able to create a complete cascade or not. And we are using the same previous graph as before random_graph.gml. So, what I am going to do here is for u in G.nodes and then, for v in G.nodes, I do not want my sets to be repeated. So, if I do it for like this for v in G.nodes, v in G.nodes 1, 2 means node 1 and node 2 will come once and node 2 and node 1 will come once, rather node 1 and here again it will choose 1 again. I do not want such kind of repetitions. So, I put a loop here node loop condition here. If u < v only then, it is what I am doing will be considered. So, if u is less than v now, I create my list 1. So, for every possible values of u and v what I do is, I append both values in my list, list.append(u) and then, list 1.append v. So, what is happening here? Now list 1 consists of my initial set, initial set of adopters. So, this loop condition will both view and take each set of 2 nodes in my network and after taking each and every set of 2 nodes in the network, we can see whether my cascade was complete or not. While I just shift everything inside these loops ok. I do not want to draw my graphs here because there will be so many sets and we cannot see the graph for each and every set.
+
+(Refer Slide Time: 04:08)
+
+[p.91] It will be a time-consuming process. We just want to see whether the cascade is complete or not.
+
+(Refer Slide Time: 04:27)
+
+And here also we do not want to draw this graph ok.
+
+(Refer Slide Time: 04:49)
+
+And also, what I do is, I print the values of u and v here. So, that I know what is happening, for which nodes we are getting the particular result ok. So, what this piece of code is doing? Let me quickly show you.
+
+[p.92] (Refer Slide Time: 05:04)
+
+So, we have a network here random_graph.gml. For every possible set of 2 nodes we take them as the initial adopters in list1. We start the cascade from these 2 nodes, and we see at and whether the, it these 2 nodes the result in a complete cascade or not. So, it is a simple code.
+
+(Refer Slide Time: 05:22)
+
+Let us run it here now ok. So, let us see this is the results so for all possible set of nodes. You see here for most of the sets the cascade remains incomplete. But there are few sets here. Like 0 2 and then, 0 9 and then 1 here 2 9.
+
+[p.93] (Refer Slide Time: 05:45)
+
+So, only these 3 sets they result in a complete cascade. All the other sets they result in an incomplete cascade. This shows us this that yes, there are certain key people, certain key nodes in this network and if you start your cascade from there. It tends to become a complete cascade. Proving our second idea that yes, there are key people in this network.
+
+=== LECTURE 99: Coding the Third Big Idea - Impact of Communities on Cascades (Week 7, transcript PDF page 94) ===
+
+[p.94] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Cascading Behavior in Networks Lecture - 99 Coding the Third Big Idea- Impact of Communities on Cascades
+
+(Refer Slide Time: 00:05)
+
+Now, we are going to talk about the third idea which is very cute which says that if you have many communities in your network. So, for the sake of simplicity, we will take two communities and we show that if our cascade starts from one community; then it actually even if it gets into this entire community, it is difficult for this cascade to get into another community. So, we will be coding and now we will be looking at this aspect.
+
+[p.95] (Refer Slide Time: 00:31)
+
+So, for implementing this, we need a graph which consist of two communities: two dense communities. So, what will we do? What will we do? We will create an artificial graph which will be consisting of two communities. How do we create this artificial graph is we will create a graph having 20 nodes? So, first 10 nodes will be connected to each other and second 10 nodes means nodes 0 to 9 will be connected to each other and node 10 to 19 will be connected to each other and there will be just one link between these two communities. Let us just quickly do it. So, I will just import networkx as nx and I will also need the random functions. So, a import random as well.
+
+[p.96] (Refer Slide Time: 01:24)
+
+Let me save this as this file as create community graph.py ok. So, I import it random and then what I will do is I create a graph G = nx.graph. After this I create the first community in this graph. So, I call the function create first community and what does this function do is, it just creates a random links between the people I will just show you. So, define, create, first community and we pass the graph here first community G and what you do here is ok. So, first I add 10 nodes in this community and no edge is. So, for i in range 0 to 10, what do I do is G.add_node(i). So, I have added 10 nodes in this graph, next I want to add some links. So, how do I add some links? For as we know these are 10 nodes and there are 10 chose to possible edges between these nodes. So, I will take every edge and I will put every edge with the probability of 0.5. So, I am doing exactly what happens in an Erdos-Renyi graph, but I am just coding it manually. So, for i in range 0 to 0 so, I will put first iterator over all of these nodes and then for j in range 0 to 10, I put a second iterator here and again to avoid duplication and the same number if i < j so, that I get every pair only once. What do I do? I will want to put an edge here with the probability of 0.5 and I am quite sure that you know what I am going to do next because we have seen it previously. We have coded it also previously. If I want to do some event with a probability, I create a random number; random uniform number real number from 0 to 1. So, I will get a real
+
+[p.97] number from 0 to 1. r = random.uniform, random.uniform (0, 1) and then if r is less than 0.5. What I do is G.add_edge form i to j. So, I have added every possible edge between these 10 nodes with the probability of 0.5. So, this is my first community. Similarly, I will create my second community. Create second community and I am sure that you know that the code is going to be same except for the numbering of nodes.
+
+(Refer Slide Time: 04:45)
+
+So, we can just copy paste this code here and what I can do is I know that my nodes are now going to run from 11 to 20 right. So, from 11 to 20 and here also 11 to 20 and here also 11 to 20, everything is done. So, 10 nodes I created here in the; similar way 10 nodes, I created here and between these 10 nodes. I will again put an edge with the probability of 0.5.
+
+[p.98] (Refer Slide Time: 05:11)
+
+So, what am I going to have now in my network, there will be two separate communities, or you can say two components in this graph? So, what currently we have made is a disconnected graph. I can also actually show you this graph. So, let me show you this graph nx.draw (G), then we have a plt.show right and let us run.
+
+(Refer Slide Time: 05:48)
+
+It create community graph.
+
+[p.99] (Refer Slide Time: 05:52)
+
+I am just create.
+
+(Refer Slide Time: 06:01)
+
+We forgot to change the name of function here. So, it is create second community. So, you can see this graph here right. We have one community here having which is random graph with the 10 nodes and 0.5 probability and one community here. Now, these are components we cannot say these are communities also, but they are components; we want a connected graph. So, what I am going to put next is I am going
+
+[p.100] to put just one edge between these two communities. So, that the communities in my graph are very well defined; I put only 1 edge.
+
+(Refer Slide Time: 06:42)
+
+So, I what do I do is G.add_edge and I add an edge. Student: (Refer Time: 06:48). Let us say from node 5 to 15. So, let us run it. So, you can see here now this is my graph having two communities. We are going to work with this graph for a third idea, for the implementation of the third idea. What I will do is, I store this graph nx.write_gml and I store this graph as let me name it as random graph with community. So, random graph community.sorry.gml write_gml; I run it.
+
+[p.101] (Refer Slide Time: 07:41)
+
+So, you can see a graph here random graph community.gml ok. So, now, we are ready to see. So, we have a graph with community, and we are ready to see the impact of cascading on such a network.
+
+(Refer Slide Time: 08:04)
+
+So, I will actually take my code from here and. Take my code from here and let us save it here. We will do all the changes here. Let us call it idea 3.py.
+
+[p.102] (Refer Slide Time: 08:13)
+
+So, first of all which is the graph we are going to work with this random underscore graph underscore community one thing and then let us change the payoffs little bit or let us keep it the say.
+
+(Refer Slide Time: 08:26)
+
+So, let the payoffs be 10 and 5 and let my starting nodes be 0 and 1.
+
+[p.103] (Refer Slide Time: 08:36)
+
+And what I am interested in is looking at how will this cascade going to occur.
+
+(Refer Slide Time: 08:42)
+
+And let me look at this in every step.
+
+[p.104] (Refer Slide Time: 08:48)
+
+I want to see the graph at every step. So, you can see I will just show you the code. It is the same code which we have written previously.
+
+(Refer Slide Time: 08:58)
+
+So, here we load a graph. Here we set all the nodes to have the action B, here we choose the initial adopters. We set the initial adopters, we draw the graph.
+
+[p.105] (Refer Slide Time: 09:09)
+
+Next, this is just a while loop in which are process runs again and again. Terminating condition, as we have discussed before action dictionary, we calculate the next snapshot and then we upload the next snapshot exactly what we want to do.
+
+(Refer Slide Time: 09:25)
+
+So, we just the code is very simple, we just have to run this code and see what happens. So, let us implement it let us execute it python idea 3.py ok.
+
+[p.106] (Refer Slide Time: 09:37)
+
+So, this is your initial graph and the nodes 0 and 1 are infected here.
+
+(Refer Slide Time: 09:44)
+
+I have adopted the idea and then you can see that 0 and 1 have adopted back the behavior B, but these other four nodes in this community have adopted this behavior A.
+
+[p.107] (Refer Slide Time: 09:56)
+
+And then you see more nodes have adopted this behavior A and this one node in this community have also adopted this behavior A and then you can see that most of the nodes in this first community where the cascade started have adopted the behavior A.
+
+(Refer Slide Time: 10:12)
+
+And then you see, one community has completely adopted the behavior A while in other communities still everybody has adopted just the behavior B. And you can keep running it again and again and you can see that this behavior you not passing on to the other
+
+[p.108] community. It remains struck to this first community only. We can see that this cascade it keeps strapped in the first community itself. So, this graph is not going to change, it will just keep running for hundred iterations like this and your cascade has actually come to an end. So, if you remember during the lecture we discussed that there is this, there are three stability conditions: first is everybody in this network adopts A, second is everybody in this network adopts B and third is some nodes in this network adopt a while others adopt B. So, you can see that is the third condition here. Some nodes in this network have adopted A, other nodes in this network have adopted B and then we have looked at what should the network look like for the third condition to happen and that was the presence of communities and that is exactly what is happening here. Here are two communities one community has adopted one behavior and the second community has adopted a different behavior.
+
+=== LECTURE 100: Coding the Fourth Big Idea - Cascades and Clusters (Week 7, transcript PDF page 109) ===
+
+[p.109] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Cascading Behavior in Networks Lecture - 100 Coding the Fourth Big Idea – Cascades and Clusters
+
+(Refer Slide Time: 00:05)
+
+Let us now move on to the last programming screen cast where we are going to validate this theorem experimentally that if there is a cluster of density greater than 1 - q in your network, then you can never achieve a complete cascade. What we are going to do for this? We need certain parameters.
+
+[p.110] (Refer Slide Time: 00:25)
+
+So, these are the parameters which we take. Let the payoff associated with your behavior b which was your initial behavior on the network is 2 that the payoff associated with a new behavior which is coming up in your network b 3. So, the value of q = 2/5. So, you remember how did we calculate this q? So, you can go back and watch it the value of q is as we calculated was b/(a + b) which is 2/5 here which is 0.4. What is it mean? It means that in this network where initially everybody has adopted this behavior b and now some people have adopted is behavior a. Now every node will look at their neighbors and if 40 percent of their neighbors have adopted the behavior a that node will also adopt the behavior a is what it means. And then we are going to work with a graph. So, this is the graph we are going to work with. So, as you can see that in this network, here is a cluster and the density of this cluster is greater than 0.6. So, you can also validate it density greater than 0.6 means if you look at every node in the cluster whether it be node 7, 8, 9, 10 or 11; 60 percent of their neighbors should be inside this cluster only. So, for example, this node 8 here has how many neighbors? 1, 2, 3, 4, 5, 6; it has 6 neighbors. And out of the 6 neighbors, 4 belongs inside this community. So, 4 by 6 is 2 by 3 and inside this it is own community which means greater than 60 percent. Node 7 has all its nodes inside the same cluster, 11 has all its nodes neighbors
+
+[p.111] inside the same cluster and nodes 9 and 10 also have 60 percent of their neighbors inside this cluster. So, we are going to take this network and after taking this network, we will you experimentally validate that no matter from which ever nodes you start your cascade outside this cluster. So, your cascade should start outside this cluster will start our cascade from some set of nodes which lie outside this cluster. And then we will see that you can never achieve a complete cascade. Your cascade will not be able to impact any of these nodes number from 7 to 11. So, we now code it and see. So, for coding we are going to make this graph manually. We want to work with this graph because here we clearly know that we have this cluster. This is the set this set as a density greater than 0.6.
+
+(Refer Slide Time: 03:06)
+
+So, let us make a graph first. So, I will create a file here let say create underscore graph dot py.
+
+[p.112] (Refer Slide Time: 03:19)
+
+And you can whatever edges I am going to type here, you can actually go back and match it with the figure which we have seen with the graph which we have seen previously. So, import networkx as nx and then import random and then G = nx.graph and then I am going to put here edges and these edges are going to be absolutely the edges which where there in the figure. So, these are the edges which we have added in this graph you can go back and match it with the figure which we have been previously. So, here we are getting this graph, we have this graph. Here only in this file only we are actually going to implement a third idea.
+
+[p.113] (Refer Slide Time: 04:02)
+
+So, let us actually save it as from create graph instead we should save it as let us say idea4.py. We are going to a forth idea here. So, we have the graph which we wanted.
+
+(Refer Slide Time: 04:22)
+
+And next what we want to do is our all the functions are actually going to be the same which were here. So, I might consider copy pasting these functions here. So, just give me 1 minute. These are all the basic functions which we have implemented previously ok.
+
+[p.114] (Refer Slide Time: 04:55)
+
+And what else do we need from this first code is let us take this code also. It is going to help us, and we have this code here.
+
+(Refer Slide Time: 05:11)
+
+So, here we have this graph and we have all the necessary functions here. What we have to do now is as we decided we know that the payoff associated with this action b.
+
+[p.115] (Refer Slide Time: 05:32)
+
+Here is going to be 2 and a here is going to be 3.
+
+(Refer Slide Time: 05:41)
+
+And then so, there were how many nodes in the network? If you remember there was 0 to 12 nodes. So, total 13 nodes in the network and out of this 13 networks denotes inside our cluster were nodes from 7 to 11. So, we can start our cascade from any node from any set of nodes except the node 7 to 11. What I am going to do is there are actually a lot of possible sets from this list from 0 to 6 and then node number 12. So, how many nodes? 0 to 6; 7 plus 8; so, there are 8 nodes.
+
+[p.116] So, there are how many possible sets on in 8 nodes is 28. So, I am not actually going to take all the 2 raise to the 28 sets and show you the result. I will take some sets here and show you the result. So, I create a list here let us say list 2 and what is this list 2? This list 2 is the list of lists. So, I will having some lists here. So, this first list here is the first my set of initial adopter for the first experiment. This list is the set of initial adopters for the second experiment and I show you that for all these sets. So, there are different initial adopters. So, for all of these sets, your cascade is not complete. It is unable to hit any of the node inside the cluster. So, let us make here list let say that the first list is 0, 1, 2, 3. So, I can take any number of elements here outs any number of elements here except the elements from 7 to 11 which are inside my cluster. And let us take 0, 2, 3, 4 and let us also take sorry 1, 2, 3, and 4 and 2, 3, 4, 5. Let us take many sets 3, 4, 5, 6 4, 5, 6, 12. Let say 2, 3, 4, 12. Let us take many nodes, let us take 6 node 0, 1, 2, 3, 4, 5. It seems that if you start your cascade from so many nodes from 6 node the cascade should be complete. And rather let us take extreme case, let us take all the nodes except the nodes in the cluster 0, 1, 2, 3, 4, 5, 6 and 12. So, except all the nodes in the cluster, we are talking about I am taking all the nodes here and we see that even in this case your cascade is unable to become complete. So, now, what we are going to do for list 1 in list 2, we are going to repeat this experiment ok.
+
+(Refer Slide Time: 09:30)
+
+[p.117] So, for every possible set of initial adopters here, what will be seeing is that list and then will be seeing the final graph and then will be seen whether the cascade is complete or not. So, there is nothing much we just need to execute it and see what is happening here.
+
+(Refer Slide Time: 09:48)
+
+python idea4.py.
+
+(Refer Slide Time: 10:02)
+
+So we have to import matplotlib.pyplot as plt.
+
+[p.118] (Refer Slide Time: 10:18)
+
+So, here is a case when our initial adopter are 0, 1, 2, 3. So, this is the cluster we were talking about. So, this is a cluster having a density greater than 60 percent and you will see that in none of the cases this cascade will be able to touch this cluster.
+
+(Refer Slide Time: 10:37)
+
+So, in this case when our cascade starts from 0, 1, 2, 3, this is the final cascade 0, 1, 2 and it remains incomplete, rather outside cluster also there are a number of nodes which remain unaffected.
+
+[p.119] (Refer Slide Time: 10:47)
+
+And then we start from 0, 2, 3, 4.
+
+(Refer Slide Time: 10:50)
+
+And then, you see that cascade is incomplete rather the cascade dies away with time.
+
+[p.120] (Refer Slide Time: 10:57)
+
+And let say we start with 1, 2, 3, 4. And then again the cascade dies away with time 2, 3, 4, 5 dies away 3, 4, 5, 6 and sub having some node infected, but still it is unable to touch any of the nodes in our cluster from 7 to 11. And then let us start from 4, 5, 6, 12 when we start from 4, 5, 6, 12. So, this is the final graph and we see that the cascade remains incomplete then, we start from 2, 3, 4 and 12 and then many nodes are inserted, but again and cluster remains unaffected and then we start from almost 6 node seems like everybody should be in affected at the end, but you can still see that the cluster remains unaffected. And then this was the extreme case we were talking about. So, we start. So, these many nodes almost 1, 2, 3, 4, 5, 6, 7, 8 nodes in the graph, I have adopted the behavior a. Even then our cascade remains incomplete and our cluster remains intact the cascade is unable to enter this cluster. So, we have validated that if there is a cluster of density greater than 1 - q in the network of the cascade can never become complete.

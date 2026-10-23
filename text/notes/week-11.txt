@@ -1,0 +1,217 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 11 — The Small-World Effect
+
+Lectures 143–153 · six degrees of separation, Milgram's letters, the Watts–Strogatz model (homophily + weak ties), decentralized search and Kleinberg's magic exponent — then we build a small-world network in NetworkX.
+
+🧠 the big picture, first
+
+Take any two people on Earth — they're joined by a chain of only about **six** acquaintances. Milgram showed this in 1967 with forwarded letters ("six degrees of separation"). It feels impossible for 6-billion-plus people, but it isn't: with ~100 friends each, friends-of-friends explode as $100^{\text{hops}}$ and cover the world in ~10 steps. **Watts & Strogatz (1998)** explained the structure: most of your ties are local (homophily — a grid/ring of near neighbours), plus a few long-range weak ties. Add just a handful of long links to a ring and its diameter collapses. Even more striking, Milgram's forwarding is a **decentralized (myopic) search**: nobody sees the whole graph, yet greedily passing "toward" the target still finds a short path — and **Kleinberg** showed it works best when long links follow $1/d^{\,k}$ with $k$ = the grid's dimension ($k=2$ for a plane).
+
+### 📒 what's inside Week 11
+
+- Is the world connected? — the six-degrees question
+- Milgram's experiment & why 6 isn't crazy
+- The reason: homophily + weak ties (Watts–Strogatz)
+- Decentralized search & Kleinberg's exponent
+- Coding a small-world network
+
+LECTURE 143
+
+## Is the world connected?
+
+Ram in Delhi wants to reach Jennifer in Los Angeles
+
+## 1 The friendship graph of the world
+
+Back in 1970 (no internet), **Ram** in Delhi wants to reach **Jennifer** in Los Angeles, whom he doesn't know. He can't contact her directly, but maybe he knows someone who knows someone… who knows Jennifer. Model the whole world as a graph: nodes = people, an edge between two people if they know each other — the friendship graph of the world.
+
+Two questions follow: **(1)** Is this graph even **connected** (is there a path between any two people)? **(2)** If so, how **long** is that path on average? The surprising answers: yes, it's connected — and any two people are separated by only about six hops.
+
+📖 the chain
+Ram → Mike (London) → Peter (Boston, originally from LA) → Monica (LA, Jennifer's friend) → Jennifer. Nobody knew Jennifer directly, yet each person forwarded to someone likely closer to her — and a short chain appeared. That "few hops" number, observed across the whole world, is the small-world effect.
+
+- What two questions define the "small-world" problem in graph terms?
+(1) Is the world's friendship graph **connected** (a path between any two people)? (2) If so, what is the average **distance** (number of hops) between two people?
+
+LECTURE 144
+
+## Milgram's experiment & why 6 isn't crazy
+
+forwarded letters, and exponential reach
+
+## 2 Six degrees of separation
+
+In **1967**, Milgram ran the actual experiment. He gave a letter to a random person $P_1$, who had to get it to a random target $P_2$ (whose address was written on it) — but **not by mailing it directly**. $P_1$ had to hand it to an acquaintance they thought was closer to $P_2$; that person did the same, and so on. Surprisingly, most letters arrived — in about **six steps on average**. Published in Psychology Today, this became six degrees of separation.
+
+🤔 counterintuitive… at first
+Over 6 billion people, yet only 6 hops apart? That sounds impossible — one number is huge, the other tiny. The world is **big** (billions of people) but **small** (six people connect any two).
+
+✍️ why 6 is actually reasonable (exponential reach, lecture 144)
+- Say you have **100** friends (level 1).
+- Each of them has 100 friends → level 2 has $100^2 = 10{,}000$.
+- Level 3 has $100^3$, … level $i$ has $100^{\,i}$.
+- By level 10 that's $100^{10}$ — far more than the world's population. $$ \boxed{\text{friends-of-friends grow exponentially — 10 hops blankets the planet}} $$
+
+So a small hop-count reaching everyone is not paradoxical — exponential growth exhausts billions in a single-digit number of levels.
+
+- What was the rule Milgram's participants had to follow, and what did he find?
+Forward the letter only to a personal acquaintance you believe is closer to the target (never mail it directly). Most letters reached the target in about **6** hops on average — "six degrees of separation."
+
+- Why isn't "6 hops among billions" a contradiction?
+Because reach grows exponentially: with 100 friends each, level $i$ has $100^i$ people, so ~10 levels already exceed the world population. Short chains can still cover everyone.
+
+LECTURES 145–146
+
+## The reason: homophily + weak ties
+
+the Watts–Strogatz model — a lattice with a few long links
+
+## 3 A grid, rewired
+
+In **1998**, Watts and Strogatz redid the experiment on email networks and gave the reason. Two ingredients we've already met:
+
+📖 the two ingredients
+- Homophily — you mostly befriend people **near** you (same locality, school, club). Picture people on a **grid/ring**, each linked to close neighbours.
+- Weak ties — a few of your friends are **far away** (another city, country, continent). These long-range links are the shortcuts.
+
+Most of your edges stay inside your "territory" (homophily); a couple jump outside it (weak ties). Those couple of long jumps are what make the world small.
+
+#### ring lattice + weak-tie shortcuts
+
+grey ring = local (homophily) ties; coral chords = a few long-range weak ties.
+
+⚙️ the Watts–Strogatz generative model
+- Put all nodes on a **cycle (ring)**; connect each to its nearest few neighbours (a lattice) — pure homophily.
+- Randomly rewire a small fraction (say ~1%) of edges: pick an edge, remove it, and reconnect it to a random node — creating a long-range "teleportation" shortcut.
+
+The result has the small-world property: high local clustering and tiny distances between any two nodes. Nobody literally "rewires" in real life — it just captures the fact that each of us has a couple of far-away friends.
+
+- What two ingredients did Watts & Strogatz identify, and which one creates the shortcuts?
+**Homophily** (mostly local, near-neighbour ties) and **weak ties** (a few long-range links). The weak ties are the shortcuts that shrink distances.
+
+- Describe the Watts–Strogatz generative model in one line.
+Start from a ring lattice (each node linked to nearby neighbours), then randomly rewire a small fraction of edges into long-range links — yielding short paths plus high clustering.
+
+LECTURES 147–149
+
+## Decentralized search & Kleinberg's exponent
+
+finding a short path with only local knowledge
+
+## 4 Search with no map
+
+The most fascinating part of Milgram's experiment isn't that a short path exists — it's that people **found** it without a map. Each holder of the letter knows only their own friends, not the global graph, yet by passing it to whoever seems "closest" to the target, the letter arrives. That's a decentralized search — no central authority, just local decisions.
+
+📖 what makes it remarkable
+- It's a **search algorithm** running on the friendship graph.
+- It's **local (greedy)**: each person only forwards to their best-looking neighbour — no one has the global picture.
+- Yet the collective, cooperative effort delivers the letter in ~6 hops. (Because it's short-sighted, it's also called **myopic search** — coded next week.)
+
+### Kleinberg's magic exponent
+
+Does decentralized search always work well? It depends on **how** the long-range links are distributed. Model a person's chance of having a far friend $v$ at grid-distance $d$ as proportional to $1/d^{\,k}$, and tune the exponent $k$.
+
+probability of a long-range link at distance d
+
+$$ P(u \sim v)\;\propto\;\frac{1}{d(u,v)^{\,k}} $$
+
+read it as: "the farther a node is, the less likely it's your friend — and $k$ controls how fast that drops." $k=0$ → all distances equally likely (links go anywhere — you overshoot the target); large $k$ → almost no long links (you crawl neighbour-by-neighbour). There's a sweet spot in between.
+
+🚌 the bus-route / metro intuition
+Plan a city's transit: you can't run a line between every pair of the 100 stops. If your lines are all **super-long express** hops ($k$ too small), you shoot past your stop and must backtrack. If they're all **tiny local** hops ($k$ too big), you change trains endlessly. The efficient design has routes at every scale — some short, some medium, some long — so you can always halve your remaining distance.
+
+🏁 the result
+Plot the myopic-search path length against $k$ and it bottoms out at a special value: $k = 2$ for a 2-D grid (and $k = 1$ for a 1-D line) — in general, $k$ equal to the **dimension** of the space. At that exponent, decentralized search is fastest (paths $\sim \log$-scale). This is Kleinberg's theorem; the full proof is optional but the take-away is: navigability needs long links spread across all distance-scales.
+
+- Why is Milgram's experiment described as a "decentralized" (local) search?
+No participant knows the entire friendship graph — each only knows their own acquaintances and greedily forwards to the one seeming closest to the target. Short paths emerge from purely local decisions, with no central coordinator.
+
+- If long links follow $P\propto 1/d^{k}$, what value of $k$ makes decentralized search most efficient on a 2-D grid, and what goes wrong for $k$ too small or too large?
+$k = 2$ (the grid's dimension). Too small ($k\to0$): links are uniformly long, so you overshoot and backtrack. Too large: almost no long links, so you inch along locally. $k=2$ balances links across all scales for fastest navigation.
+
+LECTURES 150–153
+
+## Coding a small-world network
+
+a ring, homophily ties, and a few weak ties in NetworkX
+
+## 5 Building it in NetworkX
+
+Now construct a 1-D small-world network: a **ring** of nodes with local (homophily) edges, plus a handful of random long-range **weak ties**. Start with the nodes:
+
+ring.py — basepython
+
+```
+import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()
+G.add_nodes_from(range(50))     # 50 nodes labelled 0..49
+nx.draw(G)
+plt.show()
+```
+
+**Homophily edges:** connect each node to **2 neighbours on each side** of the ring. The subtlety is wrap-around — node 49's "right neighbour" is node 0.
+
+homophily edgespython
+
+```
+def add_homophily_edges(G):
+    nodes = list(G.nodes())
+    n = G.number_of_nodes()
+    for i in range(n):
+        # left neighbours i-1, i-2 wrap automatically (Python negative indexing)
+        G.add_edge(nodes[i], nodes[i - 1])
+        G.add_edge(nodes[i], nodes[i - 2])
+        # right neighbours i+1, i+2 must be wrapped by hand
+        for step in (1, 2):
+            target = i + step
+            if target > n - 1:      # went past the last node → wrap to the front
+                target = target - n
+            G.add_edge(nodes[i], nodes[target])
+```
+
+⚠️ the wrap-around bug (the one the professor hit live)
+- **Left** indices `i-1`, `i-2` are safe — Python's negative indexing already wraps (`nodes[-1]` is the last node).
+- **Right** indices `i+1`, `i+2` can exceed `n-1` and cause an `IndexError`. Fix: if `target > n-1`, set `target = target - n` (so $n\to0$, $n{+}1\to1$).
+- Define `n = G.number_of_nodes()` before using it — forgetting this throws "name n is not defined."
+
+**Weak ties:** add long-range links by picking two distinct random nodes and joining them. Calling it once adds one weak tie.
+
+weak tiespython
+
+```
+import random
+
+def add_long_link(G):                       # one weak tie
+    v1 = random.choice(list(G.nodes()))
+    v2 = random.choice(list(G.nodes()))
+    while v1 == v2:                          # avoid a self-loop
+        v2 = random.choice(list(G.nodes()))
+    G.add_edge(v1, v2)
+
+G = nx.Graph()
+G.add_nodes_from(range(100))
+add_homophily_edges(G)
+for _ in range(10):                         # add 10 weak ties
+    add_long_link(G)
+```
+
+Building the ring is O(n) (a constant number of edges per node); each weak tie is O(1). Note the professor's simplification: instead of true rewiring (delete one edge, add one), he just **adds** weak ties — on a big graph the edge count barely changes, but the diameter still plummets (that experiment opens Week 12).
+
+- Why do the left-neighbour indices `i-1`, `i-2` need no wrap-around fix, but `i+1`, `i+2` do?
+Python's negative indexing already wraps (`nodes[-1]` is the last node), so the left side is fine. Positive indices past `n-1` run off the end and raise `IndexError`, so you must wrap them with `target = target - n`.
+
+- In `add_long_link`, what is the `while v1 == v2` loop for?
+To guarantee the two randomly chosen endpoints are different, so you never add a self-loop (an edge from a node to itself).
+
+- The professor adds weak ties instead of true rewiring. Why is that an acceptable shortcut?
+True rewiring deletes one edge and adds one; just adding a weak tie changes the edge count only slightly on a large graph, yet still injects the long-range shortcuts that shrink the diameter — the effect we care about.
+
+### The world is huge yet tiny: mostly-local ties plus a few long-range weak ties give short paths that even a blind, greedy search can find.
+
+Next week: watch the diameter collapse as weak ties are added, and code the myopic search itself.
+
+— end of Week 11 · Six degrees, Watts–Strogatz & decentralized search ✏️
+↑ back to contents

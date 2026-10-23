@@ -1,0 +1,1066 @@
+# Social Networks (NPTEL, IIT Ropar, Prof. S. R. S. Iyengar)
+# Week 6: PageRank & Link Analysis
+# Lectures 75-86
+# Website: https://pml2405.github.io/social-networks/   Repo: https://github.com/PML2405/social-networks
+
+This file has three parts, in order: (A) the student's handwritten-style study NOTES, (B) the weekly ASSIGNMENT / question paper with solutions, (C) the full lecture TRANSCRIPTS. The notes are a condensed re-teach of the lectures; the transcript is the authority.
+
+==============================================================================
+PART A - STUDY NOTES (Week 6)
+==============================================================================
+
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 6 — PageRank & Link Analysis
+
+Lectures 75–86 · how the web graph solved search — importance flows recursively — and two NetworkX implementations of PageRank.
+
+🧠 the big picture, first
+
+How does Google rank pages? Model the web as a **directed graph**: pages are nodes, a hyperlink is a one-way edge. You can **collect** this graph by crawling (a random walk covers it in ~n·log n steps). Then rank pages by a recursive notion of **importance**: you're important if important pages point to you — not merely if many do. Two "games" — **equal point-sharing** and **random-walk coin-drop** — give the same ranking, which is **PageRank**. We implement both in NetworkX, handle the **dangling-node** trap with damping, and see why endorsement count (**DegreeRank**) and PageRank need not agree.
+
+### 📒 what's inside Week 6
+
+- The web graph & the search problem
+- Collecting the web graph — random-walk crawling
+- Two ranking games & recursive importance
+- Implementing PageRank — points distribution
+
+the sink problem + damping
+- Random-walk method & DegreeRank vs PageRank
+
+LECTURE 75
+
+## The web graph
+
+the idea that became a ~450-billion-dollar company
+
+## 1 From "hire 1000 raters" to a graph
+
+Imagine it's the 1990s and the web is exploding with pages linked by **hyperlinks**. To find the best page for a keyword, the naive idea is to hire thousands of people to read and rate every page — hopeless at web scale. Larry Page and Sergey Brin's insight: use the web graph itself.
+
+#### the web graph is directed
+
+[diagram: A | B | C | D]
+
+Page = node; a hyperlink A→B = a **directed** edge. A linking to B does not mean B links to A.
+
+📖 web graph — and why it's directed
+In the web graph, each web page (or social-media account) is a node; a hyperlink / endorsement is a **directed edge** A→B. It's directed because the relation is **one-way** — you can link to (or endorse) an account that doesn't link back. Build it with `nx.DiGraph()`.
+
+LECTURE 76
+
+## Collecting the web graph
+
+crawling = a random walk that covers the graph in ~n·log n steps
+
+## 2 Crawling by random walk
+
+**Analogy:** drop into a strange city with a car and no map. At every junction, pick a random turn. After a while you'll have driven down almost every road. The same works on a graph: a random walk (crawl) visits essentially all nodes.
+
+⚙️ how long to cover the graph?
+An experiment (walk from a random start, count steps until every node is visited) shows the cover time grows like ~n·log n — a small multiple of n, nearly linear (not quadratic). So collecting the whole structure is entirely practical. It takes more than exactly n steps (the walk revisits nodes) but far less than n².
+
+cover_time.py — the experimentpython
+
+```
+import networkx as nx, random, numpy as np
+
+def walk(n, p):                          # steps to cover a random G(n,p) graph
+    G = nx.gnp_random_graph(n, p)
+    v = random.choice(list(G.nodes()))   # random start
+    visited = {v}; steps = 0
+    while len(visited) < n:               # until EVERY vertex is seen
+        v = random.choice(list(G.neighbors(v)))   # random hop
+        visited.add(v); steps += 1
+    return steps
+
+xs, ys = [], []
+for n in range(20, 300):                 # graphs of size 20..299
+    z = [walk(n, 0.3) for _ in range(10)]   # repeat 10x and average out noise
+    xs.append(n); ys.append(np.average(z))
+plt.plot(xs, ys); plt.xlabel("#nodes"); plt.ylabel("#random-walk steps"); plt.show()
+# the curve looks nearly straight (~n log n): e.g. ~299 nodes -> ~2000 steps.
+```
+
+LECTURES 77–79
+
+## Two ranking games & recursive importance
+
+equal point-sharing = random-walk coin-drop = PageRank
+
+## 3 How to rank the nodes
+
+📖 the two games (they rank identically)
+- Equal-sharing game: give every node 100 points. Each round, every node splits its current points equally among the accounts it endorses (its out-links). Iterate until the points settle; rank by final points.
+- Random-walk-drop game: a surfer walks the graph at random, dropping one coin on every node it lands on. After ~a million steps, rank by coins collected.
+
+Remarkably, both games produce the **same ranking** — so either computes PageRank.
+
+#### equal sharing — one round on 3 accounts
+
+[diagram: A | B | C | A→B 50 | A→C 50 | B→C 100 | C→A 100]
+
+A endorses B,C; B endorses C; C endorses A.
+
+✍️ worked example — one round
+Start: A=B=C=100. A splits 100 over its 2 endorsements → 50 to B, 50 to C. B sends all 100 to C. C sends 100 to A.
+
+- **C** = 50 (from A) + 100 (from B) = $\boxed{150}$
+- **A** = 100 (from C)
+- **B** = 50 (from A)
+
+General: a node with P points and d out-links sends P/d along each (100 over 4 links → 25 each).
+
+💡 the recursive notion of importance
+A node hoards points only if its pointers hoard points — which depends on their pointers. So: you're important if **important** nodes point to you — a recursive definition ("you're famous if famous people say you're famous"). Best of all: be pointed to by a **rich backer who points to few others** (a wealthy relative with few people to help → each gets a big share). Sheer count of endorsements doesn't do it.
+
+**How Google uses it:** crawl the web (drop coins), giving each page a score. For a keyword ("Britney Spears"), retrieve all matching pages and display them **sorted by score** (highest first). Simple, and it works like a charm.
+
+LECTURES 80–83
+
+## Implementing PageRank — points distribution
+
+DiGraph → 100 points → distribute → handle the sink → rank
+
+## 4 The points-distribution method
+
+⚙️ the pipeline (memorise the order)
+- Create a **directed** graph and add its edges probabilistically.
+- Initialise every node with **100 points**.
+- **Distribute** points along out-links, repeatedly, **with sink handling**, until convergence.
+- **Sort** nodes by final points → the ranking.
+- **Validate** against `nx.pagerank`.
+
+pagerank_points.py — build & distributepython
+
+```
+import networkx as nx, random, numpy as np
+
+def add_edges(G, p):
+    for i in G.nodes():
+        for j in G.nodes():
+            if i != j:
+                r = random.random()             # uniform in [0,1]
+                if r <= p:                       # biased coin: head with prob p
+                    G.add_edge(i, j)            # directed edge i -> j (i endorses j)
+    return G
+
+def distribute_points(G, points):
+    previous   = points
+    new_points = [0 for _ in range(G.number_of_nodes())]
+    for i in G.nodes():
+        out = list(G.out_edges(i))              # edges LEAVING i (its endorsements)
+        if len(out) == 0:                       # dangling node: no out-link
+            new_points[i] += previous[i]        # ...keep its own points
+        else:
+            share = float(previous[i]) / len(out)   # split equally
+            for e in out:
+                new_points[e[1]] += share       # e[1] = the endorsed node
+    return new_points
+```
+
+📖 `G.out_edges(i)`
+On a directed graph, `G.out_edges(i)` returns the edges **leaving** i, each as a `(source, target)` tuple. So `e[0]` is i and `e[1]` is the endorsed node that receives the share. A node with 100 points and 4 out-links sends 25 to each.
+
+### The sink (dangling-node) problem & the damping fix
+
+⚠️ the sink problem
+A dangling node (an account that endorses no one) keeps receiving points via its in-links but never passes any on — so points **pile up** there (or in a small closed group), distorting the ranking. Our raw method then disagrees with `nx.pagerank`.
+
+pagerank_points.py — damping (the fix)python
+
+```
+def handle_sink(G, points, s=0.8):
+    for i in range(len(points)):
+        points[i] = points[i] * s               # each node KEEPS 80%
+    n = G.number_of_nodes()
+    pooled = n * 100 * (1 - s)                   # the 20% gathered across the network
+    extra  = pooled / n                          # shared back EQUALLY to all (= 20)
+    for i in range(len(points)):
+        points[i] += extra
+    return points                                # total points unchanged (conserved)
+```
+
+read it as: "a tax: every node keeps a fraction **s = 0.8** of its points; the pooled **20%** is shared back equally to all nodes." Points can no longer pile up forever at a sink. The total is **conserved** — nothing is deleted, and dangling nodes are kept, not removed. With this, our ranking matches `nx.pagerank`.
+
+pagerank_points.py — main loop & rankpython
+
+```
+G = nx.DiGraph()
+G.add_nodes_from(range(10))
+G = add_edges(G, 0.3)
+points = [100 for _ in range(G.number_of_nodes())]     # 100 each
+
+while True:                                     # iterate to convergence
+    new_points = distribute_points(G, points)
+    new_points = handle_sink(G, new_points)     # damping fixes the sink
+    if max(abs(new_points[i] - points[i]) for i in range(len(points))) < 1e-6:
+        points = new_points
+        break
+    points = new_points
+
+ranking = np.argsort(-np.array(points))         # NEGATE -> highest points first
+
+pr = nx.pagerank(G)                             # {node: score} dictionary
+pr_sorted = sorted(pr.items(), key=lambda x: x[1], reverse=True)   # rank the built-in
+```
+
+⚙️ ranking & validating
+- `np.argsort` returns indices that sort **ascending**; negate the array (`-np.array(points)`) so the highest score comes first (descending).
+- `nx.pagerank(G)` returns a **dict** `{node: score}` — not a ready ranking. Turn it into `(node, score)` tuples and sort by value, descending.
+- Points are **conserved** each iteration; with damping, the ranking matches the built-in `pagerank`. (Tiny mismatches can come from ties or stopping before full convergence.)
+
+LECTURES 84–86
+
+## Random-walk method & DegreeRank vs PageRank
+
+teleport out of dead-ends — and why popularity ≠ importance
+
+## 5 The random-walk method
+
+pagerank_walk.pypython
+
+```
+def random_walk(G, steps=1000000):
+    nodes = list(G.nodes())
+    rw = [0 for _ in range(G.number_of_nodes())]    # random-walk points
+    focus = random.choice(nodes)
+    rw[focus] += 1
+    for _ in range(steps):
+        out = list(G.out_edges(focus))
+        if len(out) == 0:                            # dead-end (dangling node)
+            focus = random.choice(nodes)             # TELEPORT to a random node
+        else:
+            e = random.choice(out)                   # a random endorsed account
+            focus = e[1]                             # move there (e[1] = target)
+        rw[focus] += 1                               # drop a coin on the visited node
+    return rw
+```
+
+📖 teleportation
+A dangling node has nowhere to walk to. Teleportation = jump to a **uniformly random** node and resume. (The walk never stops, never back-tracks, and never deletes the node.) A node with many in-links — especially from often-visited nodes — is landed on more often, so its coin count reflects PageRank. Rank by `rw` points; it matches `nx.pagerank`.
+
+### DegreeRank vs PageRank — popularity ≠ importance
+
+#### in-degree vs PageRank (citation network)
+
+[diagram: in-degree → | PageRank → | high deg, low PR | low deg, high PR]
+
+No linear trend → in-degree and PageRank are **not** correlated.
+
+⚠️ DegreeRank ≠ PageRank
+DegreeRank = rank by raw in-degree (endorsement count). PageRank = the recursive importance score. On a real citation network they **don't line up**:
+
+- A paper cited by **many unimportant** papers → high in-degree but low PageRank.
+- A paper cited by a **few important** papers → low in-degree but high PageRank.
+
+So many weak endorsements can lose to a few important ones.
+
+degree_vs_pagerank.pypython
+
+```
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# SNAP citation dataset: each row "A B" means paper A cites paper B (e.g. 17 18)
+G = nx.read_edgelist("citation.txt", create_using=nx.DiGraph)   # load as DIRECTED
+
+deg = G.in_degree()        # {node: in-degree}   -> DegreeRank signal
+pr  = nx.pagerank(G)       # {node: pagerank}    -> PageRank score
+
+# align the two dicts into the same node order, then scatter
+pr_values = [pr[i] for i in deg.keys()]
+plt.plot(list(deg.values()), pr_values, "ro")     # in-degree (x) vs PageRank (y)
+plt.xlabel("in-degree"); plt.ylabel("PageRank"); plt.show()
+# the cloud shows NO linear trend: high-in-degree papers can have low PageRank, and
+# a paper cited by a few IMPORTANT papers can have high PageRank with low in-degree.
+```
+
+### Importance flows recursively along directed links: you rank high when high-ranked nodes (that point to few others) point to you.
+
+Collect the web graph by random-walk crawl (~n·log n). Equal-sharing = random-walk-drop = PageRank. Points distribution: 100 each → send P/d along out-links → damping (keep 80%, pool 20%) fixes dangling sinks → rank via argsort(−points). DegreeRank ≠ PageRank.
+
+- Why is the endorsement/web graph directed?
+An endorsement/link is **one-way**: A endorsing B doesn't mean B endorses A. Use `nx.DiGraph`.
+
+- Roughly how many random-walk steps to visit every node of an n-node graph?
+About **n·log n** — a small multiple of n (near-linear), not n², and more than exactly n.
+
+- What is the recursive notion of influence?
+You're influential if **influential** accounts endorse you — which depends on who endorses them. Not sheer counts.
+
+- Relationship between the equal-sharing and random-walk-drop games?
+Different procedures, but they rank the accounts in **exactly the same order** (both = PageRank).
+
+- A=B=C=100; A→B,C; B→C; C→A. After one round, C holds?
+50 (from A) + 100 (from B) = **150**. (A=100, B=50.)
+
+- Node with 100 points, 4 out-links — each endorsed account gets?
+**25** (P ÷ d = 100/4).
+
+- What is the sink problem, and how does damping fix it?
+A **dangling node** (endorses no one) hoards points. Damping: each node keeps **80%**, the pooled **20%** is shared equally among all — points can't pile up. Total conserved.
+
+- In the random walk, what happens at a node with no out-links?
+**Teleport** — jump to a uniformly random node and continue (don't stop, back-track, or delete).
+
+- How does `np.argsort` give a highest-first ranking?
+argsort is **ascending**; run it on the **negated** points (`-np.array(points)`) so the largest sorts first.
+
+- What does `nx.pagerank(G)` return, and how is it used?
+A **dict** `{node: score}` — not a ranking. Sort its `.items()` by value, descending.
+
+- Order the points-distribution pipeline.
+Create DiGraph + edges → init 100 points → distribute (with sink handling) to convergence → sort by points → compare with `nx.pagerank`.
+
+- What do they find comparing in-degree (DegreeRank) with PageRank?
+They're **not correlated**: many weak endorsements can lose to a few important ones (high in-degree can have low PageRank, and vice versa).
+
+— end of Week 6 ✏️
+↑ back to top
+
+==============================================================================
+PART B - ASSIGNMENT & SOLUTIONS (Week 6)
+==============================================================================
+
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 6 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Ranking Influence: From Endorsements to Importance
+Case Study
+A media-analytics team wants to rank social-media accounts by genuine influence. They picture the
+accounts as a graph: each account is a node, and a public endorsement one account shouting out or
+recommending another is an edge. Because endorsements are one-directional acts, the graph is directed. To
+gather it, a program follows endorsements at random, hopping from account to account; this random-walk
+sampling reaches essentially the whole reachable graph after only a modest number of steps, growing
+roughly like n·log n for n accounts, so collecting the structure is entirely practical.
+To turn the structure into a ranking, the team studies two scoring games. In the equal-sharing game, every
+account starts with the same pile of points and, each round, splits its current points equally among the
+accounts it endorses; after many rounds the piles settle, and the accounts are ranked by their final points. In
+the random-walk-drop game, a surfer roams the graph at random and drops one coin on each account it
+lands on; after very many steps, the accounts are ranked by coins collected. Remarkably, the two games
+rank the accounts in the same order.
+The ranking captures a recursive notion of influence: an account is influential when other influential
+accounts endorse it not merely when many accounts do. An account therefore gains standing from being
+endorsed by high-scoring accounts that spread their endorsements across only a few others. The team also
+checks this against raw popularity and finds that an account's endorsement count and its influence score
+need not move together at all.
+Questions 1–10
+Q1.  [MCQ]  Why is the endorsement graph treated as a directed graph?
+A.  An endorsement points one way: account X endorsing Y does not mean Y endorses X back.
+B.  Every endorsement is mutual, so the resulting graph is undirected by construction.
+C.  Endorsements count as directed only when the two accounts are on the same platform.
+D.  The graph is directed because each account endorses exactly one other account in total.
+Answer:  A
+Reference:  Lecture 75 – The Web Graph (≈07:35–end)
+Solution:  An endorsement is one-sided: you can endorse an account that does not endorse you back, so
+the relationship is asymmetric and the edge has a direction. Endorsements are not mutual, are not
+restricted to same-platform accounts, and an account can endorse many others, so the other options
+misdescribe the graph.
+
+[p.2]
+Q2.  [Match the following]  Match each idea in Column A with its description in Column B.
+Column A (idea)
+Column B (description)
+1. Endorsement graph
+a. drop one coin on each node that a random walk
+visits
+2. Sampling (crawling)
+b. accounts are nodes and endorsements are
+directed edges
+3. Equal-sharing game
+c. explore the graph by repeatedly following a
+random endorsement
+4. Random-walk-drop game
+d. each account splits its points equally among the
+accounts it endorses
+
+A.  1-b, 2-c, 3-a, 4-d
+B.  1-c, 2-b, 3-d, 4-a
+C.  1-b, 2-c, 3-d, 4-a
+D.  1-a, 2-d, 3-b, 4-c
+Answer:  C (1-b, 2-c, 3-d, 4-a)
+Reference:  Lectures 75–78 – Web graph, crawling, and the two scoring games
+Solution:  The endorsement graph has accounts as nodes and directed endorsements as edges (1-b).
+Sampling explores it by following endorsements at random (2-c). The equal-sharing game has each account
+divide its points among the accounts it endorses (3-d), while the random-walk-drop game drops a coin on
+each visited account (4-a).
+
+Q3.  [MCQ]  Which statement best captures the notion of influence behind the ranking?
+A.  An account is influential if it endorses a large number of other accounts itself.
+B.  An account is influential purely from how many accounts endorse it, whichever they are.
+C.  An account is influential if it repeats a trending hashtag many times over.
+D.  An account is influential if other influential accounts endorse it — a recursive notion.
+Answer:  D
+Reference:  Lecture 78 – Random Coin Dropping (≈05:19–end)
+Solution:  Influence is defined recursively: you are influential if influential accounts endorse you, which in
+turn depends on who endorses them. Sheer counts of endorsements received or sent, and hashtag
+repetition, all miss this recursive, importance-weighted character.
+
+Q4.  [MCQ]  What is the relationship between the equal-sharing game and the random-walk-drop game?
+A.  The two games usually disagree, so the team runs both and averages their orders.
+B.  Equal-sharing and random-walk-drop rank the accounts in exactly the same order.
+C.  Only the equal-sharing game yields a usable ranking; the walk game does not rank.
+D.  The random-walk game ranks the accounts, while equal-sharing only counts the edges.
+Answer:  B
+Reference:  Lecture 78 – Random Coin Dropping (≈03:59–end)
+
+[p.3]
+Solution:  The two games are different procedures but produce the same ordering of accounts, which is why
+either can be used to compute the ranking. They do not generally disagree, and both genuinely rank the
+accounts rather than merely counting edges.
+
+Q5.  [MCQ]  Three accounts start with 100 points each. A endorses B and C; B endorses C; C endorses A.
+After one round of equal sharing, how many points does C hold?
+A.  50
+B.  100
+C.  150
+D.  200
+Answer:  C
+Reference:  Lecture 77 – Equal Coin Distribution (≈02:37–end)
+Solution:  A splits its 100 points over its two endorsements, sending 50 to each of B and C; B sends all 100
+to C; C sends its 100 to A. So C receives 50 (from A) + 100 (from B) = 150, while A ends with 100 and B with
+50.
+
+Q6.  [MCQ]  Roughly how many random-walk steps does it take to visit every node of an n-node graph?
+A.  Roughly a small multiple of n (about n·log n) random steps cover all the nodes.
+B.  About n² random steps are required before every node has been visited once.
+C.  It is generally impossible to reach every node just by walking at random.
+D.  Exactly n random steps suffice to visit all n nodes, with none ever repeated.
+Answer:  A
+Reference:  Lecture 76 – Collecting the Web Graph (≈09:13–end)
+Solution:  Experiments showed the number of steps to cover the graph grows close to n·log n — a small
+multiple of n, looking nearly linear. It is not quadratic, it is very much possible, and it certainly takes more
+than exactly n steps because the walk revisits nodes along the way.
+
+Q7.  [MCQ]  When the team compares each account's endorsement count (DegreeRank) with its influence
+score (PageRank), what do they find?
+A.  Endorsement count and influence are tightly correlated, so either measure alone is enough.
+B.  An account with a high endorsement count always has a correspondingly high influence score.
+C.  An account with a low endorsement count can never reach a high influence score at all.
+D.  They aren't correlated: many weak endorsements can lose to a few important ones.
+Answer:  D
+Reference:  Lecture 86 – Degree Rank versus Page Rank (≈05:55–end)
+Solution:  Just as on the citation network, the two measures need not line up: an account endorsed by
+many unimportant accounts can score low, while one endorsed by a few influential ones can score high. So
+endorsement count and influence are not correlated, and neither a high nor a low count fixes the score.
+
+[p.4]
+Q8.  [MCQ]  In the scoring games, what makes an account accumulate a large number of points?
+A.  An account gains the most points by endorsing as many other accounts as it possibly can.
+B.  An account gains points when high-point accounts that endorse few others endorse it.
+C.  An account gains points mainly in proportion to how many endorsements it sends out.
+D.  An account gains points only when low-point accounts happen to be the ones endorsing it.
+Answer:  B
+Reference:  Lecture 78 – Random Coin Dropping (≈07:28–end)
+Solution:  An account does well when rich backers endorse it and those backers spread their points over
+only a few endorsements, so each one carries a large share — like a wealthy relative with few people to
+help. Sending many endorsements does not raise your own score, and points flowing from low-scoring
+accounts contribute little.
+
+Q9.  [MSQ]  Which statements about the endorsement graph and sampling are correct? (Select all that
+apply.)
+I.   The endorsement graph is directed because endorsements point one way.
+II.  Sampling the graph is modelled as a random walk over the endorsement graph.
+III. When the top accounts are listed, they are ordered by their accumulated points.
+IV.  An account's rank is determined only by how many posts the account has made.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, II, III
+D.  I, IV
+Answer:  C (statements I, II, III)
+Reference:  Lectures 75–79 – Web graph, crawling, and the ranking
+Solution:  The endorsement graph is directed (I), sampling is a random walk over it (II), and accounts are
+listed in order of the points each has accumulated (III). An account's rank comes from the endorsement
+structure, not from how many posts it has made, so IV is false.
+
+Q10.  [MSQ]  Which statements about the ranking idea are correct? (Select all that apply.)
+I.   The equal-sharing and random-walk games rank the accounts the same way.
+II.  Influence is recursive: influential accounts are those endorsed by influential accounts.
+III. An account's endorsement count and its influence score need not be correlated.
+IV.  The account with the highest endorsement count always has the highest influence score.
+A.  I, II, III
+B.  I, II, IV
+C.  II, III, IV
+D.  I, IV
+Answer:  A (statements I, II, III)
+Reference:  Lectures 77–78, 86 – the two games and DegreeRank vs PageRank
+
+[p.5]
+Solution:  The two games agree on the order (I), influence is recursive (II), and endorsement count and
+influence score can diverge (III). Because they can diverge, the most-endorsed account is not guaranteed
+the highest score, so IV is false.
+
+[p.6]
+Comprehension 2 — Implementing the Influence Ranking in NetworkX
+Case Study
+A developer ranks social-media accounts by influence, implementing PageRank by the points-distribution
+method on a directed graph built in NetworkX. Each node is an account, and an edge i → j means account i
+endorses account j. The graph is created with nx.DiGraph, and edges are added probabilistically: for each
+ordered pair of distinct nodes a random number in [0,1] is drawn, and the edge is added when that number
+is at most a chosen probability p. Every node is then initialised with 100 points.
+Each iteration redistributes the points: a node looks at its out-links (the accounts it endorses) and sends an
+equal share of its current points along each one, so a node holding P points with d out-links sends P/d to
+every account it endorses. This repeats until the point totals stop changing. One snag is a dangling node an
+account that endorses no one: it keeps receiving points but never passes any on, so points pile up there and
+the ranking is thrown off. The fix is a damping step: each round, every node holds back most of its points
+while a fixed fraction is pooled across the network and shared back equally among all nodes.
+A second implementation uses the random-walk method: a surfer hops to a random endorsed account and
+drops a point on each account it visits, and when it reaches a dangling node it teleports to a uniformly
+random account and carries on. Either way, the accounts are finally sorted by their points to give the
+ranking, which is checked against NetworkX's built-in pagerank. Key fragments:
+import networkx as nx, random, numpy as np​
+ ​
+G = nx.DiGraph()​
+# add an edge i -> j (i endorses j) with probability p​
+r = random.random()​
+if r <= p:​
+    G.add_edge(i, j)​
+ ​
+# one distribution step: send an equal share along each out-link​
+out = G.out_edges(i)​
+share = float(previous_points[i]) / len(out)​
+for e in out:​
+    new_points[e[1]] += share        # e[1] is the endorsed account​
+ ​
+order = np.argsort(-np.array(points))  # accounts, highest points first
+Questions 1–10
+Q1.  [MCQ]  Why is the graph built as a directed graph (nx.DiGraph)?
+A.  An undirected graph is used, since points flow equally both ways along each edge.
+B.  A directed graph is used, since points flow only along each node's out-links.
+C.  A directed graph is used purely to make the drawing of the network easier to read.
+D.  The choice of graph type makes no real difference to how the points are distributed.
+Answer:  B
+Reference:  Lecture 80 – Points Distribution Method 1 (≈01:49–end)
+
+[p.7]
+Solution:  PageRank sends a node's points along its out-links (its endorsements), so direction is essential —
+a node's outgoing edges decide where its points go. The graph type is not a cosmetic choice, and points do
+not flow both ways as they would on an undirected edge.
+
+Q2.  [MCQ]  A node holding 100 points endorses 4 accounts (4 out-links). In one distribution step, how much
+does each endorsed account receive from it?
+A.  100, the node's full pile of points, handed to each of the endorsed accounts.
+B.  4, a single point for each of the node's four out-links in turn.
+C.  400, the node's points multiplied by its number of out-links.
+D.  25, the node's points divided equally among its 4 out-links.
+Answer:  D
+Reference:  Lecture 80 – Points Distribution Method 1 (≈00:06–01:00)
+Solution:  Each endorsed account gets an equal share, P divided by the number of out-links: 100 / 4 = 25.
+The node does not hand its whole pile to each account, nor scale its points up by the link count.
+
+Q3.  [MCQ]  In the distribution step the code iterates over G.out_edges(i). Which description is correct?
+A.  G.out_edges(i) lists i's out-links; for each edge, index 1 is the account that gains the share.
+B.  G.out_edges(i) lists i's in-links; for each edge, index 0 is the account that gains the share.
+C.  G.out_edges(i) returns just the count of i's out-links as a single integer value.
+D.  G.out_edges(i) works on undirected graphs and returns every edge touching node i.
+Answer:  A
+Reference:  Lecture 81 – Points Distribution Method 2 (≈12:00–end)
+Solution:  On a directed graph G.out_edges(i) returns the edges leaving i; each edge is a (source, target)
+pair, so index 0 is i itself and index 1 is the endorsed account that receives the share. It is not a count, not
+the in-links, and is meant for directed graphs.
+
+Q4.  [MCQ]  What is the “sink” problem that can distort the points-distribution ranking?
+A.  A node with many out-links drains all of the points out of the whole network.
+B.  A node with many in-links gives its points away faster than it can receive them.
+C.  A node that endorses no one hoards the points it receives and never passes them on.
+D.  Two nodes with equal points make the iteration oscillate and never converge.
+Answer:  C
+Reference:  Lecture 82 – Points Distribution Method 3 (≈11:15–end)
+Solution:  A dangling node — an account that endorses no one — keeps collecting points from its in-links
+but has nowhere to send them, so points accumulate there (or in a small group of such nodes) and the
+ranking is distorted. Out-links spread points rather than draining them, and equal points do not by
+themselves cause oscillation.
+
+[p.8]
+Q5.  [MCQ]  How does the damping step fix the sink problem?
+A.  Every node passes on 100% of its points, so that nothing is ever held back at all.
+B.  Each node keeps 80% of its points, and the pooled 20% is shared equally among all nodes.
+C.  Each node keeps 20% of its points, while the other 80% is simply deleted from the graph.
+D.  Every dangling node is removed from the graph before the point distribution begins.
+Answer:  B
+Reference:  Lecture 83 – Points Distribution Method 4 (≈00:51–end)
+Solution:  With s = 0.8, each node retains 80% of its points and the collected 20% is redistributed equally to
+every node — like a tax that is shared back to all — so points cannot pile up forever at a dangling node.
+Points are conserved (not deleted), and the dangling nodes are kept in the graph, not removed.
+
+Q6.  [MCQ]  In the random-walk method, what happens when the surfer reaches an account that endorses
+no one?
+A.  On reaching such a dead-end node, the walk stops and the whole run ends right there.
+B.  On reaching such a dead-end node, the walk steps back to the node it just came from.
+C.  On reaching such a dead-end node, that node is deleted and the walk then carries on.
+D.  On reaching such a dead-end node, the walk teleports to a uniformly random node.
+Answer:  D
+Reference:  Lecture 84 – Random Walk Method 1 (≈00:05–end)
+Solution:  A dangling node has nowhere to walk to, so the surfer teleports — jumps to a uniformly random
+account — and resumes from there. The run does not end, the surfer does not back-track, and the node is
+not deleted.
+
+Q7.  [Arrange in order]  Arrange the steps of the points-distribution implementation in the correct order.
+Steps (in scrambled order):
+(i)   Initialise every node with 100 points.
+(ii)  Create a directed graph and add its edges probabilistically.
+(iii) Sort the nodes by their final points to obtain the ranking.
+(iv)  Repeatedly distribute points along out-links (with sink handling) until they converge.
+(v)   Compare the resulting ranking against NetworkX's built-in pagerank.
+A.  i → ii → iv → iii → v
+B.  ii → i → iv → iii → v
+C.  ii → i → iii → iv → v
+D.  ii → iv → i → iii → v
+Answer:  B (ii → i → iv → iii → v)
+Reference:  Lectures 80–83 – Points-distribution pipeline
+Solution:  First create the directed graph and its edges (ii), then give every node 100 points (i), then
+distribute points repeatedly with sink handling until convergence (iv), then sort nodes by final points (iii),
+and finally validate against the built-in pagerank (v).
+
+[p.9]
+Q8.  [MCQ]  The code ranks nodes with np.argsort. How does it obtain a highest-first (descending) order?
+A.  argsort already sorts largest-first, so it gives the descending ranking directly.
+B.  It sorts the points in ascending order and reads them straight from top to bottom.
+C.  It runs argsort on the negated points, so the highest-point node comes out first.
+D.  It runs argsort on the node labels and ignores the points entirely while sorting.
+Answer:  C
+Reference:  Lecture 82 – Points Distribution Method 3 (≈01:27–05:07)
+Solution:  argsort returns indices that sort the values in ascending order, so negating the points first makes
+the largest value sort to the front — giving the highest-point account rank one. Plain argsort is ascending,
+and sorting the labels would ignore the scores.
+
+Q9.  [MCQ]  The implementation is validated against NetworkX's pagerank. What does nx.pagerank(G)
+return, and how is it used here?
+A.  It returns a {node: score} dictionary; its items are sorted by value, descending, to rank.
+B.  It returns the ranking already as a finished, ordered list of the nodes from best to worst.
+C.  It returns a single number, namely the rank of the single top node in the graph.
+D.  It returns the in-degree of every node, which is then used directly as the score.
+Answer:  A
+Reference:  Lecture 82 – Points Distribution Method 3 (≈07:00–end)
+Solution:  nx.pagerank returns a dictionary mapping each node to its PageRank value, not a ready-made
+ranking, so the code turns the items into (node, value) tuples and sorts them by value in descending order.
+It does not return a finished list, a single number, or the in-degree.
+
+Q10.  [MSQ]  Which statements about the implementation are correct? (Select all that apply.)
+I.   The total number of points is conserved from one iteration to the next.
+II.  With sink handling, the method's ranking matches NetworkX's pagerank.
+III. The random-walk method uses teleportation to escape dangling nodes.
+IV.  A node that endorses no one distributes its points equally to all other nodes.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III, IV
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 81–84 – Points-distribution and random-walk methods
+Solution:  Points are conserved across iterations (I), the sink-handled method matches the built-in pagerank
+(II), and the random-walk method teleports out of dangling nodes (III). A dangling node endorses no one, so
+in the distribution method it simply keeps its own points rather than sharing them with everyone — that
+sharing is the job of the damping step — so IV is false.
+
+[p.10]
+End of Week 6 Question Paper  —  20 questions  •  2 comprehensions
+
+==============================================================================
+PART C - LECTURE TRANSCRIPTS (Week 6, Lectures 75-86)
+==============================================================================
+=== LECTURE 75: The Web Graph (Week 6, transcript PDF page 2) ===
+
+[p.2] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis Lecture – 75 The Web Graph
+
+Let us down switch directions and talk about something that I spoke in at length in the introductory video.
+
+(Refer Slide Time: 00:19)
+
+It is about the origin of Google as an industry and the algorithm that they used to search the web. So, I will now call upon you all to imagine the following story.
+
+[p.3] (Refer Slide Time: 00:29)
+
+Please note you really have to imagine otherwise,otherwise; you cannot get the gist what I am going to say. Please imagine that me and you are in the 1990s and I have this word with you that, see there is something called the internet which is fast developing. There is something called a web page where people put some information and there is something called hyper link, a hypertext where in the page you can link to another page. You click here, it just goes there right that is what you mean by hyperlink. By a link you mean something that links to somewhere else, but hyperlink means something that not just links hyper means what more than a link hyperlink is more than a link. Hyperlink means it just does not link you to a new place; it even takes you to that place. So, a hyperlinkshyperlink was the invention of hypertext was very big leap in computer science. So, there are pages with hyperlinks to other pages and now me and you are thinking of a start up idea. In the 1990 where we see that internet is booming with a lot of web pages which are linked one pageone-page links to the other page through a hyper link and we all start thinking. Now there are so many pages here thousands and thousands of pages. Today actually its billions of billionsbillions of pages, billions of pages, but I am talking about 1990; me and you are having coffee table conversation in nineteen ninety. Look there are so many web pages. How do you know what to search for? How do you know which page has the right information? Assume there are so many pages, web pages
+
+[p.4] talking about television technology, the television technology. Which page is a authoritative source for me to refer? If there are 100 pages which talk about 100 different web pages written by 100 different technicians, technology experts. Which is the best possible webpage? Now I see I repeat we are in 1990s, I see that this probably becomes a problem is going to become a problem very soon. Now that there are few pages people can sort of go through all that page and decide which one is good and then read it, but very soon the web pages will be populated with hundreds of thousands of pages. How on earth will people know what to look for where right? What is the immediate idea, you think we both will get over this coffee table discussion in 1990? I for a reason would give this dumb idea that fine we will hire some thousand people. Assume we had we had so much money to pay thousand people; I will say we will hire thousand people and ask them to go through each and every page and maintain a sheet which has the following entries following columns.
+
+(Refer Slide Time: 03:39)
+
+First column will be the link second column will be the keywords which tells me what is this linkthis link is all about. This is the link I will say it talks about television technology. There is another link, this talks about health tips for good health; another link that talks about latest cars, another link that talks about World War-I so on right. First column will have the link, second column will have this keywordsthese keywords what I what is the link all about. The third column will be, I will read by me I mean this
+
+[p.5] thousand employeesthese thousand employees I am going to hire, each one of them will read the link and give the article rating. Or this article on World War-I is 8 on 10 rating, 8 on 10 like how the give rating for movies. Another person sees another link on World War-I and says this is not so good; it is 3 on 10 so on and so on and so on. These thousand employees in my start up industry will go through every single possible page ever created, somehowsomehow, we get access to all the pages let us say and we rate all the pages and we also put keywords. So, that whenever someone searches for a keyword television technology, then it will come to this database of all the entries that my thousand people whom I have hired have populated. It will look at the highest rated page which has the keyword television technology and display that to him. Maybe it will sort it in the order of rating, best rated link first next best second, third, fourth descending order. It will show it you wonderful idea, everybody will come to my page to search for information on what is the so calledso-called internet with so many pages. Very soon I will become a millionaire because everybody will be coming to my page, my page will become popular. And once you have a popular portal, you can make a lot of money through ads or whatever right. So, here is my idea in 1990 let us say, but then nobody ever dreamt that there could be a much much better way of doing this. I am going to explain next: what is the much much better way which paved its way for the birth of as I said a 450 billion dollar450-billion- dollar industry called Google; obviously, my start up idea will not scale up. Thousand people can do how much of work? The number of pages that gets populated on the internet is in terms of millions. So, very soon I will run out of man hours I am I will be need of more man hours and less employees; obviously, thousand is not enough. You should think of some other way of doing it right. What is this way of doing? It is very simple I will tell you the simple idea which is behind searching and again I will try explaining it bit by bit with analysis examples and questions; very simple.
+
+[p.6] (Refer Slide Time: 07:23)
+
+Larry Page and SurgeySergey Brin, they came out with his idea of maintaining what is called a web graph.
+
+(Refer Slide Time: 07:35)
+
+By a web graph you mean take a page a webpage, call it a node. Take all the web pages, each web page is represented by a node. You wire a link between this page and this page namely this node and that corresponding node by a link. If this page has a hyperlink to that page; for example, the same example I have been giving you people. This is my homepage and I link the homepage of my friend on my homepage. Then my homepage is
+
+[p.7] a node, my friends homepage is a node; there is an edge from my home page to my friends homepage. Please note this is a directed graph, why? Me linking to Prime Minister’s homepage does not imply that the Prime Minister’s homepage also links to mine. It is completely one sided correct. I like her, she does not mean she likes me. It is a very asymmetric relation. So, this is what is called a web graph where pages are denoted by nodes and a link represents a page pointing to another page through a hyperlink. The point is if you collect this web graph that is enough it does the trick of having thousand people or more. First question, how do I collect the web graph, what is the use of this web graph, how is this web graph going to solve the problem that I was trying to resolve with some thousand employees by hiring thousand employees right. I have thousand employees in my organisation and now I am saying you can replace these thousand employees or even more by simply making node of the web graph. How do we get a web graph? What is the web graph? Think about it. It is a graph containing so many nodes and so many links. How do you even now the in some nook corner of the world, there will be a web page point into some other web page I am saying that you should have the all this information. How do you get this information? Do you have any idea how one can get this information? Any rough idea? Think about it.
+
+=== LECTURE 76: Collecting the Web Graph (Week 6, transcript PDF page 8) ===
+
+[p.8] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis Lecture - 76 Collecting the Web Graph
+
+So, let us be organised. We are only asking these two questions. Let us answer them one at a time.
+
+(Refer Slide Time: 00:15)
+
+There is this question of web graph which will solve our problem; our problem of searching the web looks like unrelated you see. A graph of who points to whom which page points to what, has nothing to do with your search problem. So, first question is how we collect this web graph? I am saying this web graph will solve the problem. How will it solve the problem? Two things: firstly, how do you collect this web graph; secondly, how do you think this web graph will solve your problem. Let us go step by step. So, first question. How do we collect this web graph? Here is a technique to collect the web graph. You should imagine a small situation.
+
+[p.9] (Refer Slide Time: 01:03)
+
+Imagine a city that you have never visited. And what I will do is I will put you to this new city; I will put you to this new city. Assume there is there are no vehicles in the city at all, you are the only one with a nice vehicle. I have given you a driver, a car road are empty; I repeat a new city you do not know of. Let us say you are not given a driver you drive the car, because if you are given a driver will know the localities. So, you are in a new city you do not know the localities, you are given the car; there is no traffic at all. What you do is you fix a camera on your car and just keep taking random turns here and there and keep going and going and going for the next one week. Assume you are given enough rest in between; you are given enough food in between; all you need to do is to simply take random turns and keep going. Obviously you will not go a left and a right and a right and; obviously, you will not take a right and a right and a right and a right; you will come back to the same place, I said randomly. In every junction you toss a coin, you will take a decision whether you want to move towards your left or towards your right or towards straight. Or if there is a junction with 5 roads going from there, you roll a dice and you decide which side to go uniformly a track. You keep doing this for let us say, 1 week or more be even more may be 1 month. At the end of 1 month do you think there will be a road that you would not have explored?
+
+[p.10] May be yes, you would not have intuitively you feel you would not have. But do you think, you would have explored most of the roads in the city? Intuitively yes, you feel you would have if you take a car and keep going randomly wherever is an intersection, you break the tie by choosing a road uniformly at random and then move in that road and keep doing this for about a month’s time in the city. You would have covered almost all roads right almost all roads you would have covered. Now what does this tell you? Does it tell you anything about the question that I just now asked?
+
+(Refer Slide Time: 03:31)
+
+Is there a way in which you can explore this entire web graph and capture it? I gave you an example and you have this question in your hand, how do you get the web graph. The car, new city, taking random turns example; do you think you can link these two things? And do you think a question here has a solution which I stated in the form of an example?
+
+[p.11] (Refer Slide Time: 04:01)
+
+So let us now do a quick experiment. I am curious to see if one takes a random walk on a given graph, how much time will it take for one to reach the entire graph by that I mean all vertices in the graph?
+
+(Refer Slide Time: 04:19)
+
+So, let us go slowly. I now need to generate a random graph on some n vertices with some probability p and then I pick a vertex randomly call it the start vertex. I will start walking on the graph randomly from this start vertex and then my question is when one will visit all the vertices in the graph. Will one at all visit all the vertices, ever? Pause for
+
+[p.12] a minute and think about this question and the what you think is your answer for this question. Do you think it will take a long time or sometimes it is never possible to reach all the nodes by just taking a random walk? What do you mean by this? In a city, if you take a cab and then keep visiting places uniformly at random by tossing a coin and deciding whether to take a left turn or a right turn, how much time will it take for you to explore the entire city?
+
+(Refer Slide Time: 05:21)
+
+Let us now write a piece of code a quick python code to check how many random walks does it take to reach the entire graph. By reach the entire graph I mean reach all the vertices of the given graph.
+
+[p.13] (Refer Slide Time: 05:41)
+
+Here is a piece of python code that have written. I am sure you people are, I am sure you people all of you are very familiar with python right now. You know how to write a piece of code. So, I have not gone a line by line. I have finished this code and you can probably take a pause and then take a look at this code and then judge what the code is doing. So, as you can see, I have imported a few functions import random matplotlib networkx and NumPy. NumPy is used to compute average; it is a nice package for scientific computations. I am not using it much except for the 24th line as you can see, I am computing the average here in 24th line ok. Let me go slowly. This function walk (n, p); all it does is it generates a random graph with n nodes and p vertices starts from a random vertex in the given graph G (n, p). By that I mean an addition graph with n nodes and p probability p. And then I start with a with a vertex v which is uniformly picked from the vertex z. And then I keep walking on this graph and then count how much time it takes until I visit all elements of the vertex set ok. Take a look at this code. It is quite self explanatory and then I what I do is I call this walk function quite often with i ranging from 20 to 300 with probability 0.3. Take a look at the walk function, you will understand what I am doing here. And every time I get an answer, what is the answer? The answer here is walk of i comma 0.3, simply returns the number of attempts number of random walks you must
+
+[p.14] take until you finish going through all the given vertices of the graph with i vertices and p equals 0.3. And then I append this to a list called z and repeat this experiment some 10 times and then take the average of the number of random walks it takes for me to reach the entire graph. And then I do it for graphs of the size 20, 21, 22, 23 up to 300. And, then I plot on the x axis this range namely the number of vertices in the graph and in the y axis this plots the list l which stands for the number of random walks you have taken to cover the entire graph. So, let me execute this program and see what happens.
+
+(Refer Slide Time: 08:37)
+
+(Refer Slide Time: 08:39)
+
+[p.15] As you can see, the these are the number of nodes and the number of at random walks it takes for you to cover the entire graph. So, let us wait and see what happens. So, 263, 4, 5, 6, 7 so, on; it goes on till 300. So, as you can see the right side is the answer which is the number of random walks it takes for you to go to the entire graph.
+
+(Refer Slide Time: 09:13)
+
+So, now I get the plot the plot looks beautiful as you can see um. The x axis is the number of nodes in the graph and y axis is the number of attempts it takes for you to number of random walks, you need to take to cover the entire graph.
+
+[p.16] What does the signify? It signifies that it is just a little bit of an effort a few times the number of nodes in a network is what it takes for you to cover the entire graph and that is a very nice observation that we make. As you can see the plot clearly says it is looking very linear, although it is not very linear a little bit of observation will tell you that it is very close to a n log n function. Anyway details a aside we will not worry much. All that I need to understand is this is very much possible.
+
+(Refer Slide Time: 10:07)
+
+For example, when I take a node on 299 when I take a graph on 299 nodes, when I take a graph on 299 nodes in roughly 2000 random walks, I cover the entire graph. As you can see 298 seems to have taken a little more time as you know this is averaged. So, if you have average a lot more, this will be a properly increasing function.
+
+=== LECTURE 77: Equal Coin Distribution (Week 6, transcript PDF page 17) ===
+
+[p.17] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis Lecture - 77 Equal Coin Distribution
+
+Going with the flow, we had two questions.
+
+(Refer Slide Time: 00:11)
+
+Question 1 was collect the web graph. Question 2 is use this web graph to solve your search problem. Question 1 you all are convinced is very doable, why? You saw the plot just now. When there are n number of nodes, it is not very difficultdifficult to explore the entire graph with n nodes. Random walk makes you search for all possible nodes and visit all the places that way you would know what is linking to what; not only will you get all the nodes; you will get a whole lot of edges as well right.
+
+[p.18] (Refer Slide Time: 00:45)
+
+So, which means a partial structure of the graph is reveal to you. The second question that we asked how can we use such a web graph to solve our search problem? That we should go slightly slowly. I am going to divide my explanations in several pieces. I will go piece by piece; at the end put all these pieces together and you will see that we can solve the search problem just by using this web graph. So, I am going to go in bits and pieces and solve the problem of how we can use this web graph to solve the search question. The first piece is as and always a puzzle.
+
+(Refer Slide Time: 01:43)
+
+[p.19] You are given 30 people with complicated friendship between them, you have to decide who is the most important person here and I am going to use a very weird strategy to find out who is the most important person. Repeat 30 node graph, they are all friends. I am going to find out a nice way in which, I am going to use a nice way in which I can find out who is the most important person here. What do I do? As I told you it is a very weird strategy; do not break your head on why am II am doing it. What has this to do with a question? As I told you I am going to go in bits and pieces. The first piece is the stand alone question the standalone question; I mean do not try to relatedrelate with anything else just look at this is a problem in its own right. 30 people and I am going to use the following strategy to find who is good here, who is the best here.
+
+(Refer Slide Time: 02:37)
+
+Basically, I am going to rank everyone who is the best, who is the second best, third best. What I do is I take 100 gold coins and give it to every single person on this network of 30 people. So, the first person gets 100 gold coins second person gets 100 gold coins 100 100 100 100 100 30 people; each of them get 100 gold coins. And what isdoes the first person do?
+
+[p.20] (Refer Slide Time: 03:15)
+
+Assume a person has 3 edges. This node has 3; let us just take one node it has 3 outgoing edges. So, 100 can be divided into 33 33 33; I am going to round of ok. So, let us say 90 let us say 4 edges are going not 3, 4 edges are going 100 gold coins to a node and this node gives 25 gold coins to each of its neighbours. If it was 3, I will just divide it by 3 and 33.33 each. I will assume gold coins can you canyou can consider decimal part of it and then give it and by powdering it let us say. So, every person distributes the gold coins that they have to their neighbours. Now this one who has 4 neighbours to him will have some people who have him as a neighbour. So, he will also get some gold coins right.
+
+[p.21] (Refer Slide Time: 04:19)
+
+So, all I do is I take a network. As you can see 100 gold coins, each one iteration one snap like this will make everyone distribute their existing gold coins to all their neighbours.
+
+(Refer Slide Time: 04:33)
+
+You see with one snap, everything changechanges in the network on these 30 nodes. Another snap again it gets distributed. Observe very closely.
+
+[p.22] (Refer Slide Time: 04:37)
+
+What is the distribution? Whatever gold coins you have, whoever are your neighbours you should just go and give it to them and whoever is pointing to you they will give their gold coins to you. In every snap this happens, every snap this happens. Keep doing this, snaps are basically iterations you see the graph changing; first snap, change; second snap, change; third snap, change. You see it keeps changing like this, keeps changing like this and so on and so forth. I keep doing this up to eternity guess what happens. Very interestingly, this converges which means there is a stage after which the gold coins get accumulated and it does not change; just stays stagnant. And in that statestate, you go and see who has the maximum gold coins, you will see there is this node which has the maximum gold coins. You call him rank 1. Now what is it denote how did you accumulate so many gold coins? You did some random process, you simply started giving gold coins that you have what isdoes this even denote in the first place? Let us see that in a while, but I just did this for fun, a very weird strategy to find out who is the most important person. Whoever accumulates the maximum gold coins eventually with time is the most important person. The second most gold coin collector is the second most important person; third, third most important person; fourth, fourth; fifth, fifth so on. What just happened? Pause and think about it.
+
+=== LECTURE 78: Random Coin Dropping (Week 6, transcript PDF page 23) ===
+
+[p.23] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis
+
+Lecture - 78 Random Coin Dropping
+
+ So, just now we saw a strategy of every node being given 100 gold coins and these nodes distribute all the gold coins to their immediate neighbours; equally. And as this process continuous and continuous the number of gold coins they get distributed not evenly although, we started evenly; they get distributed haphazardly.
+
+(Refer Slide Time: 00:26)
+
+And I go and see that node which has accumulated the highest number of gold coins, call him the winner first king; first top one person; rank 1 person. Second most gold coin accumulator, I call him the second best, second king I rank him accordingly. That was one way. I will now give you yet another way of ranking the nodes. Now, I will not use gold coins; I will use something else of course, I will use gold coins, but I will give the gold coins in a quite different way.
+
+[p.24] (Refer Slide Time: 01:10)
+
+What I will do is, I will stand on a node, some node and from 1 node assume I have 4 neighbours, I jump to a neighbour uniformly at random and give that neighbour a gold coin. From that node I will jump to yet another node, whatever it is pointing to maybe, it is pointing to 5 nodes. I will pick 1 node uniformly at random jump there, give him a gold coin. Remember the car and roads experiment I keep visiting the places I said, and I explore entire city, I am doing something similar here. From 1 node is just take a random hop and go to another node. Whenever I visit a node, I drop a gold coin on that node, I keep doing this, keep doing this, keep doing this, and I see, how many gold coins are accumulated by these nodes? After some 1 million such random walks; I am walking randomly right. So, I call it a random walk. Random walk, gold coin drop; random walk, gold coin drop; random walk and I drop a gold coin. So, on and so, on and so, on and million times and I observe after a million iterations, every node has accumulated gold coins. Although, they are not equal different nodes have accumulated different number of gold coins right. We can see that the figure says, if I take 1 million random walks which node gets how many gold coins? At the end I again, look at which node got the highest gold coin? I observe that the node which got the highest number of gold coins here was the same node which got the highest gold coins in my previous strategy previous experiment.
+
+[p.25] In fact, the second best here will also be a second best there. In fact, third best, fourth best, fifth best, all of them here we will agree with everything else there. It is very surprising that this is true for you, but mathematically if one sees it is not at all a surprise. In fact, as part of the advanced material for this chapter I am going to cover the mathematical details of why and how this is happening as well. You are free to skip that its sort of it is not required that you go through it, but if you are curious to know what is happening, here where these 2 things the same, you may want to take a look at the mathematical material that I am going to record in the next few days, I mean in the next few hours of the video well.
+
+(Refer Slide Time: 03:59)
+
+All that you need to buy from this explanation is that the strategy of 100 gold coins being distributed equally versus taking a random walk and dropping a gold coin, both this strategies rank the nodes in a same way; in exactly the same way. So, the moral of the story is sharing gold coins game and dropping gold coins game yield the same ranking of the nodes. So what? I am going to analyse this first game and the second game properly, for reasons of better explanation I am going to call the first game. The equal sharing of gold coins game, the second game the random walk drop the coin game. So, simply speaking equal sharing and random walk; game 1, game 2. Let us slowly analyse and understand what these 2 games mean. What has happened so far? 2 games; this game is same as this game in terms of ranking the nodes. I will first
+
+[p.26] look at the first game which is 100 coins and equal sharing. Let us just think what happened here? What kind of nodes will attract the highest number of coins? A node has highest number of coins, if it is getting a lot of coins from its neighbours.
+
+(Refer Slide Time: 05:19)
+
+When will the neighbours give this a lot of coins? If the neighbours are getting a lot of coins. When will the neighbours get a lot of coins? If they are adjacent to whatever if there pointed by neighbours who get a lot of coins. You see this is a very recursive argument here. This captures the very notion of the following definition: you are famous, if famous people say you are famous, and those people are famous if famous people say that they are famous so on and so forth. This goes on like this correct. We discuss this in the introductory lecture in the first chapter right. You are famous if someone famous says you are famous. It is a very recursive definition. So, you see there is a definition for there is a abbreviation called GNU. If you are to computer science, you will know what is GNU. GNU stands for GNU is not UNIX and now what does that GNU stand for? Again, GNU is not UNIX; this is called a recursive definition. For fun they have called it this way, but you see the all the all the time trying to say is the definition is sort of recursive here. You are famous if someone famous says you are famous and how do you know they are famous? What do you, what do you mean by famous then? Famous they are famous if someone famous says they are famous. And this famous is defined very recursively. Now you see what is happening in the first game. A
+
+[p.27] node accumulates a lot of gold coins if a lot of people, the people who are adjacent to it accumulate a lot of gold coins right. Only then you will the pass on the gold coins to me. Please note, for me to accumulate a lot of gold coins people who point to me should accumulate a lot of gold coins and they should not have a lot of people adjacent to them. Now, what do I mean by this?
+
+(Refer Slide Time: 07:28)
+
+I have a rich cousin brother who helps me out whenever I want money let us say and I have 1 such cousin brother, but assume he has 10 such people to whom he is ready to help. Then I may not get all his help because his help sort of gets divided into 10. So, there are 2 aspects here; you should be having some good backups like a rich cousin brother to help you out in times of distress and he must not be ready to help a lot of people. So, he must have very few friends outgoing, and he must be rich. When will he be rich? When a lot of people point to him, so, a rich person, a rich node is being pointed at by a lot of people, lot of rich people let us say. But that person should point to a few people and one of those few people should be you I am just set up dissecting this problem and then observing it. But what I am trying to say is the moral of the story so far.
+
+[p.28] (Refer Slide Time: 08:38)
+
+If you have understood that a node accumulates a lot of gold coins, if it is being pointed by nodes that accumulate a lot of gold coins. This much is enough and then you call a node to be highly ranked if it is being pointed by highly ranked nodes.
+
+=== LECTURE 79: Google Page Ranking Using Web Graph (Week 6, transcript PDF page 29) ===
+
+[p.29] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis
+
+Lecture – 79 Google Page Ranking Using Web Graph
+
+Let us now, get back to the web graph question, 2 questions that we observed. We asked rather, how do you collect the web graph? How are you going to use it to solve your search problem? I am going to collect the web graph by taking random walks I collected. As you are collecting, as you are visiting nodes through random walks, you give points to each node.
+
+(Refer Slide Time: 00:36)
+
+For example, on this 30-node network which we did in let us say, second game the random coin dropping game. We dropped the coins and we saw which node got the highest gold coins. On the web graph we are going to do the same thing. We are going to walk on this web graph.
+
+[p.30] (Refer Slide Time: 00:53)
+
+We keep walking, keep walking, keep walking, we walk like let us say billion times and keep dropping the coins and we look at which node has the highest coins. And when you search for a keyword in the search engine what Google does, is this. It firstly, keeps walking on the web that is called crawling; it keeps crawling on the web keeps dropping the gold coins and sees which node has the highest gold coin. Every single page has basically, the gold coin accumulation points ok. When you type in let us say a keyword namely ah, I will say Britney Spears; if you type in the keyword Britney Spears we all know she is very popular, very popular pop singer. There is a there are lot of pages which talk about Britney Spears, which page should come first? What Google will do is it will go and retrieve all those pages, which has anything to do with Britney Spears. You will have some 10000 pages maybe, even more and as an example let me say 10000 pages. Now, Google does not display in fact, it displays all the 10000 pages, but it should display the most relevant page in the beginning. What is the most relevant page? That page, that has accumulated the maximum gold coins; this is how Google works. Google just displays all these 10000 results in descending order of the points that page is accumulate as Google crawls the web and drops a gold coin, on each page that it visits. Very simple, very straight forward, very easy to understand algorithm, very easy to implement technique it works like a charm.
+
+[p.31] Google harnessed the potential of what is called a web graph, where web pages are related by hyperlinks and Google as an industry thought one should as a before it became Google, in fact in fact, story is very interesting, these 2 people Larry Page and Sergey Brim, they were sitting in a old garage and they were trying to implement this; this particular algorithm of crawling through the web. In fact, their crawling was also very suspicious that people thought that they are trying to hack something and things like that, in fact, they gone into trouble because of this. You can read up the literature for this. I mean articles on this, in fact, there is a nice documentary made on this as well. I strongly suggest that you watch it. So, these people were doing something out of the box, which was like crawling the entire web and then giving points to each node and using that to give you the right search results. Work like a charm something that is unexpected which is the web graph seemingly useless of what use you think a person like me and you, remember when we had this coffee table discussion in 1990, do not you think? By no means one could think of seemingly useless ah data like the web graph coming in use in a problem such as search. And that seemingly useless data made this industry a big billion-dollar industry for a simple reason that it avoided hiring thousands of people which is like the first thought that one will get when it comes to solving the search problem. All that they did was take the web graph. How easy is to take? It is easy to take just crawl, take random walk; you will get all the web graph. Not only will you get as you crawl, as you take random walk, drop a gold coin and see which page has how many gold coins. And then when someone asks for a keyword search and show all the pages which has this keyword but sort them according to the gold coins accumulated by this web pages and that is precisely what Google does.
+
+=== LECTURE 80: Implementing PageRank Using Points Distribution Method-1 (Week 6, transcript PDF page 32) ===
+
+[p.32] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture – 80 Implementing Page Rank Using Points Distribution Method – 1
+
+(Refer Slide Time: 00:06) Hey everyone, in this video we are going to implement page rank using points distribution method. I assume, you have been already introduced to this method in the previous videos. So, I will just be briefing out the technique and then we will start the implementation. So, in this method what happens is, we start with the signing of fixed equal number of points to every node in the graph. After that every node distributes its points to its neighbours, by neighbours I mean the nodes that are connected to this node by an out link. So, basically what we do is we take a node and we look at its out links and the nodes we are connected to this node through an out link get an equal share of points from this node. For example, if there is node which has 100 points and it has 2 out links; so, basically it has 2 neighbours. These 2 neighbours should be getting 50 points each from this node. That is, that is called points distribution in case the node is having 4 neighbours and its having 100 points in that case every neighbour will be getting 25
+
+[p.33] points each from this node. Now, that point distribution happens for every node in the graph that is called one iteration. So, every iteration, so, after every iteration the points that every node contains keeps changing. For example, initially if we assign some 100 points to every node and we perform this points distribution after one iteration, the points that every node contains will change. And we keep repeating this process and after every iteration the points will keep changing; however, after some point after some number of iterations what happens? The points do not change, that is even after distributing points the points that the nodes were containing earlier is same as the points that the nodes will be containing after the iteration. That happens because the number of points that the node distributes is equal to the number points and it gets from the nodes through which it relates to an in link. So, we basically get a convergence, and as soon as we get the convergence, we stop. And this point every node will be having some number of points after attaining the convergence, every node will be having some points and we can sort the nodes based on that that point distribution. Basically, we can rank the nodes and that ranking is called page rank. So, that was about the points distribution method. Now let us see the steps that we are going to follow for the implementation.
+
+(Refer Slide Time: 01:49)
+
+[p.34] So, as a first step we are going to take a directed graph as you might be knowing for page rank it is better to take a directed graph because the points are distributed based on the out links. So, we are going to create a directed graph, we can also take make use of a function from networkx to generate the directed graph, but we will be creating a graph here by ourselves.
+
+(Refer Slide Time: 03:19) After that we will be assigning 100 points to each node. So, that is the initialisation of the points to every node. As I told you after that every node will distribute the points.
+
+(Refer Slide Time: 03:30)
+
+[p.35] So, as a third step every node will keep distributing its points to its neighbours and this process will keep repeating until, we get a convergence that is, until a point where the nodes points stop changing, that is where we will stop.
+
+(Refer Slide Time: 03:49) Now, after that we will be getting some distribution of points amongst these nodes and we can rank the nodes based on the points that they have accumulated. That ranking will be called page ranking; page rank basically, to validate whether the method is working fine or not.
+
+(Refer Slide Time: 04:08)
+
+[p.36] What we will do is as the last step is, we will make use of the inbuilt page rank method from network x and we will see the ranking that we get from that method and we will compare the ranking that we got from our implementation. So, these are the steps that we are going to implement. Let us get started with implementation.
+
+=== LECTURE 81: Implementing PageRank Using Points Distribution Method-2 (Week 6, transcript PDF page 37) ===
+
+[p.37] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture - 81 Implementing Page Rank Using Points Distribution Method – 2 Let us start with the Implementation of Page Rank Using Points Distribution Method, as we discussed in the previous video.
+
+(Refer Slide Time: 00:12) I have pasted to 5 steps from the previous video over here and we will take the steps one by one. So, let me create a main function here ok. So, let me import networkx first. So, let us take these steps one by one. So, the first step is create or take a directed graph with n nodes as I told you previously. So, we can use a generator for creating a directed graph that is some function from network, we can make use of. For example, we have a function gnr graph which gives us a directed graph. We can use any function, or we can create our own function to create a directed graph as well. In this video we are going to created at directed graph ourselves. So, let us see how we can do that. So, as a first step I am just creating an empty directed graph by using this function G = nx.DiGraph ok. This graph is empty, but it is a directed
+
+[p.38] graph. Now, let us add the nodes and then we will add the at the edges. Let us add some nodes to it. So, I will write G.add_nodes from. So, we will add a list, I will write i for i in range, let me add some 10 nodes here. We can add more as well, but I want to show you the conversions, if you took take and a number of nodes it will take more nodes, it will take more time for convergence; you can always change that. So, I am taking 10 nodes at this point. Now, we have added the nodes, we must now add the edges. So, I am going to use a technique of course, you can use many different methods to create a graph. The method that I am going to use here is that I will be randomly adding edges between the nodes, that is also well known technique to create a random graph which I think we will be discussing in the next weeks video. But I will be just briefing out the technique here because we will be creating this directed graph using that technique. So, for that purpose I will be creating a function, let me create a function add edges ok. I will pass the graph here which has nodes and no edges as of now. So, I will be probabilistically adding the edges, I will briefly explain you the method as well. I am passing a probability value of 0.3 here and this function will be written in graph where the edges have been added. So, let me create this function here I will create it here so, I will write. So, as a parameter this function requires the value of p which is a probability value. So, let me tell you what we are you doing here. So, we are going to take all possible edges that can ever we added to the graph and we will toss I mean, and we will add these edges to the graph after tossing a coin. By that what I mean is we will take an edge and we will toss a coin, if a coin turns out to be head we will add that edge and if the coin turns out to be tail we will not add that edge. So, here in this case as you can see that we are passing a probability value p here and the value of p we have passed as 0.3; you can pass any value here, you can pass any value between 0 to 1 over here. So, by passing this probability value what we mean is that, you can assume that the coin is biased by a probability 0.3 which means with the probability 0.3 the coin will turn out to be head. And, with the probability 0.7 the coin will turn out to be a tail.
+
+[p.39] So, we will take an edge, we will toss the coin which is biased by this probability value and if a coin turns out to be head, we will add that edge otherwise we will not add that edge. So, this is the technique that we are going to follow. This is a well-known technique which is used to basically create random graphs. We are using this technique; you can use any other technique as well. So, let us see how we can implement this. So, we have to take all possible edges, how can we do that. I can start loop I can write for i in G.nodes. So, I got all the nodes here because, we want the edges I will start another loop here. So, I will write for j in G.nodes ok. So, i comma j is we will give us all possible edges, we are now going to add self edges. So, I am going to check over here whether i is equal to j or not. So, I will write if i != j only then go ahead. So, we have to implement that coin tossing here now, can you imagine how we can do that. We are going to take a random value for that we need to random package. So, let me import that, import random. So, we are going to make use of function random.random which gives us a random value between 0 and 1. Let me store that here r = random.random.
+
+(Refer Slide Time: 05:56) Now, we got some value here in r, we will check whether that value r <= p value or not. If that if r <= p; that means, we got a head and if r > p ; that means, we got a tail. So, that is that how we are going to implement that coin tossing part. So, we got this random
+
+[p.40] value, let us check whether r <= p; if it is we are going to add that edge. So, I will write G.add_edge, the edge is going to be (i , j) right and the edge part when r > p, we assume that that is that is a tail. So, we will not add that edge, we will just continue here. So, this is how we are going to add the edges. Now, you know that this G is a directed graph. So, the edges that are going to be added here by using this add edge function are going to be directed edges. So, after this loop we would have added several edges, then we can return this graph. So, this is our add edge function and now we have created this graph G and we can go ahead. So, we are done with the first point, let us implement the second one. It says assign 100 points to each node. So, we have to maintain a list points which will be storing the points for every node and we have to initialise this points list to 100. Let me create a function although you can directly write it, but I am going to create a function for this.
+
+(Refer Slide Time: 07:35) So, I will write points is equal to initialize points and I will pass the graph here ok. So, let me create this function ok. So, this function is just going to create a list points and that points list will be having 100 points for each node. So, I will write 100 for i in range, what is going to the size of this list. And, the size of this list is going to be equal to the number of nodes that are there in the graph although we know that there are 10 nodes as of now, but we can always change that. So, let me generalized it by writing G.number_of_nodes and then we should return this list points we are done ok. Let us go
+
+[p.41] here; we have done the second point. So, every node has 100 points right now. Let us go to third step, third step says keep distributing points until convergence. Now, how do we distribute_points? Let us see how we do that. For that purpose, let me create a function distribute_points. So, I will write define distribute_points. So, this is going to be one iteration and we are going to distribute_points in this function. As you know that after the nodes distribute their points their points change. So, we are going to need previous points and new_points. Let us pass the graph here because, we are going to need that and let us pass the points that are there as of now. As I told you previous points and new_points let me create to let me create two lists here. So, I will write previous points to be the same as points and this is just for a ease of understanding. Another list I will create new_points, this is what we will be returning. So, this list I am going to initialize to 0 and during the distribution part, this list will get more points and that is what we will written.
+
+(Refer Slide Time: 09:58) So, for now I will write 0 for i in range G.number_of_nodes. I have not copied G.number_of_nodes ok. So, this is the initialization of the new_points list which will be returned by this function. Now, how do we distribute? As I told you for every node, we will look at its out links. So, let me start a loop at these points, I write for i in G.nodes. Now, i is a node and we must distribute its points. How do we distribute? We look at its out links right. So, let us keep a track of the out links of this node i, the function that we
+
+[p.42] can use from networkx for this purpose is out_edges. So, I will call that function I will write G.out_edges. Now, this function is there for directed graphs only, the parameter will be the node. So, we write G.out_edges. What this function does is, for the node i it will return a list of the edges which are out_edges from this node i. Now after this, this node i has to distribute its points and equal share of its points to its neighbours right. So, we have the points that this node i has in this list previous points right. We are going to distribute these points equally amongst its neighbours. And the number of neighbours we can get by getting the list and by getting the length of this list. Now, what happens what will happen if the list is empty, that is the node has no out link. In that case, the length of this list will be 0. So, it is a good idea to check for that condition over here. So, let me check if the length of this out is 0 not, because in that case division by 0 exception might come. So, it is better to check it here. So, I will write if length of out is equal to 0 which means this node has no out link ok. If a node has no out link, what should happen? It will not be distributed; it will not be distributing any of its points right. So, what we write is, new_points for i are going to be plus equal to I will tell you why I have written plus equal to previous points i ok. So, I have written plus equal to because, this point is going to retain its points it is not going to give its points to anybody because there is no out link. However, it might have some in links and through those in links it might be getting more points. So, that is why we have to keep adding it. So, we have to write plus equal to. Now, this is what we will do in case a node has no out link. In the general case that is the nodes have out links, what are we going to do? We are going to distribute an equal share of these nodes points to its neighbours. Now, what is that share going to be? Let us create a variable share. Now, the share is going to be the number of points that are going to be distributed to every neighbour. What is this share going to be? So, as I told you if there are if there are 3 neighbours, the points the points that are going to be distributed is total divide by 3. And what is the number of neighbours here? The number of neighbours is equal to the
+
+[p.43] length of out here right. So, what are we going to do is we will write previous points that is what is to be distributed right, you remember that you have to only distribute the previous points. So, previous points are to be distributed in equal share so, we divide by length of out this. So, this is what is to be distributed, let me sorry let me do the float casting here so, that we get the exact values ok. So, this is a share that has to be distributed to the neighbours. Now, where are the neighbours? The neighbours are in this list; this list is a list of edges. So, for every edge 0th value is the source that is our node i and first value that is the value at index 1 is going to be the neighbour ok. So, let us start a loop here in order to distribute the points. So, I will write for each in out which means for every neighbour, we are going to update the new_points of every neighbours. So, I will write new_points for each now each is an edge. So, I will write each 1, each 1 is going to be the neighbour. So, new_points plus equal to share so, that is how we will be updating the points of every neighbour. I think we are done, let us return. What are we going to return? We are going to return the graph G and we are going to turn the list new_points ok. So, we have created this function, this distributes points which is going to be one iteration where every node will be distributing its points. Let us go back to main and let us see what we have to do.
+
+(Refer Slide Time: 15:22) We have to keep distributing the points until the convergence. So, we have to basically
+
+[p.44] keep calling this function distribute_points. So, what we can do is let me create another function which will keep calling this function that we have just created. Let us call this function keep distributing points and the parameter will be G and the points that we have and this function should return G and points again. So, we are passing something and that is getting updated and that is what we will be returned. Now, what should this function do? Keep distributing points, this function has to keep calling the function distribute_points until we get the convergence ok. So, let us create this function ok.
+
+(Refer Slide Time: 16:22) So, as I told you this function has to keep calling this distribute_points function, let me start a while loop here. So, what I can write is while 1, they should keep going on ok. What should keep going on? Before that let me rename these previous points is equal to points, this is for the ease of variable name that is all ok. So, we are going to start this loop, this will keep going on and on. We have to call the function this distribute_points. So, I will copy it and I will call it here, this function returns two things again. So, I will write G, new_points is equal to this right. What are we passing? We are passing previous points. So, let me rename these previous points done. So, we have called this function and one iteration is happened and we have got the new_points in this list new_points. If we want to keep track let us let us print this so, that we can see the updated points ok. Now, this will keep going on and on, it has to stop somewhere basically when the convergence happens. So, you can do one thing, or you can do one or the two things, you
+
+[p.45] can either through your code check whether the convergence has happened or not that is one thing. And, other simple thing that we can do is we can keep observing as we are printing it right. So, we can keep observing these points and whenever we see that convergence has happened, we can stop it. So, for that let us let us ask the user to stop it, enter may be # to stop and let us ask the user to enter a hash when he wants it to stop. So, we will take that through the function may be raw input and if that char is equal to # we are going to stop. So, I will write break ok. Now, after one iteration, we have to assign the new_points to be the previous points and we have to repeat the process. So, it is important to write previous points is equal to new_points and after that we will go back here, and the same thing will start alright. I think we have done, let us return let us return the same two things G and new_points. I think this function should work ok, we can, may be check the code as well if it is working fine, wait there is an error here ok. So, let us check the functionality of this code whether it is working fine or not. So, let me call main here ok.
+
+(Refer Slide Time: 19:34) Let us get back to our screen and let us try calling this file ok. So, these are the points, we did not print the initial points right. They were obviously, 100 100 each we can print that as well. So, this is these are the values that we are getting after one iteration. And we have to press enter after it, after I press enter the next the next iteration starts.
+
+[p.46] And, as you can see the points are changing the first node was earlier having 33 points and now it is having 38 points. I am keeping on pressing enter and we are seeing the points how they are changing.
+
+(Refer Slide Time: 20:12) So, I keep on pressing the enter ok, as you can see we are sword of reaching the convergence.
+
+(Refer Slide Time: 20:21) So, it may stop, it may happen that as you keep pressing enter it will not change at all. So, nothing will change, or it may happen that values are changing by very nominal
+
+[p.47] decimal points. So, you can stop wherever you want and or you can go on and on. So, it is up to you. So, I am keeping on pressing enter and I can see the values changing slightly only by decimal points. So, I can keep going on and on or I can stop.
+
+(Refer Slide Time: 20:53) So, I want to stop let me press hash and we are stopping. So, these are the points distribution that we are getting, and we are sort of seeing the convergence taking place as well. Now, let us get back to our code and let us see what is pending ok, next step is to get the nodes ranking as per the points accumulated. So, we have to basically rank the nodes based on the points that they have acquired overtime after number of iterations, after the convergence point. So, I think we will do that in the next video.
+
+=== LECTURE 82: Implementing PageRank Using Points Distribution Method-3 (Week 6, transcript PDF page 48) ===
+
+[p.48] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture - 82 Implementing Page Rank Using Points Distribution Method – 3
+
+(Refer Slide Time: 00:07) In the previous video, we saw the conversions taking place when it comes to the points that the nodes are able gather in every iteration. So, we saw that the points are converging. Now, the next step is how we can rank the nodes based on the points that they have gathered. Now, let us create a function to sort the nodes based on points. So, let me create get nodes sorted by points, I am going to pass the points list and it should return me the list of nodes. I am sorry I am sorry ok. So, I will write nodes_sorted_by_points = get_nodes_sorted_by_points which is a function which I am going to create. And, then let me print the nodes that we will be getting. So, we will just be printing the nodes that we are getting, I should print the initial points as well. So, that we know how the points are changing. So, I am printing the initial points here ok, getting back to the function that you have to create get_nodes_sorted_by_points. Let us create this function here. Sorry ok.
+
+(Refer Slide Time: 01:27)
+
+[p.49] Now, what should this function do? This function has as an input a list which is points which is a list having the points for every node. And, what should this function do? This function should return a list of the nodes sorted by their points. Now, what are the nodes? How are the nodes labeled? The nodes are basically from as you can see here from 0 to 9 right; that is how the nodes are numbered. So, we can just simply get the index of the nodes from this points list. So, basically what we have to do is, we have to sort the index of the values which are there in the points right. We can use again several methods for that, one method which might be very quick is we can make use of the package numpy. So, numpy has function argsort which basically returns the index, the indices sorted by the values of a list. So, we are going to use that function argsort that function is there in numpy.
+
+(Refer Slide Time: 02:49)
+
+[p.50] So, let me import that package. So, I will write import numpy as np ok. So, the input to wherever we yeah here so, the input to that function is basically an array which is a numpy array and here as an input we have a points which is a list. So, we have to convert that list into a numpy array. Now, how we do that? So, I will write points array is equal to np numpy.array. So, so this array is the function which converts a list into an numpy array ok. Now, points array is a numpy array and we can apply the function argsort on it. And, what is that function do? It returns the indices sorted by the values of the list. So, write np numpy.argsort points array ok. What is it return? It returns the indices. So, indices basically are the nodes in our case. So, maybe I can write nodes_sorted_by_points equal to this thing ok. Now, one thing that has to be noted is by default argsort sorts in the ascending order right. And, which order do you want? We want descending order that is the node which has high points should be the first to be ranked ok; so, simple thing that we can do here just put a minus here. By putting a minus all the values are convert converted to negative and the ordering that we will be getting will be negative. So, as simple as that we can work with that simple method. So, this nodes_sorted_by_points is going to have the nodes sorted by of course, the points in descending order right. So, the first value will be the node which is having highest ranking and hence the highest page rank ok. Let us return this nodes_sorted_by_points, this should work.
+
+[p.51] (Refer Slide Time: 05:07) So, let us go back to main and let us see is anything pending. So, we had already called this function and we had already printed the values. So, let us see whether this function works fine or not ok.
+
+(Refer Slide Time: 05:18) So, let us call this function, let us let us see how the code works. So, let me execute this ok. So, these are the initial points I am sorry these are the initial points 100 each, as we assigned initially. And then we started the iterations, after the first iteration as you can see the first node which was having 100 points is now having 120 points and second
+
+[p.52] node the points for second node have reduced and so on. So, that that keeps changing; this is the scenario after first iteration. I press enter and this is this scenario after second iteration. So, the points have 150 for the first node, I keep on pressing enter.
+
+(Refer Slide Time: 06:01) And I keep on seeing the values changing as you can see. So, let us concentrate on the first node as of now. So, 224 I keep pressing enter because it is keeping on changing it is 2 219.
+
+(Refer Slide Time: 06:14) And only the decimal values are changing ok.
+
+(Refer Slide Time: 06:20)
+
+[p.53] Let us let us look at any other node if the values are changing drastically. So, if the values are not at all changing, we will stop of course, if the values are changing slightly, we can either keep going on and on or we can stop there. So, that that should be enough and that is what I am mean to say; let us see if any other value is changing. I am giving on pressing enter and the values are only slightly changing. So, I think I can stop at any moment, let me press hash here.
+
+(Refer Slide Time: 06:46) So, our loops stops ok, this function is looking fine. So, I getting the nodes_sorted_by_points, these are the sorted nodes that we are getting. Basically, these are rankings; this is the ranking of the nodes. So, the node 0 is having the highest page
+
+[p.54] rank node 2 is on the second number and so on. So, this is the ranking that we obtained. Now, let us see whether this ranking is correct or not as per the page rank; by third that is there in networkx. So, let us get back get to the last step which is compare the ranks thus, obtained the ranks obtained with the inbuilt page rank method. Now, let me tell you there is an inbuilt function which we can use to compute the page rank values for the nodes for a given graph. We have ourselves implemented it over here, there are several other methods as well let me tell you. We have implemented one of the methods which is using the distribution of the points. We might look at other methods as well maybe in the subsequent videos; let us check the ranking that we obtained from page rank. So, the function is nx.pagerank and we will pass the graph here ok. Let me tell you what it returns, it basically returns a dictionary where the keys are the nodes and the values are the page ranks of the nodes. So, basically it does not tell the ranking of the nodes, it tells us the page ranks page rank values of each node. So, we would have to rank them ourselves. So, how can we do that? Let me sort this dictionary ok, we cannot sort the dictionary because the dictionary does not contain any sorting order. So, we can create a list of the tuples from the dictionary as we have been doing in the previous videos as well. So, how can we do that? Let us see so, this is going to be a list of the sorted tuples based on the values. So, the function that we can use is sorted, I write pr.items and same old method that we use key is equal to lambda. How can how do we want to sort it? We want to sort it based on the value which is the second thing in the tuple which is x1. So, we will write x : x1 and by default it is a ascending right and we want it to be descending. So, we will write reverse is equal to True. So, pr sorted is a list of the tuples ok. What we want? We want the nodes; we want the nodes sorted by the page rank value only. So, maybe what we can do is, we can only print the first value from each tuple. So, write for i in pr_sorted ok, I am going to only print the first value for every i ok. So, I want all the values in same line so, I have put a comma here ok. Let us check the working of the code. So, basically what we have to check is the ranking that we were getting r by r method and the ranking that we are getting by this method are the same or not.
+
+(Refer Slide Time: 10:20)
+
+[p.55] Let us check alright. So, these are the initial values 100 each and after first iteration these are the values that we get. We got 50 points for the first node now, I am pressing enter and the values are changing ok. So, the values are changing.
+
+(Refer Slide Time: 10:41) . Let us the, for first node has 106, only the decimal values are changing. And, let us check the second one, second one is also slightly changing third, fourth I think all the nodes are only slightly changing. So, we can stop at this moment or maybe you can go ahead a little more ok. I am just keeping on pressing enter; it is just changing very slightly. It might take number of iterations to stop. So, maybe we can press hash and stop at this point.
+
+[p.56] (Refer Slide Time: 11:15) This is something that I want to tell you. So, this is the first thing that you can see is the ranking that we got by our method ok. And, the second row is the values that we got by the page rank method from networkx. Now, let us compare 9 4 3 5 is correct after that 0 6 1 2 7 8. So, we can we see some changes here. This is what I wanted to show you, why these changes are coming and how we can handle that ok. So, can you imagine what can happen if there is a node which has no out link. So, as we also implemented if a node has no out link, this node does not distribute its points. So, in every iteration, what happens it keeps on changing; it keeps on getting points ok. It keeps on getting point from other nodes and it never distributes its own points. So, what happens is that the point sink happens. Sink basically all the points are getting accumulated at 1 node or a set of nodes. So, this example I gave for 1 node, it may also happen that in the graph that we generated there are a bunch of nodes which are not distributing any points outside. So, basically there is a link from 1 node to the other and there is a link from second node to the first node, but there is no link outside. So, these 2 nodes will keep accumulating all the points and that is how the ranking that we will get will not be accurate. So, for that we need to take some measures, we must handle that case. The networkx function is basically handling those cases whereas; our function is not handling those
+
+[p.57] cases; that is why we are getting these differences in the ranking. Now, we are going to handle these cases. Let me tell you it will not happen in all the cases, because in all the cases your graph might not be having such sinks right. Let us check one more example, if we are getting the same. So, let us check for the convergence first.
+
+(Refer Slide Time: 13:31) Again the values are keeping changing ok, now I am pressing enter and it is not going dead basically the values are not at all changing. So, it is completely stopped, there is no change now I am keeping on pressing enter. So, we can just press hash, let us see the ranking that we getting we are getting 5 7 9 8 4 6 0 3 1 2 ok, that is again another thing I want to show. So, this might be a graph where there is no such problem as I just explained you there is no sink. There is no 1 node or a set of nodes which are keeping on accumulating all the points and they are not distributing that case is not here and that is why we are getting the same thing here. So, our method is accurate just in case there is no sink there in the graph ok. Let me just take another case and I am sure there will be some problem here. I actually want some problem to happen so, that the next video we can cover that because, we are going to handle such cases.
+
+(Refer Slide Time: 14:28)
+
+[p.58] I am again pressing the enter and it is not going ahead, it is stopped. So, 8 7 6 2 1 you pick 2 1. Yeah, we got the difference nice. So, 2 9 1 and 2 1 9 so, we got a difference right; let me tell you one more thing sometimes there might be a slight you know variation for another reason as well. And, that another reason could be that 2 nodes are having exactly same page rank values right. So, in that case your method can rank them in a different order and page rank method from networkx for example, can rank them in a different order. So, that sort of difference can happen even if your method is completely working fine and taking care of the sink cases as well. So, that you can just ignore, but as of now we know that our code is not taking care of the sink cases. So, we need to do that ok. So, let us get back to our code.
+
+(Refer Slide Time: 15:30)
+
+[p.59] And in the next video we will be handling that case.
+
+=== LECTURE 83: Implementing PageRank Using Points Distribution Method-4 (Week 6, transcript PDF page 60) ===
+
+[p.60] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture – 83 Implementing Page Rank Using Points Distribution Method – 4
+
+(Refer Slide Time: 00:06) In the previous video, we finished Implementing Page Rank using Points Distribution Method and it was in most of the cases coming same as the ranking that the networkx a function page rank provides us. However, in some cases the ranking was not similar; the reason for that was that our code was not handling the cases, where one node or a set of nodes have no out links. So, in that case all the points get accumulated in that node or that set of nodes. So, our code has to handle those cases. That is what we will be doing in this video. Let us get back to our code and see what kinds of measures are required to handle those cases.
+
+(Refer Slide Time: 00:51)
+
+[p.61] (Refer Slide Time: 00:56) So, this was our main. And here, we were calling this function keep_distributing_points and let us get back to this function and see what it was doing. So, keep distributing functions was keeping on calling this function distribute_points. This distribute_points was basically, 1 iteration that was returning us updated points after that iteration right. Now, after every iteration we have to make some changes to the points in order to handle the cases of sinks, point sinks. Now, how that is usually done let me explain that to you. So basically, what we do is after every iteration, we gather a fraction of points from every node and the points that we gather, this way we then distribute these points equally
+
+[p.62] amongst all the nodes right. So basically, for example, after 1 iteration we get some points with all the nodes. And after that to handle the sink cases, we take one more step and, in that step,, we let the node have 80 percent of it is points and we take some 20 percent of the points from that node. And we do that with every node. And that is how we gather some number of points, after that we divide these points that we have gathered this way amongst all the nodes equally. Now this is the way to handle the problem of sink. You can consider this to be similar to the tax system in any country, where we take some say 30 percent of the salary from every person, if their salary is exceeding some value. So, the amount of money that we gather this way that is distributed for the development of the rest of the people or all the people in general. So, it is the same scenario here as well, the number of points that the node will be all the nodes will be keeping. And the fraction of points that they will be letting go is basically decided by a parameter, which is usually denoted by s. So, usually we take s = 0.8, which means 80 percent of the nodes points will be with the nodes and 20 percent of the nodes points will be let go by all the nodes right. So, let us increment that thing here. As you can see in this function keep_distributing_points, we call this function and that is how we got the new points.
+
+(Refer Slide Time: 03:44) Now, after we get the new points, let us take one more step to handle um the sinks let me
+
+[p.63] for that purpose create a function. So, I will write new points, is equal to handle points sink let us call this function. So, let us pass the graph and the new points here ok. So, we have to create this function, now which will be doing, whatever I just explained that is it will be taking 20 percent of the points from every node and whatever we gather this way we will be distributed to all the nodes equally.
+
+(Refer Slide Time: 04:16) So, let us create this function ok. So, as a first step every nodes point will be reduced right, every nodes point will be reduced to 80 percent of what they were. So, let me start look here for i in range(len(points)) we can generalize it to may be points and that is what it will be returning. So, for in range(len(points)), we must reduce the points for every node. So, we will write points[i] = points[i] * 0.8. So, they become 80 percent or what they were earlier let me do the casting ok. So now, every node has reduced points reduced to 80 percent, now what should be done with the remaining 20 percent of the point that we have gathered from every node? Now if you know that what are the total number of points that the graph had initially: you can understand that then the total number of points never change. They are only sorry; they are only distributed amongst each other or the nodes will keep giving the points to each other, but the total number of points never changed ok. So, we are going to use that fact to know, what are the points that we have gathered? So, if every nodes point has become 80 percent, we have gathered 20 percent of the total
+
+[p.64] number of points that the graph had ok. Now what is the total number of points that had? We had assigned 100 points to every node ok. Let us see the total number of nodes, I will just show that here. So, I will write g.number_of_nodes ok. So, I got n here what will be the total number of points in the graph that will be n * 100, because we assigned 100 points. Now all of this these total points 20 percent is what we have now so that we can distribute to every node. So, I will write into 0.2. So, this is what we have ok. Now how many points to we have to distribute to every node? We must distribute these points equally ok. So, we will divide by n ok, so that we get an equal share for every node that will be the casting here ok. Let us call it extra now because, this is the extra points that every node will be having may be, we can took this as well ok. So, these are the extra points that have to be assigned to every node apart from the point that they already have. So again, we will start a loop. I will write for i in range(len(points)) again ok. So, points of every node will become plus equal to extra ok. So, every node is going to get extra points I think we have done. So, just return the points these are the new points ok. So, we passed old points to this function handle_points_sink and it will return the updated points, which will go back to this function keep distributing points here ok. So, new points have changed, this is what we passed, and this is what we got ok. So, new points have changed since, we had not change the name. So, I do not think we have to change any other thing in the function.
+
+(Refer Slide Time: 08:09)
+
+[p.65] (Refer Slide Time: 08:14) Let see how our program works. So, let us execute, so these are the initial values, and these are this is how the values are changing, I am just keeping on pressing enter and now I will press # ok. So, these are the values that we are getting 0592837. So, they are exactly in matching. So, we are handling the sink cases. So, the values are exactly matching. Let me tell you one more thing sometimes there might be few differences with the with the ranking that you are getting from the networkx function as I told you, I guess one of the reasons could be 2 of a nodes are having the same page rank another reason could be
+
+[p.66] you have not let it converge, it is going on and on and it is taking a lot of iterations to reach an exact convergence point. And you are just stopping somewhere in the middle. So, that might also lead to a slight deviation from the ranking that you are getting from networkx. Let me check one more example here ok.
+
+(Refer Slide Time: 09:21) So, this is what we are getting let me stop here. 4653270198 here; so, we are getting the same values because, we are handing the case. So, in case you get the slight deviations also you need do not worry because, you have understood the whole concept; how basically points distribution is similar to getting a page rank because, apart from the mathematical complexities this is what basically is the main idea behind getting the nodes rank based on the page rank values. So, this was about the implementation of page rank using point distribution method. So, we are going to implement random walk method in the next videos.
+
+=== LECTURE 84: Implementing PageRank Using Random Walk Method-1 (Week 6, transcript PDF page 67) ===
+
+[p.67] Social Networks Prof. S.R.S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture – 84 Implementing PageRank Using Random Walk Method – 1
+
+(Refer Slide Time: 00:05) Hey everyone, in the previous video we implemented page rank using points distribution method. In this video we are going to Implement Page Rank Using Random Walk Method. Now what exactly is random walk method? So, basically, we are going to choose 1 node from the network uniformly at random. And, we will look at its neighbors; we will choose one neighbor out of them uniformly at random. And then we will look at the neighbors of that node, and we will keep doing this. And that is how we will randomly walk on the network that precisely what random walk is. Now, there are two things that we are going to do along with this walk. And that is first thing that we will do is as and when we choose a node, we will increment its points by 1. Since we used points in the previous method as well which are different sort of points, let us call these points as random walk points just to differentiate things.
+
+[p.68] So, as I was saying as and when we reach a node, we increment its random walk points by 1 ok. That is one thing that we do, second thing is while we are randomly walking on the network it might so happen that we reach a node which has no out links, which has no neighbors where we can go right. So, in that case what we do is we out of all the nodes in the network we choose one uniformly at random and we resume ours our random walk from that node. Now this is precisely called teleportation, which is a frequently used term when you talk about page rank and random walks. So, teleportation is basically choosing a node uniformly at random from the network and starting our basically resuming our random walk from that point. Now, what is the basic idea behind this concept? How is it I mean it is, it looks counterintuitive that we are trying to implement page rank using random walk; it sort of does not make sense intuitively. So, let me tell you the basic idea that is used here. As we randomly walk on the network, a node which has a number of huge number of in links. There is a high probability that we will reach at this node more often right. And anytime we reach a node we are incrementing its random walk points. So, the number of times we reach a node we are keeping a track of that. And a node which has high number of in links we will be reaching that node quite often. On contrary if we have a few nodes which have very a smaller number of in links, we will be reaching them very less often and that is what is recorded by the number of random walk points. So, that is a basic idea because in page rank also the idea is same. If lot of nodes point to you then you are in important ok. And another thing that it captures is if a lot of important nodes points to you then you are important. So, in the random walk also that thing will be captured that if a lot of nodes, which are reached quiet often and they are pointing to you, you will be reached quiet often. And, the same thing is captured by the count that we are keeping random walk points that we are keeping. So and based on those points we are going to rank the nodes; which will be precisely same as a ranking that we get from the page rank technique. So, let us see the
+
+[p.69] steps that we are going to implement ok.
+
+(Refer Slide Time: 03:54) As in the previous case we are going to take a directed graph. So, we can either take it using some generator from network x function or we can create it ourselves. So, we created in the previous video we are just going to make use of that code again. Second step that must be implemented is the main step which is performing a random walk. As I just explained to you, we are going to implement those steps. After performing a random walk, we are going to have count of the number of times we reached a node that is the random walk points. So, we are going to rank the node based on the random walk points that we obtained in the previous step. In the last step as we did in the previous video as well. We are going to compare a results, with the results that we obtained from the inbuilt page rank method from networkx. So, these are the sequence of steps that we are going to follow; first, third and fourth steps are the same as in the previous video. So, the main thing that has to be implemented is the second one that is the random walk which we are going to in the next video.
+
+=== LECTURE 85: Implementing PageRank Using Random Walk Method-2 (Week 6, transcript PDF page 70) ===
+
+[p.70] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis Lecture – 85 Implementing Page Rank Using Random Walk Method – 2
+
+(Refer Slide Time: 00:07) In this video we are going to Implement Page Rank Using Random Walk. So, let us start the code.
+
+(Refer Slide Time: 00:12)
+
+[p.71] As I told you, in the previous video there are 4 steps which are to be implemented. And out of those 4 steps first third and forth steps are the same that we implemented in our previous video on implementation of page rank using point distribution method. So, we are going to reuse that code and there is no point of writing the code again. So, I have copied pasted the code which is required over here in this file. Let me show you, we will start from the first step. First step is to take a directed graph. So, as we had created the graph. How had we created? We had taken a an object of nx.DiGraph. So, we created an empty directed graph here and after that we add nodes to it, we added 10 nodes to this graph. And after that we added edges to the node to the graph using this function add_edges.
+
+(Refer Slide Time: 01:07) So, let us go back here. These add edges function I have copied as it is from the previous code. So, here just to brief about we are tossing coin for every edge. And if the coin turns out to be head, we are adding that edge otherwise we are not keeping that edge. So, that is how we are randomly assigning edges to the graph.
+
+(Refer Slide Time: 01:35)
+
+[p.72] So, after this our graph is ready and we can perform a random walk on this. So, that is a second step performing a random walk which is to be done, we will just do that. After forming the random walk we will be having random walk points. And then we have to rank the node based on random walk points which is what we have done in the previous video. I have just pasted the code; I have just renamed this function get node sorted by random walk. I just renamed it here that is all, the functionalities entirely the same.
+
+(Refer Slide Time: 02:08) So, this function I have added as it is. So, that part is done.
+
+(Refer Slide Time: 02:13)
+
+[p.73] And finally, once we are done, we use the page rank method from network x. And we compare the results, our results with the functions results; again, this is entirely the same code ok. So, what has to be done is the second step which is performing a random walk, now let us do that. So, this function is going to we are going to create a function random walk and that function will return random walk points ok.
+
+(Refer Slide Time: 02:43) So, let us write that: random walk points is equal to random walk. So, we are going to create this function random walk, we will pass the graph there ok. So, let us create this function.
+
+[p.74] (Refer Slide Time: 02:59) Now, as I told you what do we mean by random walk? We will randomly choose, 1 node from all the nodes that, is the first step ok how do we do that? Let us create let us get a list of nodes firstly. So, let us write node = G.nodes because, we have chosen one randomly we will choose out of these out of these list. And as and when we visit a node, we increment its counter, increment its random walk points. So, it will be nice to create a list which will be returned by this function, random walk points is equal to we have to initialize it to 0. So, we can write 0 for i in range G.number_of_nodes. So, random walk points initialize to 0. Now, we have this list of nodes and we have to choose one out of them out of these nodes randomly. So, we can do r is equal to random dot. We have to choose 1 node randomly out of these lists; for that we can use a function random dot choice, random dot choice out of nodes ok. So, we got 1 node uniformly at random. Since, we are have visited it we must increment its counter its point. So, we will write RW points for this node r, must be incremented by 1. After that we have to look at the nodes which are neighbors to this node ok. We have to choose one neighbor uniformly at random. So, let us first get a list of the neighbors of this node are. How do we get that? For a directed graph we have function G dot out edges ok. G dot out edges for r, out will contain a list of all the edges, out edges from r ok. And after that we have to choose one of the, one of the neighbors uniformly at
+
+[p.75] random and we have to repeat the same process. So, basically what are we are doing, we have to keep repeating it. How many times we should do, as much as possible ok. So, let us create a counter for that. And we can start a loop because, we have to keep repeating things, we can take a very big number probably whatever as much as you can handle. I have taken this big number. So, we will visit these many nodes. So, we will basically have these many iterations of a random walk from one node to the other. So, we can keep any number here. In the basic idea is that we should be able to visit all the nodes; we there should not be nodes which we have not visited because if you do not visited node the counter for them will be 0. And, hence we will not be able to rank the nodes properly. So, the idea is that we should be able to visit all the nodes. And that too multiple times so, that we are able to capture the frequency of visiting in our counts; in our random walk points ok. So, what do we have to keep repeating? We are started the loop. What do we have to keep repeating? We had reached r and these are the neighbors of r, we have to choose one uniformly at random out of them ok. So, that is what we will do. Before that what if this out is 0, the length of out is 0 that is the node which we have reached has no out links that may also happen right. And, I told you in that cases what we do? In that case we do teleportation, that we that is we choose one node uniformly at random from all the nodes. So, let us check that if length of out is equal to 0, what am I doing? If the length of out is equal to 0. What we do? We have to choose one uniformly random let us create a new variable for that to keep the node which is currently under focus ok. This focus will contain the node which is currently under focus, which is currently being visited basically. So, we have to choose one node uniformly at random from all the nodes we will write random dot choice nodes ok. This is the list which we already created. In case the node which we have reached at has number of neighbors, what do we have to do? We have to choose one neighbor out of them. So, maybe we can have another random variable here, we can write r1 dot. I am sorry random.choice. Now this choice has to be made out of what? This choice has to be made out of out. Because out is what is containing all the edges and we will choose one edge
+
+[p.76] out of them. Now, what is going to be the focus? The focus is not going to be the edge. The focus is going to be the node which is on the other side. How do we get the node, which is on the other side, using r1[1] because r1[0] , r1[1] is basically the edge ok yeah exactly? So, we got the focus where focus is the current node where we are currently. Since we have reached at this node. We have to implement the random walk points for this node. So, we will write random walk points for focus plus is equal to 1. Now again we have to get the list of its neighbors. So, we will write out is equal to we can copy paste this, I am just set r will be replaced by focus; because focus, focus is what is a current node. Now, this is one iteration; what is iteration having? This iteration consists of looking at the neighbors choosing one out of them randomly and then it be and then repeating the same process. That is what this while looping is doing. Let us implement the count c that is the number of times this while loop will continue ok. I think we are done. So, what we have to return? This function should return random walk points right. So, let us return this; I think we are done. Let us go down to the main, in the main also we have implemented everything.
+
+(Refer Slide Time: 10:05) We only have to write this instruction rest all are the same from the previous code. I think we are good to go, let us check whether this code works.
+
+[p.77] (Refer Slide Time: 10:19) So, let us so, as you can see the outputs 9, 2, 4, 6 and here 9, 2, 6, 4 and rest of the values are matching. So, there can be two reasons for the miss match. One could be the rank of 4 and 6 might be same, 4 and 6 here and 6, 4 and 4 here. So, they can give different ordering. Second reason could be that we needed more iteration so, that we were able to visit all the nodes properly and we could achieve the effect. Because random walk is basically based on probability right, you randomly choose the next node. It might so, happen that you are ending up reaching one node, more than the other node whereas, they both have the same number of in links right. So, that may happen, let us check another example. Again, here a everything is same except 8 2 and 2 8 over here; we can get one more. So, in this case used as you can see it is precisely the same, everything is matching. So, it might happen because it is based on probability and it is never possible that there are 2 nodes which have the same configuration in terms of the number of in links. And, we are reaching these two nodes precisely the same number of times. So, that sort of difference is going to happen. So, this was about the implementation of page rank using random walk technique.
+
+=== LECTURE 86: DegreeRank versus PageRank (Week 6, transcript PDF page 78) ===
+
+[p.78] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Lecture – 86 Degree Rank versus Page Rank
+
+(Refer Slide Time: 00:05) Hey everyone, in this video we going to see the relationship between Degree Rank and Page Rank that is we are going to see whether they correlate with each other or not? We are going to see whether the nodes which have less degree do they have less page rank and vice versa. So, in order to check this, we are going to use citation network which is a directed graph I already have downloaded it from snap repository, so I am going to use that. So, let us start the implementation.
+
+(Refer Slide Time: 00:34)
+
+[p.79] Let me show you the citation data set how it looks like?
+
+(Refer Slide Time: 00:38) So, this is the citation data set as you can see it is in the form of edge list. Every row contains an edge these are the IDs of the research papers. So, if you take an edge it indicates that the first paper is citing the second paper. So, the paper which there is ID 17 is citing in the paper with the ID 18. So, this is a sort of information that we have.
+
+(Refer Slide Time: 01:04)
+
+[p.80] Let us implement this now. Since the network is in the form of a edge list we are going to use the function read edge list in order to read it into a graph for object. First, let me import networkx we are going to plot there is a so let me import matplotlib ok. So, let us start the main function we have to read the network. So, G = nx.read_edgelist, the network name is citation.txt. Since we have to create a directed graph, we will write create using is equal to nx.DiGraph. Now since this is a directed graph, we are going to keep a track of the in degrees of the nodes that is basically what we will compare with the page rank. So, we have to check whether a node which has more in degree that is a greater number of in links. Does it have more page rank is well or not and vice versa. So, let us first get all the in degrees we can use a function G.in_degree for that purpose. Now what this function return is a dictionary. So, this is going to be a dictionary where the keys are going to the nodes and the values are going to be the in_degree values of these nodes. Similarly, in order to compute the pr we are going to use the inbuilt functions from networkx. We will write the page rank = nx.pagerank(G), again page rank function will return a dictionary where the keys are the nodes and the values are the page rank values of these nodes.
+
+[p.81] Since these two are two different dictionaries and we must plot them. We basically we are going to keep the in_degree values on the x axis and the corresponding page rank values on the y axis. Since there is a two different dictionaries let us keep one of them in the order of the other. So, I am going to create a list to keep the page rank values in the same order in which degree values are coming. So, I am creating this list page rank values is equal to a list. So, I am going to create this list which will have the page rank values of the nodes in the same order in which they are pairing in this degree dictionary ok. So, for that I am starting a loop in deg.keys. So, deg.keys will give the keys in the sequence, then we will append the page rank values pr_values.append. What do we have to append? We have to append the page rank value of the corresponding node i ok. So, we will write pr[i] ok, so we got the both the things in the same sequence and then we can plot them. So, I will write plt.plot on the x axis we have in degrees which are available in this dictionary. So, we will write deg.values corresponding to these degree values what are the page rank values is what is available in pr_values list that we just created. Let us display it in red circles; we can also change the marker size ok. Let us also give the labels, degrees of the nodes and we can also give the y label on y axis we have page ranks, page rank values ok. After that we have to show we will write plt.show sorry ok. Then we will call this main function they should work. Let us see how it works?
+
+(Refer Slide Time: 05:55)
+
+[p.82] As you can see in the plot degree and page rank values are not correlated with each other. Because if they if they had been correlated, they would have been linear sort of plot over here which is not there. And, you can see that there are few nodes which have high in degree; however, very less page rank. For example, if you take this node it has high in degree, but if you look at its page rank which is less. In the context of citation network, it indicates that this is a research paper which is being cited by several other papers. However, those papers are not so important right that is why this paper got less page rank. Similarly, if you look at the other side you have a few nodes which have very less in degree; however, extremely high page rank. Now in the context of citation network, it indicates that these are the research papers which are being cited by very fewer other papers. However, those papers are important themselves that is those papers are being cited by a lot of other papers, or those papers are being cited by a lot of important papers. So, the conclusion is that in degree and page rank values are not correlated with each other.

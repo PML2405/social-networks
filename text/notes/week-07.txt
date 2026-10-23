@@ -1,0 +1,273 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 7 — Cascading Behaviour & Diffusion
+
+Lectures 87–100 · why we follow each other, how a new idea diffuses (or stalls) through a network, and a NetworkX simulation of four cascade ideas.
+
+🧠 the big picture, first
+
+We **follow** each other — for direct benefit and for information. When a new behaviour (an app, a product, an idea) spreads person-to-person it **branches** outward — that's **diffusion**. We model each choice as a **coordination game**: adopt the new action once a fraction **q = b/(a+b)** of your partners have. Diffusion doesn't always win: **dense clusters block it** — precisely, a cluster of density > **1−q** stops a complete cascade. To get things moving, **raise the payoff** or seed **key (well-connected) people**. We then code all four ideas in NetworkX.
+
+### 📒 what's inside Week 7
+
+- We follow — and why
+- Diffusion & the coordination game
+
+the q = b/(a+b) threshold, social reinforcement
+- Communities, key people & cluster density
+- Cascades and clusters — the blocking theorem
+- Collective action & thresholds
+- The cascade simulation — base code + 4 ideas
+
+LECTURES 87–88
+
+## We follow — and why
+
+conformity, direct benefit, and information
+
+## 1 Do we follow? Why?
+
+In a restaurant where everyone orders the burger, you probably order the burger too; at a fork where everyone turns right, you turn right. In the classic elevator experiment, a lone rider turns to face the back wall just because everyone else does — our sense of **conformity**. But following isn't always wise (if everyone's answer is 30, you may cross out your correct 40). So why do we follow?
+
+📖 two reasons we follow
+- Direct benefit — an explicit gain: "refer my shoes to 5 friends and get a free pair," so you adopt.
+- Informational gain — you follow to get useful information: a farmer learns of better hybrid seeds from a friend; a doctor learns of a new vaccine from colleagues.
+
+LECTURES 89–91
+
+## Diffusion & the coordination game
+
+a behaviour branching through a network — and the switching threshold
+
+## 2 Modelling how a behaviour spreads
+
+#### diffusion branches (it doesn't just travel)
+
+[diagram: seed]
+
+One adopter seeds several, who each seed several — it fans out, not a single chain.
+
+📖 diffusion
+Diffusion is the **branching** spread of a behaviour/idea through a network: an adopter passes it to several partners, who pass it on further. "Travel" is a misnomer — a single path — whereas diffusion fans out. The key question: how many end up adopting?
+
+### The coordination game
+
+Each node chooses one of two actions, A (new) or B (old). You get payoff **a** for each partner who also does A, and **b** for each partner who also does B. If a fraction p of your partners have adopted A:
+
+payoffs
+
+$$ \text{adopt A}: p\,a \qquad \text{adopt B}: (1-p)\,b $$
+
+switch to A when…
+
+$$ p\,a \ge (1-p)\,b \;\Longrightarrow\; p \ge \frac{b}{a+b} $$
+
+read it as: "adopt the new action A once at least a fraction **q = b/(a+b)** of your partners already have." Rearrange $pa \ge (1-p)b$: $pa \ge b - pb$, so $p(a+b) \ge b$, giving $p \ge b/(a+b)$. This **q** is the node's threshold.
+
+✍️ worked examples — the threshold
+- a = 3 (app), b = 2 (cash): $q = \dfrac{2}{3+2} = \dfrac{2}{5} = \boxed{0.4}$.
+- A vendor has 20 partners: 6 on the app, 14 on cash. App payoff = 6·3 = 18; cash payoff = 14·2 = 28. Since 28 > 18 → **stay on cash**. (Equivalently p = 6/20 = 0.3 < 0.4.)
+
+📖 social reinforcement & the three outcomes
+Social reinforcement: each additional partner who adopts raises p, nudging you past your threshold. Across the whole network, a diffusion settles into one of **three outcomes**: everyone on A, everyone on B, or a **split** into two groups (one on A, one on B).
+
+LECTURE 92
+
+## Communities, key people & density
+
+why a cascade stalls at a community boundary
+
+## 3 Communities resist; key people help
+
+#### a cascade fills one community, can't cross
+
+[diagram: weak tie — cascade can't cross]
+
+The new action fills the seeded community, but a single weak tie can't carry it across.
+
+⚙️ key people & community density
+- A cascade fills the community it starts in but often **can't cross a weak tie** into another (the far endpoint has too many old-behaviour friends).
+- Starting trouble (first-mover risk): the hard part of diffusion is the beginning — the first person to adopt a new thing, while everyone else is on the old one, takes a risk (like being the first to sit in a time machine). Once a few adopt, the rest follows easily.
+- Key people: instead of advertising to everyone, seed a few **well-connected** nodes so the idea ripples out (**viral marketing** — convince the "head of the family," or put a celebrity on the box).
+- Community density = edges / C(n,2). Higher density → harder to inject a new idea (a tight bundle of sticks won't break) — tightly-knit friends resist.
+
+LECTURE 93
+
+## Cascades and clusters
+
+the theorem: a dense enough cluster blocks a complete cascade
+
+## 4 When does a cascade fail to complete?
+
+📖 cluster of density D · complete cascade
+- A cascade = the whole trajectory of a diffusion — the set of nodes the new action spreads to as it branches through the network.
+- A cluster of density D: every node in it has at least a fraction **D** of its neighbours inside the cluster.
+- A complete cascade: every node in the network eventually adopts the new action A.
+- **Assumption:** the theorem assumes a uniform threshold q for every node.
+
+the blocking theorem
+
+A cascade with threshold q **cannot complete**
+
+if the network has a **cluster of density > 1 − q**.
+
+(and the converse holds too)
+
+read it as: "if a tight cluster keeps more than a fraction (1−q) of everyone's friends inside it, then fewer than q of their friends are outside adopters — so their threshold q is never met, and the new action can't get in."
+
+✍️ worked example — why density > 1−q blocks
+q = b/(a+b) with a=3, b=2 → q = 0.4, so 1−q = 0.6. Take a cluster of density > 0.6: node 8 has 6 neighbours, 4 inside → 4/6 ≈ 0.67 > 0.6. So >60% of its friends are inside (still on B); <40% could be outside adopters — below the 0.4 threshold. The node never switches. Same for every cluster member → the cascade **can't enter** → not complete.
+
+LECTURE 94
+
+## Collective action & knowledge
+
+how incomplete knowledge stalls a feasible protest
+
+## 5 Thresholds for joining in
+
+📖 intrinsic threshold (collective action)
+In a protest/revolt, each person has an intrinsic threshold = the minimum number of participants (**including themselves**) that must be in before they'll join. You know your own threshold and your friends' — but not the whole network's.
+
+✍️ worked example — the two ways a protest fails
+**Case 1 — an unreachable threshold cascades (a path u–v–w).** Thresholds u=2, v=3, w=4, but w has only **2** friends → w can see at most itself + 2 = 3 people < 4, so **w can never join**. v (needs 3) sees w is out → v **drops**; then u (needs 2) sees both are out → u **drops**. No protest — and here it was genuinely infeasible (no group satisfies everyone). Each node reasons this out from full knowledge of its friends.
+
+**Case 2 — a feasible protest stalled by incomplete knowledge (a cycle u–v–w–x).** Now everyone's threshold is 3 and any three neighbours could protest — a protest is feasible. But u can't see the whole network (it doesn't know x, nor whether v and w know each other's thresholds), so u can't be sure enough will join and **dares not start**; by symmetry nobody does. Rewire so u, v, w all mutually see each other's thresholds and the protest does happen.
+
+So a protest can fail two ways: it's structurally impossible (Case 1), or it's possible but **network invisibility** stops it (Case 2). This is why firms limit cross-group communication ("divide and conquer") — isolated clusters can't see that everyone else is also ready to revolt.
+
+LECTURES 95–100
+
+## The cascade simulation
+
+base code + four big ideas, in NetworkX
+
+## 6 Coding the cascade
+
+cascade.py — base codepython
+
+```
+import networkx as nx, random
+import matplotlib.pyplot as plt
+
+# build ONCE and reuse, so every experiment runs on the SAME graph (fair comparison)
+G = nx.erdos_renyi_graph(10, 0.5)
+nx.write_gml(G, 'random_graph.gml')
+G = nx.read_gml('random_graph.gml')
+
+a, b = 4, 3                                    # payoff of A (new), of B (old)
+
+def set_all_B(G):
+    for n in G.nodes():
+        G.node[n]['action'] = 'B'             # everyone starts on the old action
+
+def set_A(G, seeds):
+    for n in seeds:
+        G.node[n]['action'] = 'A'             # seed nodes flip to the new action
+
+def find_neighbours(c, node, G):              # count neighbours currently on action c
+    num = 0
+    for nb in G.neighbors(node):
+        if G.node[nb]['action'] == c:
+            num += 1
+    return num
+
+def recalculate_options(G):
+    dict1 = {}
+    for node in G.nodes():
+        num_A = find_neighbours('A', node, G)     # A-neighbours
+        num_B = find_neighbours('B', node, G)     # B-neighbours
+        payoff_A = a * num_A
+        payoff_B = b * num_B
+        dict1[node] = 'A' if payoff_A >= payoff_B else 'B'   # adopt the higher-payoff action
+    return dict1                               # everyone's next action, decided together
+
+def reset_node_attributes(G, dict1):
+    for node in dict1:
+        G.node[node]['action'] = dict1[node]  # apply ALL decisions at once (synchronous)
+
+def terminate_1(c, G):                         # returns 1 iff EVERY node holds action c
+    for n in G.nodes():
+        if G.node[n]['action'] != c:
+            return 0
+    return 1
+
+# --- the cascade loop ---
+set_all_B(G)
+set_A(G, [3, 7])                               # A=green, B=red in the drawing
+count = 0
+while True:
+    dict1 = recalculate_options(G)
+    reset_node_attributes(G, dict1)
+    count += 1
+    if terminate_1('A', G) or terminate_1('B', G) or count >= 100:
+        break                                  # all-A, all-B, or the 100-round cap
+
+complete = terminate_1('A', G)                 # 1 = COMPLETE cascade (every node on A)
+```
+
+⚙️ the pipeline & key facts
+- Build an ER graph, set every node to **B** → seed a few nodes to **A** → each round **recalculate** every node's action from neighbours' payoffs → stop when settled (all A / all B) or after **100 rounds** → report whether the cascade is **complete**.
+- `num_A` = a node's count of A-neighbours (not its degree, not the payoff a).
+- Adopt A when `a·num_A >= b·num_B` (weighted payoffs, not a bare count).
+- The **100-round cap** stops runs where nodes flip forever (no convergence). Reaching 100 rounds ≠ a complete cascade.
+
+**Worked step (a=3, b=2):** node 2 has B-neighbours {1,8,0,5} (num_B=4) and A-neighbours {7,3} (num_A=2). payoff_A = 3·2 = 6, payoff_B = 2·4 = 8. Since 8 > 6, node 2 **stays B** — this is why a low-payoff new action dies out at first.
+
+### The four big ideas (same shell, different setup)
+
+| idea | what changes | observation |
+| 1. Increase the payoff | fix seeds (0,1); raise a | dies out at a=6,7,8,9; completes at a=10 — a bigger payoff turns a stalled cascade complete. |
+| 2. Key people | fix payoff; try every seed pair | most seed-pairs give an incomplete cascade; a few well-connected pairs give a complete one → seed key people. |
+| 3. Communities | 2 dense communities (0–9, 10–19) + 1 link | the cascade fills the seeded community but can't cross — one ends on A, the other stays on B. |
+| 4. Cascades & clusters | a cluster (nodes 7–11) of density > 1−q | from any seeds outside the cluster, the cascade never enters it → never complete, validating the theorem. |
+
+⚠️ code notes
+- Decisions are **synchronous**: `recalculate_options` computes everyone's next action from the current snapshot, then `reset_node_attributes` applies them together.
+- Reuse the **saved** graph (`write_gml`/`read_gml`) across all four experiments so differences are due to the change tested, not a fresh random graph.
+- Idea 1 holds **b fixed at 5** and raises a from 6→10 (so you're isolating the payoff, not the seeds). Idea 2 tries every seed pair with a nested `for u in G.nodes / for v in G.nodes` guarded by `if u < v` to avoid duplicate/reversed pairs — only a few pairs give a complete cascade.
+- Idea 3's graph: two 10-node communities built as separate random graphs (each edge with prob 0.5, like a mini Erdős–Rényi), joined by a single link (e.g. `G.add_edge(5, 15)`) — then saved for reuse.
+- Idea 4's cluster: node 8 has 6 neighbours, 4 inside → 0.67 > 1−q = 0.6, so the cluster is impenetrable. Seeds are always chosen outside nodes 7–11, and the cascade never reaches them.
+
+### A new behaviour spreads once a fraction q = b/(a+b) of your partners adopt — but a cluster of density > 1−q blocks a complete cascade.
+
+Diffusion branches through the network. Raise the payoff or seed key (well-connected) people to get it moving; dense communities resist. Simulate: set all B → seed A → each round adopt the higher-payoff action (a·num_A vs b·num_B) → stop at all-A / all-B / 100 rounds.
+
+- Why is the spread called diffusion, not travel?
+It **branches** — each adopter can seed several others — rather than following a single chain or a central broadcast.
+
+- A vendor switches when p·a ≥ (1−p)·b. What threshold on p?
+$p \ge \dfrac{b}{a+b}$. With a=3, b=2 → 2/5 = 0.4.
+
+- a=3, b=2; 20 partners, 6 app, 14 cash — which action?
+App = 6·3 = 18; cash = 14·2 = 28 → **stay on cash** (p = 0.3 < 0.4).
+
+- What is social reinforcement?
+Each extra partner who adopts nudges the vendor closer to (past) its threshold — the cumulative pull of peers.
+
+- Match: diffusion / complete cascade / cluster of density D / key people.
+Branching spread / every node adopts A / every node has ≥ D fraction of neighbours inside / well-connected seeds.
+
+- When can a cascade with threshold q not complete?
+When the network has a **cluster of density > 1−q** — its members have >1−q friends inside, so <q outside adopters, threshold never met.
+
+- What's the idea behind seeding key people?
+Convince a few **highly-connected** nodes whose adoption ripples out (viral marketing) — far stronger than blanket advertising or seeding low-degree nodes.
+
+- What is a vendor's intrinsic threshold (collective action)?
+The **minimum number of participants (including itself)** that must join before it will.
+
+- Thresholds 2, 3, 4, but the "4" has only 2 partners — why no protest?
+The one needing 4 can never reach it → won't join; the "3" sees that and drops; then the "2" drops. Incomplete knowledge stalls a feasible protest.
+
+- Why save/reload the ER graph with GML?
+So all four experiments use the **identical graph** — differences come from the change tested, not a new random graph.
+
+- In `recalculate_options`, when does a node adopt A?
+When `a·num_A >= b·num_B` (its weighted A-payoff ≥ B-payoff). `num_A` = count of A-neighbours.
+
+- Why the `count >= 100` stop condition?
+To cap runs where nodes flip forever (never converge). Reaching 100 rounds does **not** mean the cascade completed.
+
+— end of Week 7 · course notes complete ✏️
+↑ back to top

@@ -1,0 +1,310 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 6 — PageRank & Link Analysis
+
+Lectures 75–86 · how the web graph solved search — importance flows recursively — and two NetworkX implementations of PageRank.
+
+🧠 the big picture, first
+
+How does Google rank pages? Model the web as a **directed graph**: pages are nodes, a hyperlink is a one-way edge. You can **collect** this graph by crawling (a random walk covers it in ~n·log n steps). Then rank pages by a recursive notion of **importance**: you're important if important pages point to you — not merely if many do. Two "games" — **equal point-sharing** and **random-walk coin-drop** — give the same ranking, which is **PageRank**. We implement both in NetworkX, handle the **dangling-node** trap with damping, and see why endorsement count (**DegreeRank**) and PageRank need not agree.
+
+### 📒 what's inside Week 6
+
+- The web graph & the search problem
+- Collecting the web graph — random-walk crawling
+- Two ranking games & recursive importance
+- Implementing PageRank — points distribution
+
+the sink problem + damping
+- Random-walk method & DegreeRank vs PageRank
+
+LECTURE 75
+
+## The web graph
+
+the idea that became a ~450-billion-dollar company
+
+## 1 From "hire 1000 raters" to a graph
+
+Imagine it's the 1990s and the web is exploding with pages linked by **hyperlinks**. To find the best page for a keyword, the naive idea is to hire thousands of people to read and rate every page — hopeless at web scale. Larry Page and Sergey Brin's insight: use the web graph itself.
+
+#### the web graph is directed
+
+[diagram: A | B | C | D]
+
+Page = node; a hyperlink A→B = a **directed** edge. A linking to B does not mean B links to A.
+
+📖 web graph — and why it's directed
+In the web graph, each web page (or social-media account) is a node; a hyperlink / endorsement is a **directed edge** A→B. It's directed because the relation is **one-way** — you can link to (or endorse) an account that doesn't link back. Build it with `nx.DiGraph()`.
+
+LECTURE 76
+
+## Collecting the web graph
+
+crawling = a random walk that covers the graph in ~n·log n steps
+
+## 2 Crawling by random walk
+
+**Analogy:** drop into a strange city with a car and no map. At every junction, pick a random turn. After a while you'll have driven down almost every road. The same works on a graph: a random walk (crawl) visits essentially all nodes.
+
+⚙️ how long to cover the graph?
+An experiment (walk from a random start, count steps until every node is visited) shows the cover time grows like ~n·log n — a small multiple of n, nearly linear (not quadratic). So collecting the whole structure is entirely practical. It takes more than exactly n steps (the walk revisits nodes) but far less than n².
+
+cover_time.py — the experimentpython
+
+```
+import networkx as nx, random, numpy as np
+
+def walk(n, p):                          # steps to cover a random G(n,p) graph
+    G = nx.gnp_random_graph(n, p)
+    v = random.choice(list(G.nodes()))   # random start
+    visited = {v}; steps = 0
+    while len(visited) < n:               # until EVERY vertex is seen
+        v = random.choice(list(G.neighbors(v)))   # random hop
+        visited.add(v); steps += 1
+    return steps
+
+xs, ys = [], []
+for n in range(20, 300):                 # graphs of size 20..299
+    z = [walk(n, 0.3) for _ in range(10)]   # repeat 10x and average out noise
+    xs.append(n); ys.append(np.average(z))
+plt.plot(xs, ys); plt.xlabel("#nodes"); plt.ylabel("#random-walk steps"); plt.show()
+# the curve looks nearly straight (~n log n): e.g. ~299 nodes -> ~2000 steps.
+```
+
+LECTURES 77–79
+
+## Two ranking games & recursive importance
+
+equal point-sharing = random-walk coin-drop = PageRank
+
+## 3 How to rank the nodes
+
+📖 the two games (they rank identically)
+- Equal-sharing game: give every node 100 points. Each round, every node splits its current points equally among the accounts it endorses (its out-links). Iterate until the points settle; rank by final points.
+- Random-walk-drop game: a surfer walks the graph at random, dropping one coin on every node it lands on. After ~a million steps, rank by coins collected.
+
+Remarkably, both games produce the **same ranking** — so either computes PageRank.
+
+#### equal sharing — one round on 3 accounts
+
+[diagram: A | B | C | A→B 50 | A→C 50 | B→C 100 | C→A 100]
+
+A endorses B,C; B endorses C; C endorses A.
+
+✍️ worked example — one round
+Start: A=B=C=100. A splits 100 over its 2 endorsements → 50 to B, 50 to C. B sends all 100 to C. C sends 100 to A.
+
+- **C** = 50 (from A) + 100 (from B) = $\boxed{150}$
+- **A** = 100 (from C)
+- **B** = 50 (from A)
+
+General: a node with P points and d out-links sends P/d along each (100 over 4 links → 25 each).
+
+💡 the recursive notion of importance
+A node hoards points only if its pointers hoard points — which depends on their pointers. So: you're important if **important** nodes point to you — a recursive definition ("you're famous if famous people say you're famous"). Best of all: be pointed to by a **rich backer who points to few others** (a wealthy relative with few people to help → each gets a big share). Sheer count of endorsements doesn't do it.
+
+**How Google uses it:** crawl the web (drop coins), giving each page a score. For a keyword ("Britney Spears"), retrieve all matching pages and display them **sorted by score** (highest first). Simple, and it works like a charm.
+
+LECTURES 80–83
+
+## Implementing PageRank — points distribution
+
+DiGraph → 100 points → distribute → handle the sink → rank
+
+## 4 The points-distribution method
+
+⚙️ the pipeline (memorise the order)
+- Create a **directed** graph and add its edges probabilistically.
+- Initialise every node with **100 points**.
+- **Distribute** points along out-links, repeatedly, **with sink handling**, until convergence.
+- **Sort** nodes by final points → the ranking.
+- **Validate** against `nx.pagerank`.
+
+pagerank_points.py — build & distributepython
+
+```
+import networkx as nx, random, numpy as np
+
+def add_edges(G, p):
+    for i in G.nodes():
+        for j in G.nodes():
+            if i != j:
+                r = random.random()             # uniform in [0,1]
+                if r <= p:                       # biased coin: head with prob p
+                    G.add_edge(i, j)            # directed edge i -> j (i endorses j)
+    return G
+
+def distribute_points(G, points):
+    previous   = points
+    new_points = [0 for _ in range(G.number_of_nodes())]
+    for i in G.nodes():
+        out = list(G.out_edges(i))              # edges LEAVING i (its endorsements)
+        if len(out) == 0:                       # dangling node: no out-link
+            new_points[i] += previous[i]        # ...keep its own points
+        else:
+            share = float(previous[i]) / len(out)   # split equally
+            for e in out:
+                new_points[e[1]] += share       # e[1] = the endorsed node
+    return new_points
+```
+
+📖 `G.out_edges(i)`
+On a directed graph, `G.out_edges(i)` returns the edges **leaving** i, each as a `(source, target)` tuple. So `e[0]` is i and `e[1]` is the endorsed node that receives the share. A node with 100 points and 4 out-links sends 25 to each.
+
+### The sink (dangling-node) problem & the damping fix
+
+⚠️ the sink problem
+A dangling node (an account that endorses no one) keeps receiving points via its in-links but never passes any on — so points **pile up** there (or in a small closed group), distorting the ranking. Our raw method then disagrees with `nx.pagerank`.
+
+pagerank_points.py — damping (the fix)python
+
+```
+def handle_sink(G, points, s=0.8):
+    for i in range(len(points)):
+        points[i] = points[i] * s               # each node KEEPS 80%
+    n = G.number_of_nodes()
+    pooled = n * 100 * (1 - s)                   # the 20% gathered across the network
+    extra  = pooled / n                          # shared back EQUALLY to all (= 20)
+    for i in range(len(points)):
+        points[i] += extra
+    return points                                # total points unchanged (conserved)
+```
+
+read it as: "a tax: every node keeps a fraction **s = 0.8** of its points; the pooled **20%** is shared back equally to all nodes." Points can no longer pile up forever at a sink. The total is **conserved** — nothing is deleted, and dangling nodes are kept, not removed. With this, our ranking matches `nx.pagerank`.
+
+pagerank_points.py — main loop & rankpython
+
+```
+G = nx.DiGraph()
+G.add_nodes_from(range(10))
+G = add_edges(G, 0.3)
+points = [100 for _ in range(G.number_of_nodes())]     # 100 each
+
+while True:                                     # iterate to convergence
+    new_points = distribute_points(G, points)
+    new_points = handle_sink(G, new_points)     # damping fixes the sink
+    if max(abs(new_points[i] - points[i]) for i in range(len(points))) < 1e-6:
+        points = new_points
+        break
+    points = new_points
+
+ranking = np.argsort(-np.array(points))         # NEGATE -> highest points first
+
+pr = nx.pagerank(G)                             # {node: score} dictionary
+pr_sorted = sorted(pr.items(), key=lambda x: x[1], reverse=True)   # rank the built-in
+```
+
+⚙️ ranking & validating
+- `np.argsort` returns indices that sort **ascending**; negate the array (`-np.array(points)`) so the highest score comes first (descending).
+- `nx.pagerank(G)` returns a **dict** `{node: score}` — not a ready ranking. Turn it into `(node, score)` tuples and sort by value, descending.
+- Points are **conserved** each iteration; with damping, the ranking matches the built-in `pagerank`. (Tiny mismatches can come from ties or stopping before full convergence.)
+
+LECTURES 84–86
+
+## Random-walk method & DegreeRank vs PageRank
+
+teleport out of dead-ends — and why popularity ≠ importance
+
+## 5 The random-walk method
+
+pagerank_walk.pypython
+
+```
+def random_walk(G, steps=1000000):
+    nodes = list(G.nodes())
+    rw = [0 for _ in range(G.number_of_nodes())]    # random-walk points
+    focus = random.choice(nodes)
+    rw[focus] += 1
+    for _ in range(steps):
+        out = list(G.out_edges(focus))
+        if len(out) == 0:                            # dead-end (dangling node)
+            focus = random.choice(nodes)             # TELEPORT to a random node
+        else:
+            e = random.choice(out)                   # a random endorsed account
+            focus = e[1]                             # move there (e[1] = target)
+        rw[focus] += 1                               # drop a coin on the visited node
+    return rw
+```
+
+📖 teleportation
+A dangling node has nowhere to walk to. Teleportation = jump to a **uniformly random** node and resume. (The walk never stops, never back-tracks, and never deletes the node.) A node with many in-links — especially from often-visited nodes — is landed on more often, so its coin count reflects PageRank. Rank by `rw` points; it matches `nx.pagerank`.
+
+### DegreeRank vs PageRank — popularity ≠ importance
+
+#### in-degree vs PageRank (citation network)
+
+[diagram: in-degree → | PageRank → | high deg, low PR | low deg, high PR]
+
+No linear trend → in-degree and PageRank are **not** correlated.
+
+⚠️ DegreeRank ≠ PageRank
+DegreeRank = rank by raw in-degree (endorsement count). PageRank = the recursive importance score. On a real citation network they **don't line up**:
+
+- A paper cited by **many unimportant** papers → high in-degree but low PageRank.
+- A paper cited by a **few important** papers → low in-degree but high PageRank.
+
+So many weak endorsements can lose to a few important ones.
+
+degree_vs_pagerank.pypython
+
+```
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# SNAP citation dataset: each row "A B" means paper A cites paper B (e.g. 17 18)
+G = nx.read_edgelist("citation.txt", create_using=nx.DiGraph)   # load as DIRECTED
+
+deg = G.in_degree()        # {node: in-degree}   -> DegreeRank signal
+pr  = nx.pagerank(G)       # {node: pagerank}    -> PageRank score
+
+# align the two dicts into the same node order, then scatter
+pr_values = [pr[i] for i in deg.keys()]
+plt.plot(list(deg.values()), pr_values, "ro")     # in-degree (x) vs PageRank (y)
+plt.xlabel("in-degree"); plt.ylabel("PageRank"); plt.show()
+# the cloud shows NO linear trend: high-in-degree papers can have low PageRank, and
+# a paper cited by a few IMPORTANT papers can have high PageRank with low in-degree.
+```
+
+### Importance flows recursively along directed links: you rank high when high-ranked nodes (that point to few others) point to you.
+
+Collect the web graph by random-walk crawl (~n·log n). Equal-sharing = random-walk-drop = PageRank. Points distribution: 100 each → send P/d along out-links → damping (keep 80%, pool 20%) fixes dangling sinks → rank via argsort(−points). DegreeRank ≠ PageRank.
+
+- Why is the endorsement/web graph directed?
+An endorsement/link is **one-way**: A endorsing B doesn't mean B endorses A. Use `nx.DiGraph`.
+
+- Roughly how many random-walk steps to visit every node of an n-node graph?
+About **n·log n** — a small multiple of n (near-linear), not n², and more than exactly n.
+
+- What is the recursive notion of influence?
+You're influential if **influential** accounts endorse you — which depends on who endorses them. Not sheer counts.
+
+- Relationship between the equal-sharing and random-walk-drop games?
+Different procedures, but they rank the accounts in **exactly the same order** (both = PageRank).
+
+- A=B=C=100; A→B,C; B→C; C→A. After one round, C holds?
+50 (from A) + 100 (from B) = **150**. (A=100, B=50.)
+
+- Node with 100 points, 4 out-links — each endorsed account gets?
+**25** (P ÷ d = 100/4).
+
+- What is the sink problem, and how does damping fix it?
+A **dangling node** (endorses no one) hoards points. Damping: each node keeps **80%**, the pooled **20%** is shared equally among all — points can't pile up. Total conserved.
+
+- In the random walk, what happens at a node with no out-links?
+**Teleport** — jump to a uniformly random node and continue (don't stop, back-track, or delete).
+
+- How does `np.argsort` give a highest-first ranking?
+argsort is **ascending**; run it on the **negated** points (`-np.array(points)`) so the largest sorts first.
+
+- What does `nx.pagerank(G)` return, and how is it used?
+A **dict** `{node: score}` — not a ranking. Sort its `.items()` by value, descending.
+
+- Order the points-distribution pipeline.
+Create DiGraph + edges → init 100 points → distribute (with sink handling) to convergence → sort by points → compare with `nx.pagerank`.
+
+- What do they find comparing in-degree (DegreeRank) with PageRank?
+They're **not correlated**: many weak endorsements can lose to a few important ones (high in-degree can have low PageRank, and vice versa).
+
+— end of Week 6 ✏️
+↑ back to top

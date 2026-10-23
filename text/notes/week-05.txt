@@ -1,0 +1,346 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 5 — Schelling Segregation & Structural Balance
+
+Lectures 54–74 · how mild local preferences sort a city (Schelling), and the elegant maths of friend/enemy triangles (structural balance) — both simulated in NetworkX.
+
+🧠 the big picture, first
+
+Two self-contained chapters. **(A) Spatial segregation (Schelling model):** even when everyone is happy with just a few nearby same-type neighbours, a whole city sorts itself into sharp blocks — **local rules → a global pattern** (emergence), though it's a strong tendency, not a logical certainty. **(B) Structural balance:** in a network of **friendships (+) and rivalries (−)**, a triangle is comfortable exactly when it has an **odd number of + ties**. Unstable triangles flip until stable, and the Balance Theorem proves a stable complete network is always **one bloc or two** — never three. We code both.
+
+### 📒 what's inside Week 5
+
+- Spatial segregation & the Schelling model
+
+threshold, grid neighbours, emergence
+- Schelling — the NetworkX implementation
+- Positive & negative ties — the four triangles
+
+stable iff odd # of +, enemy's-enemy-is-a-friend
+- Balance Theorem & its proof
+
+one bloc or two, never three
+- Structural balance — the implementation
+
+count unstable, repair, form two coalitions
+
+LECTURES 54–56
+
+## Spatial segregation & the Schelling model
+
+mild local preference, sharp global sorting
+
+## 1 Why a city self-segregates
+
+People move into a locality roughly at random, but over time they **segregate** into clusters of similar people. The Schelling model explains this with one simple rule.
+
+📖 the model & the threshold
+A city = a **grid**. Each cell is **empty**, or holds a person of **type 1** or **type 2**. A cell's **neighbours** are the cells touching it, diagonals included. Each person has a threshold t: they are **content** if at least t of their neighbours are the **same type**; otherwise they are unsatisfied and move to a random empty cell.
+
+#### neighbour counts on the grid (diagonals count)
+
+[diagram: 3 | 5 | 8 | corner=3 | edge=5 | internal=8]
+
+**Internal** cell = 8 neighbours; **corner** = 3; **non-corner edge** = 5. An **empty** cell has no team, so it is never "unsatisfied".
+
+#### random start → segregated end
+
+[diagram: start (mixed) | settled (sorted)]
+
+Each person only wants ≥ t same-type neighbours, yet the floor drifts into clean blocks.
+
+✍️ worked example — thresholds as a % of 8 neighbours
+| "similarity %" | t (of 8) | outcome |
+| 25% | 2 | settles fast, mild sorting |
+| 50% | 4 | clear segregation |
+| 75% | 6 | sharp segregation, slower |
+| ~89% | ≈7 | almost impossible → may never settle |
+
+A higher threshold sharpens the sorting but slows convergence; an extreme demand (need ~all 8 neighbours to match) stops the floor from ever settling.
+
+💡 the deep point — emergence, but not inevitability
+- **Local → global:** nobody plans a sorted city; each person follows one simple local rule, and the floor-wide pattern **emerges**. No central planner.
+- **Not inevitable:** you can hand-build a mixed seating where everyone still meets the threshold (e.g. t=3 with everyone content) — so segregation is a strong **tendency**, not a mathematical certainty.
+- **Recompute each round:** when one person moves, it changes their neighbours' counts — some content people become unsatisfied and vice versa — so the unsatisfied set is rebuilt every iteration.
+
+LECTURES 57–61
+
+## Schelling — the NetworkX implementation
+
+grid → types → find unsatisfied → shift → repeat
+
+## 2 Coding the Schelling model
+
+schelling.py — build the gridpython
+
+```
+import networkx as nx, random
+import matplotlib.pyplot as plt
+
+N = 10
+G = nx.grid_2d_graph(N, N)                 # 10x10 grid; nodes are (row, col) tuples
+pos = dict((node, node) for node in G.nodes())   # place each node at its (row,col)
+
+# grid_2d_graph gives only the 4 side-neighbours; add the 4 DIAGONALS:
+for (u, v) in list(G.nodes()):
+    if u + 1 <= N - 1 and v + 1 <= N - 1:   # down-right diagonal
+        G.add_edge((u, v), (u + 1, v + 1))
+    if u + 1 <= N - 1 and v - 1 >= 0:       # down-left diagonal (stay in bounds)
+        G.add_edge((u, v), (u + 1, v - 1))
+
+# assign a type to each cell: 0 = empty, 1 = type-1, 2 = type-2
+for node in G.nodes():
+    G.node[node]['type'] = random.randint(0, 2)
+```
+
+⚙️ why add diagonal edges?
+`nx.grid_2d_graph` connects each cell only to its 4 orthogonal neighbours. Schelling needs the **8**-cell (Moore) neighbourhood, so we add both diagonals. After this, `G.neighbors(node)` automatically returns 8 for internal cells, 5 for edges, 3 for corners — no special-casing needed.
+
+schelling.py — unsatisfied & shiftpython
+
+```
+t = 3                                       # threshold
+
+def unsatisfied_nodes(G):
+    out = []
+    for node in G.nodes():
+        if G.node[node]['type'] == 0:       # empty cell: never unsatisfied
+            continue
+        same = 0
+        for nb in G.neighbors(node):
+            if G.node[nb]['type'] == G.node[node]['type']:
+                same += 1                    # count same-type neighbours
+        if same < t:                         # fewer than t teammates -> unhappy
+            out.append(node)
+    return out
+
+def shift_one(G, empty_cells):
+    unhappy = unsatisfied_nodes(G)
+    if len(unhappy) != 0:
+        mover = random.choice(unhappy)       # an unsatisfied person...
+        dest  = random.choice(empty_cells)   # ...to a random empty cell
+        G.node[dest]['type']  = G.node[mover]['type']   # occupy the empty cell
+        G.node[mover]['type'] = 0                        # vacate the old cell
+
+for i in range(5000):        # many rounds; recompute unsatisfied each time
+    empty_cells = [n for n in G.nodes() if G.node[n]['type'] == 0]
+    shift_one(G, empty_cells)
+```
+
+✍️ worked example — is this cell content?
+An internal cell has 8 neighbours, of which **2** are teammates, and t = 3. Since 2 < 3, the person is **unsatisfied** and moves. (Contentment depends on the number of teammates, not the total neighbour count — 8 is irrelevant here.)
+
+⚠️ gotchas
+- An **empty** cell (type 0) is skipped — it can never be "unsatisfied".
+- **Recompute** `empty_cells` and `unsatisfied` each round; a move invalidates them.
+- Convergence time depends on N, t, and the random start; a bigger t or grid needs many more iterations (and t too high never converges).
+- **Boundary of the rule:** "content" = at least t same-type neighbours, so unsatisfied ⇔ `same < t` (a cell with exactly t=3 same-type neighbours stays). The lecture's spoken code once wrote `<= t`, but the "at least t" definition (and the assignment) use strict `< t`.
+
+⚙️ the full screencast structure (what my streamlined code folds together)
+- Because `grid_2d_graph` labels nodes as `(row,col)` tuples, the lecture relabels them 0…N²−1 (`i*N + j`) and draws with an explicit `pos` dict; a `display_graph` function colours each type via `nx.draw_networkx_nodes(...)`.
+- It builds a `get_boundary_nodes` list (a node `(u,v)` is boundary iff `u==0 or u==N-1 or v==0 or v==N-1`) and its complement `internal = set(G.nodes()) - set(boundary)`, then dispatches to `get_neighbours_internal` (the 8 offsets: 4 orthogonal + 4 diagonal) vs `get_neighbours_boundary` (8 special cases). **Adding the diagonal edges to G (as we did) makes `G.neighbors` return the right 3/5/8 automatically — the same thing, less code.**
+- Two versions of the move rule exist: the unsatisfied node moves to a **random** empty cell (what we implement) or to an empty cell where it would be satisfied. And note: mathematically why segregation emerges from the threshold is still an **open problem**.
+
+LECTURES 62–64, 68
+
+## Positive & negative relationships
+
+the four signed triangles — stable iff an odd number of + ties
+
+## 3 Friend/enemy triangles
+
+Now edges carry a **sign**: **+** = friendship/alliance, **−** = hatred/rivalry. In a small group everyone has some relationship, so it's a complete signed graph. The whole theory lives in the **triangles**.
+
+#### the four signed triangles
+
+[diagram: + + + (3 pos) | STABLE | + + − (2 pos) | UNSTABLE | + − − (1 pos) | STABLE | − − − (0 pos) | UNSTABLE]
+
+green solid = + (friend), red dashed = − (enemy).
+
+📖 the stability rule
+A signed triangle is stable exactly when it has an **odd** number of + ties — i.e. **3 positives** (all friends) or **1 positive** (two friends with a shared enemy). The **even** cases — **2 positives** or **0 positives** — are **unstable** and generate pressure to change.
+
+- **+ + −** (2 pos): X is friends with Y and Z, but Y and Z are enemies — X is in a bind (the "Rama & Krishna" problem). Resolves by Y–Z befriending (→ +++) or X dropping one tie (→ +−−).
+- **− − −** (0 pos): three mutual enemies is unstable, because **an enemy's enemy is a friend** — two of them bond over their common foe, forming a +. (When two people "sweat/struggle together" against a shared rival, they ally — the shared complaining, or cribbing, cements the bond.)
+
+LECTURES 65–67
+
+## The Balance Theorem & its proof
+
+a stable complete network is one bloc or two — never three
+
+## 4 Where does it all settle?
+
+Take 30 people who all know each other — a complete signed graph with $\binom{30}{2}=\frac{30\cdot29}{2}=435\approx\frac{30^2}{2}$ ties, some + some −. Unstable triangles flip signs over time. What does the stable end-state look like?
+
+Balance Theorem
+
+A balanced complete signed network is either
+
+**(1) one bloc** of all-mutual-friends, or
+
+**(2) two blocs**: + inside each, − across them.
+
+read it as: "a stable society splits into **at most two camps** — friends within, enemies between. Never three or more." Like a boxing ring or a war: the fight is always **two sides**, never three (the enemy's-enemy rule keeps merging teams down to two).
+
+#### a balanced network — two blocs
+
+[diagram: bloc A (all +) | bloc B (all +)]
+
++ within each bloc, − across. Every triangle is +++ or +−− — never a 2-positive or 0-positive.
+
+⚙️ the proof (fix one node x)
+- Pick any node **x**. Split everyone else into x's **friends** (+ to x) and x's **enemies** (− to x).
+- Two **friends** of x must be **+** to each other (else + + − → unstable). So x's friends form an all-+ bloc with x.
+- Two **enemies** of x must be **+** to each other (enemy's-enemy; else − − − → unstable). So x's enemies form an all-+ bloc.
+- A friend and an enemy of x must be **−** (+ − + → unstable). So the two blocs are enemies across.
+
+⇒ exactly the two-bloc structure. QED.
+
+LECTURES 69–74
+
+## Structural balance — the implementation
+
+build signed graph → count unstable → repair → form two coalitions
+
+## 5 Coding structural balance
+
+⚙️ the implementation, in order
+- Build a **complete signed graph** on n countries; each edge + or − at random.
+- **Enumerate every triangle** with `combinations(nodes, 3)` and record its three signs.
+- **Count unstable** triangles (0 or 2 positives).
+- **Repeatedly repair** an unstable triangle (flip one tie) until none remain.
+- **Split** the stable cast into **two coalitions**.
+
+balance.py — build & countpython
+
+```
+import networkx as nx, random
+from itertools import combinations
+
+n = 5
+G = nx.Graph()
+G.add_nodes_from(range(1, n + 1))
+signs = ['+', '-']
+for i in G.nodes():
+    for j in G.nodes():
+        if i != j and not G.has_edge(i, j):
+            G.add_edge(i, j, sign=random.choice(signs))   # complete signed graph
+
+tris_list = [list(x) for x in combinations(G.nodes(), 3)]  # every triangle (C(n,3))
+
+def get_signs(tris_list, G):
+    all_signs = []
+    for (a, b, c) in tris_list:
+        all_signs.append([G[a][b]['sign'], G[b][c]['sign'], G[a][c]['sign']])
+    return all_signs
+
+def count_unstable(all_signs):
+    unstable = 0
+    for s in all_signs:
+        p = s.count('+')            # number of positive ties in this triangle
+        if p == 0 or p == 2:        # EVEN # of + -> unstable
+            unstable += 1
+    return unstable
+```
+
+✍️ worked example — how many triangles?
+6 contestants → triangles = $\binom{6}{3}=20$ (unordered triples). Note $\binom{6}{2}=15$ is the number of edges, and `permutations` would over-count each triangle 6×. So use `combinations(nodes, 3)`.
+
+balance.py — repair one unstable trianglepython
+
+```
+def repair_one(G, tris_list, all_signs):
+    while True:                                   # find an unstable triangle
+        idx = random.randint(0, len(tris_list) - 1)
+        p = all_signs[idx].count('+')
+        if p == 0 or p == 2:                      # found one
+            break
+    a, b, c = tris_list[idx]
+    edges = [(a, b), (b, c), (a, c)]
+    e = random.choice(edges)                      # flip ONE tie -> parity flips -> stable
+    if p == 2:                                    # 2 pos: flip any edge -> 1 or 3 pos (odd)
+        G[e[0]][e[1]]['sign'] = '-' if G[e[0]][e[1]]['sign'] == '+' else '+'
+    else:                                         # 0 pos: make any edge '+'  -> 1 pos
+        G[e[0]][e[1]]['sign'] = '+'
+
+# main loop: repair until fully stable
+all_signs = get_signs(tris_list, G)
+unstable  = count_unstable(all_signs)
+while unstable != 0:
+    repair_one(G, tris_list, all_signs)
+    all_signs = get_signs(tris_list, G)           # signs of adjacent triangles changed
+    unstable  = count_unstable(all_signs)         # recount (it fluctuates, then hits 0)
+```
+
+⚠️ repair notes
+- **2-positive** triangle: flipping any of its 3 edges gives an odd count (1 or 3) → stable. **0-positive**: making any edge `+` gives 1-positive → stable.
+- Fixing one triangle changes **adjacent** triangles, so the unstable count **fluctuates** (can rise before it falls) — but always converges to 0. To see this, append `unstable` to a list each round and `plt.plot` it: e.g. n=5 → C(5,3)=10 triangles (4 stable, 6 unstable) converges fast; n=8 shows the count jumping 26→28→… before hitting 0.
+- Screencast extras: nodes are given country names via `nx.relabel_nodes(mapping, G)`, drawn with `nx.circular_layout` + `nx.get_edge_attributes(G,'sign')` so the "+/−" show on edges.
+
+balance.py — form two coalitionspython
+
+```
+def coalitions(G):
+    r = random.choice(list(G.nodes()))
+    first, second = [r], []
+    to_process, processed = [r], []
+    for each in to_process:                        # BFS-style spread from r
+        if each in processed:
+            continue
+        for nb in G.neighbors(each):
+            if G[each][nb]['sign'] == '+':          # friend -> SAME coalition as 'each'
+                if nb not in first: first.append(nb)
+                if nb not in to_process: to_process.append(nb)
+            else:                                   # enemy -> the OTHER coalition
+                if nb not in second: second.append(nb)
+                processed.append(nb)
+        processed.append(each)
+    return first, second                            # the two allied blocs
+```
+
+📖 how the split works
+Start from any node; put its **friends in its own coalition** and its **enemies in the other**, then process each newly-placed friend the same way, spreading outward until everyone is assigned. Because the network is now balanced (Balance Theorem), this cleanly yields the two blocs. (We call them "coalitions", not "communities" — this uses edge signs, unlike Week 3's link-density community detection.)
+
+### Mild local rules sort a whole city (Schelling), and friend/enemy triangles are stable exactly when an odd number of ties are positive — driving any balanced network into just one or two camps.
+
+Schelling: content if ≥ t same-type of 8 neighbours (internal=8, corner=3, edge=5). Balance: stable ⇔ odd # of + (1 or 3); unstable ⇔ even (0 or 2). Balance Theorem: one bloc or two, never three.
+
+- What is the central finding of the Schelling simulation?
+Each person follows a mild **local** preference, yet the floor sorts itself sharply — a global pattern **emerges** with no central planner.
+
+- Neighbour counts: internal / corner / non-corner edge / empty cell?
+**8 / 3 / 5** (diagonals count); an empty cell has no team → never unsatisfied.
+
+- "At least half of 8 neighbours are teammates" is what threshold t?
+t = **4** (25%→2, 75%→6).
+
+- Internal cell, 8 neighbours, 2 teammates, t = 3 — content?
+**Unsatisfied** — 2 < 3. Contentment counts teammates, not total neighbours.
+
+- Everyone demands ~89% of 8 to be teammates — outcome?
+≈7 of 8 must match → almost no seating works → the floor **may never settle**. (Higher t sharpens sorting only up to a point.)
+
+- Why recompute the unsatisfied set each round?
+A move rewrites neighbourhoods, so content people can become unsatisfied and vice versa — the set is stale after any move.
+
+- When is a signed triangle stable?
+When it has an **odd** number of + ties (1 or 3). Even (0 or 2) is unstable.
+
+- X allied to Y and Z, but Y–Z are rivals — what happens?
+Unstable (2 positives); resolves by Y–Z allying (+++) or X dropping a tie (+−−).
+
+- Which is stable and which rule: three mutual rivals? two rivals sharing a common rival?
+Three mutual rivals = **unstable**. Two rivals of a common rival tend to ally — **enemy's enemy is a friend** → a stable 1-positive triangle.
+
+- What does a balanced complete signed network look like?
+**One all-allied bloc, or two alliances** (+ within each, − across). Never three or more, regardless of size.
+
+- For 6 contestants, how many triangles to check?
+$\binom{6}{3}=\textbf{20}$ (unordered triples). 15 is the edge count; ordered triples over-count 6×.
+
+- In code, a triangle's 3 signs are collected — when is it unstable?
+When the list has **zero or two** "+" marks (count the +; 0 or 2 → unstable).
+
+— end of Week 5 ✏️
+↑ back to top

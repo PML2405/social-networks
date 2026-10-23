@@ -1,0 +1,610 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 1 — Introduction, Python & NetworkX
+
+Lectures 1–13 · why a whole class hears one rumour, then the exact Python + NetworkX toolkit we build everything on.
+
+🧠 the big picture, first
+
+A **social network** is just **dots joined by lines** — people joined by relationships. This week does two things. (1) It shows one emergent miracle: give 50 near-strangers just ~3 random friends each and the whole group becomes **connected** — one rumour reaches everyone. (2) It hands you the **tools** to see this yourself: enough **Python** (lists, dictionaries, `random`, plotting) and the **NetworkX** graph library to build, draw and measure networks. Everything in Weeks 2–12 is built on this toolkit — learn it cold.
+
+### 📒 what's inside Week 1
+
+- The gossip puzzle — modelling people as a graph
+
+nodes, edges, the friendship network
+- Answer to the puzzle — connectedness
+
+path, connected vs disconnected, why random friendships connect everyone
+- Python — part 1
+
+variables, loops, `random`, lists, functions, the birthday paradox
+- Python — part 2
+
+dictionaries, matplotlib plotting, numpy arrays
+- NetworkX — part 1
+
+Graph, add_node/edge, draw, `order`/`size`, complete & random graphs
+- NetworkX — part 2
+
+weighted city graph, Graph vs DiGraph, connectivity, Dijkstra shortest paths, exceptions
+- The Challenge
+
+why there are more graphs than atoms in the universe
+- Coming attractions — the 6 big ideas
+
+PageRank, search, link prediction, contagion, weak ties, marketing
+
+LECTURE 1
+
+## The gossip puzzle — people as a graph
+
+a rumour, a classroom, and the jargon of the whole course
+
+## 1 Modelling people as dots and lines
+
+The course opens with a scene: two students, one week into college, are amazed that everyone already knows a piece of gossip (Vardan and Simran are dating) — even though almost nobody has met more than a handful of classmates. How does a rumour reach all ~50 people when each person has spoken to only 3–4 others?
+
+To reason about it, the instructor **models** the class. Draw each person as a dot; if two people are friends, join their dots with a line.
+
+📖 the core vocabulary (memorise — used all course)
+- Node (also vertex) — a dot. Here, one person. Plural of vertex = vertices.
+- Edge (also link) — a line joining two nodes. Here, a friendship.
+- Graph (also network) — the whole picture: a set of nodes plus the edges between them.
+- Friendship network — the graph whose nodes are people and whose edges are their friendships.
+
+The course uses **node/vertex** and **edge/link** interchangeably, and **graph/network** interchangeably. A social network is literally a graph of people.
+
+#### a tiny friendship network
+
+[diagram: Rama | Krishna | Ramesh]
+
+Rama–Krishna friends; Krishna–Ramesh friends; Rama–Ramesh **not** (no line).
+
+In this picture Rama and Krishna are joined (an edge), Krishna and Ramesh are joined, but Rama and Ramesh are not — so we draw no line between them. Build this up for all 50 people and you get the class's friendship network.
+
+A rumour can travel **only along edges**: from a person to their friends, then to their friends' friends, and so on. So the whole question — "can the news reach everyone?" — becomes a question about the shape of the graph.
+
+LECTURE 2
+
+## Answer to the puzzle — connectedness
+
+path · connected vs disconnected · why a few random friendships suffice
+
+## 2 Paths, connectedness, and the emergent surprise
+
+📖 path & connected
+Path — a sequence of edges leading from one node to another (A→C→F→B). Connected graph — a graph in which there is a path between every pair of nodes; starting anywhere, you can reach everyone. Disconnected — some pair has no path between them. A maximal connected piece is a component.
+
+**The experiment.** Take 50 dots (people). For each person, pick **3** other people uniformly at random and declare them friends. Draw the resulting graph. Astonishingly, it comes out **connected** — every two people are joined by some path — even though each person knows only 3 others. Repeat the whole experiment **1000 times**: it is connected almost every single time.
+
+#### connected (one blob) vs bifurcated (two islands)
+
+[diagram: connected ✓ | disconnected ✗ | no edge crosses the gap]
+
+Left: a path joins every pair. Right: two groups with **no** crossing edge — the news cannot jump the gap.
+
+**Why so few friendships still connect everyone.** The only way the class could split is a bifurcation: two groups (say 25 & 25) with friendships inside each but **not one edge crossing**. How likely is that? Between two groups of 25 there are **25 × 25 = 625** possible cross-friendships. For a clean split, all 625 must be absent. Even **one** of them appearing fuses the two islands into one.
+
+With so many independent chances, the probability that none occurs is vanishingly small. So bifurcation is possible but wildly improbable — which is exactly why the random experiment almost always yields a connected graph.
+
+read it as: "the class connects up not because everyone is popular, but because it is nearly impossible to keep two groups perfectly apart when everyone is free to befriend anyone." This is our first **emergent property** — order appearing from random choices.
+
+⚠️ don't confuse these
+- **Connected ≠ complete.** Connected only needs a path between every pair, not a direct edge. A connected 36-person class can exist with ~50 edges, far below the maximum.
+- **One isolated person breaks connectivity.** If a node has 0 edges, no path reaches it → the graph is disconnected, and the rumour reaches everyone except that person.
+- A disconnection isolates only the separated part; news still spreads freely within a connected piece.
+
+LECTURE 3
+
+## Python — part 1
+
+the interactive shell · loops · the `random` library · lists · functions
+
+## 3 Just enough Python to analyse networks
+
+You only need a first course in programming. The instructor works in `ipython` (an interactive Python shell where you type code and see results immediately). Variables need no declaration: `a = 2` makes an integer, `c = "Sudarshan"` makes a string. You can swap two variables in one line: `a, b = b, a`.
+
+### Loops and conditionals
+
+python_basics.pypython
+
+```
+for i in range(10):      # range(10) -> 0,1,2,...,9  (10 excluded)
+    print(i)             # prints 0 through 9
+
+k = 10
+while k <= 20:           # repeat while the condition holds
+    print(k)
+    k = k + 1            # increment; without this it loops forever
+
+if k > 20:               # k is now 21, so this fires
+    print("k is greater than 20")
+
+if k > 25:               # a SEPARATE if: 21 > 25 is False...
+    print("bigger than 25")
+else:
+    print("the statement is false")   # ...so the else fires
+```
+
+**Key gotcha, used all course:** `range(n)` gives `0,1,…,n-1` — the top value **n** is excluded. So `range(10)` runs 10 times; `for i in range(k)` runs the body **k** times.
+
+### The `random` library — how we build random networks
+
+Load a library with `import random`, then call its functions with `random.<name>`. Four functions matter:
+
+random_demo.pypython
+
+```
+import random
+
+random.randrange(1, 10)   # random INTEGER from 1..9  -> STOP (10) is EXCLUDED
+random.randint(1, 5)      # random INTEGER from 1..5  -> BOTH endpoints INCLUDED
+random.random()           # random FLOAT in [0, 1)    -> e.g. 0.7213...
+random.choice([100, 200, 300, 400, 500])   # one element picked from the list
+```
+
+| call | possible values | rule to remember |
+| random.randint(2, 5) | {2, 3, 4, 5} | both endpoints included |
+| random.randrange(2, 5) | {2, 3, 4} | start included, stop excluded |
+| random.random() | a float in [0, 1) | never invents integers only; gives decimals |
+| random.choice(L) | one existing element of L | never an in-between value |
+
+read it as: "`randint` is **int**-inclusive on both ends; `randrange` behaves like `range` — it **drops the last**." This start-included / stop-excluded contrast is a favourite exam trick.
+
+### Lists — Python's arrays
+
+lists_demo.pypython
+
+```
+L = []              # empty list
+L.append(2)         # -> [2]        add to the end
+L.append(10)        # -> [2, 10]
+L.append("hi")      # lists can hold ANY type, even strings
+L.sort()            # sort in place (ascending)
+L.reverse()         # reverse in place (so sort+reverse = descending)
+L.remove(77)        # remove the FIRST occurrence of the value 77
+len(L)              # number of elements in L
+```
+
+Other in-place list methods the shell reveals with a `.`+Tab: `append, count, extend, index, insert, pop, remove`. A list appended with a whole dictionary counts that dictionary as a **single** element (see the quiz).
+
+✍️ worked example — the Birthday Paradox (the instructor's own demo)
+- Pick 60 people; give each a random birthday (a day-number 1–365):
+
+birthday.pypython
+
+```
+import random
+L = []
+for i in range(60):                 # 60 people
+    L.append(random.randint(1, 365))  # a birthday 1..365
+L.sort()
+print(L)   # look for two equal neighbours -> a shared birthday
+```
+
+- Sort and scan for repeats. With 60 random birthdays you almost always find at least two people who share one.
+- With only 40 people it is rare; by ~60 it is near-certain. Walk into any 60-person classroom and two people share a birthday. $$ \boxed{\text{60 random birthdays} \Rightarrow \text{a collision, almost surely}} $$
+
+**Why it matters here:** it is our second taste of an emergent, surprising-but-reliable pattern — and it drills the `for i in range(k): L.append(...)` idiom we use to build networks.
+
+### Functions — `def`, parameters, `return`
+
+functions_demo.pypython
+
+```
+import random
+
+def sum3rand():                 # no parameters
+    a = random.random()
+    b = random.random()
+    c = random.random()
+    return a + b + c            # a value between 0 and 3
+
+def sumkrand(k):                # k is a PARAMETER
+    ans = 0
+    for i in range(k):          # run k times
+        ans = ans + random.random()
+    return ans                  # sum of k random numbers
+```
+
+**Workflow tips the course uses.** Write functions in a file, say `sudarshan.py`, then `import sudarshan` and call `sudarshan.sum3rand()`. After editing the file you must `reload(sudarshan)` (not `import` again) to pick up the changes. A triple-quoted string just under `def` is a **docstring** (help text) shown by `sudarshan.sum3rand?`. (reload & the trailing `?` help are IPython/Python-2 conveniences; in Python 3 use `importlib.reload` and `help(...)`.)
+
+LECTURE 4
+
+## Python — part 2
+
+dictionaries · matplotlib plotting · numpy arrays
+
+## 4 Dictionaries, plotting, and numpy
+
+### Dictionaries — store an attribute with each element
+
+📖 dictionary
+A dictionary stores **key → value** pairs: each element (the key) carries an attribute (the value), e.g. a person's name → their age. It is stored internally as a hash table, so a look-up is O(1) — it does not scan sequentially like a list O(n). That speed is why we use it for millions of entries.
+
+dict_demo.pypython
+
+```
+d = {"Annie": 25, "yoyo": 30, "sid": 19}   # key:value pairs
+
+d["Annie"]        # access BY KEY -> 25     (NOT by position)
+d[0]              # ERROR: 0 is not a key; dicts have no index order
+
+d["Annie"] = 26   # UPDATE (same syntax as add)
+d["john"] = 40    # ADD a new pair (key not present -> created)
+del d["john"]     # DELETE one pair by key
+d.clear()         # remove all pairs, keep the (empty) dict
+# del d           # remove the whole dictionary from memory
+
+d.keys()          # list of all keys
+d.values()        # list of all values
+d.items()         # list of (key, value) tuples
+for pair in d.items():
+    print(pair[0], pair[1])     # pair[0]=key, pair[1]=value
+
+squares = {x: x**2 for x in range(11)}         # {0:0, 1:1, ..., 10:100}
+evens   = {x: x**2 for x in range(11) if x%2==0}   # only even keys
+```
+
+⚠️ dictionary gotchas
+- **Order is not preserved** the way you inserted it — the dict stores keys by hash. Never rely on `d[0]` to mean "the first thing I added."
+- Accessing a missing key raises `KeyError`. Accessing by an integer position (`d[0]`) also fails unless `0` is literally a key.
+- `**` is exponentiation: `x**2` = x². The instructor used `d.has_key("Annie")` (Python 2) to test membership; in Python 3 write `"Annie" in d`.
+
+### matplotlib — drawing plots
+
+plotting_demo.pypython
+
+```
+import matplotlib.pyplot as plt      # 'plt' is the standard short alias
+
+plt.plot([1, 2, 3, 4, 5])            # ONE list -> taken as the y-values...
+plt.show()                           #  ...x defaults to 0,1,2,3,4 (indices)
+
+plt.plot([1,2,3,4,5], [1,4,9,16,25]) # TWO lists -> explicit x and y
+plt.plot(x, y, "ro")                 # 'r'=red, 'o'=dots (no line)
+plt.plot(x, y, "b^-")                # blue triangles joined by a line
+plt.title("squares of the numbers")
+plt.xlabel("the values", fontsize=18, color="red")
+plt.ylabel("the squares")
+plt.axis([0, 6, 0, 30])              # [xmin, xmax, ymin, ymax]
+plt.plot(x, y, linewidth=3.0)        # thicker line (default 1.0)
+plt.grid(True)                       # background grid (default off)
+plt.scatter(x, y)                    # scatter plot
+plt.bar(x, y)                        # bar chart
+plt.show()                           # NOTHING renders until you call show()
+```
+
+⚙️ the two rules that trip people up
+- **One list = y-values.** `plt.plot([300,600,900])` plots those as y, with x auto-assigned 0,1,2 (Python indices start at 0).
+- **Nothing shows until `plt.show()`.** You must call it (again) after each plot to see the figure.
+
+### numpy — element-wise math on arrays
+
+A plain Python list does **not** support element-wise math: `x ** 2` on a list raises `TypeError`. Convert it to a numpy array first and the operation applies to every element:
+
+numpy_demo.pypython
+
+```
+import numpy as np
+
+x = [1, 2, 3]
+x ** 2              # TypeError: lists don't support element-wise power
+
+x = np.array([1, 2, 3])
+x ** 2              # -> array([1, 4, 9])   element-wise, works!
+```
+
+**Exam rule:** element-wise operations (like `x**2`) work on a `numpy.array`, **not** on an ordinary list. That's why we convert before plotting curves like x², x³, x⁴.
+
+- What can `random.randrange(2, 5)` return, and how does it differ from `random.randint(2, 5)`?
+`randrange(2,5)` → {2,3,4} (stop excluded). `randint(2,5)` → {2,3,4,5} (both ends included).
+
+- `x=[]; for i in range(8): x.append(random.randint(1,6)); x.sort(); x.append({"a":1,"b":2}); print(len(x))` — what prints?
+**9**. Eight integers are appended, then one dictionary is appended as a single element → 8+1 = 9 (the dict's 2 keys don't matter).
+
+- Why does `trucks = {"Delhi":25}; trucks[0]` raise `KeyError`?
+Dictionaries are accessed **by key**, not by position. `0` is not a key, so `KeyError`. You'd write `trucks["Delhi"]`.
+
+- Which of these need numpy: `plt.show()` to render? element-wise `x**2`?
+`plt.show()` is always required to display (matplotlib). Element-wise `x**2` needs a **numpy array**; a plain list raises `TypeError`.
+
+LECTURE 5
+
+## NetworkX — part 1
+
+build a graph · draw it · complete graphs · random graphs · `order` & `size`
+
+## 5 NetworkX: the graph toolkit
+
+NetworkX is a Python package for building and analysing graphs. The universal first line is `import networkx as nx` (the `as nx` gives it a short alias — the standard convention).
+
+networkx_1.pypython
+
+```
+import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.Graph()          # create an empty (undirected) graph
+
+G.add_node(1)           # add vertices one at a time
+G.add_node(2)
+G.add_node(3); G.add_node(4); G.add_node(5); G.add_node(6)
+G.nodes()               # -> all the nodes just added
+
+G.add_edge(1, 2)        # add edges (creates endpoints if missing)
+G.add_edge(1, 3)
+G.add_edge(4, 6)
+G.add_edge(5, 4)
+G.add_edge(2, 3)
+G.edges()               # -> all the edges
+
+nx.draw(G, with_labels=True)   # draw it; with_labels shows node numbers
+plt.show()                     # display the picture
+```
+
+### Built-in graph generators + the two measurements you'll use constantly
+
+networkx_1b.pypython
+
+```
+Z = nx.complete_graph(10)   # EVERY possible edge among 10 nodes
+Z.order()                   # number of NODES  -> 10
+Z.size()                    # number of EDGES  -> 45
+
+H = nx.complete_graph(100)  # all possible edges among 100 nodes
+
+G = nx.gnp_random_graph(20, 0.5)  # 20 nodes; each possible edge added
+                                  # independently with probability 0.5
+```
+
+| method | returns | memory hook |
+| G.order() | number of nodes | "order" = how many people |
+| G.size() | number of edges | "size" = how many links |
+| nx.complete_graph(n) | graph with all pairs joined | everyone friends with everyone |
+| nx.gnp_random_graph(n, p) | n nodes; each edge present w.p. p | toss a coin per possible edge |
+
+⚠️ order vs size — exam favourite
+Watch the print order. `print(Z.size(), Z.order())` for `complete_graph(6)` prints **15 6** — edges first, nodes second — because you asked for `size()` then `order()`. Don't assume nodes come first.
+
+### The maths behind a complete graph
+
+A complete graph on n nodes has every pair joined. The number of pairs (hence edges) is:
+
+max edges on n nodes
+
+$$ \binom{n}{2} = \frac{n(n-1)}{2} $$
+
+read it as: "each of the n people could befriend the other n−1; that counts every friendship twice (A–B and B–A are the same edge), so divide by 2." For n = 10 → 45; for n = 6 → 15; for n = 36 → 630.
+
+✍️ worked example — 36-student batch
+- **Max possible friendships?** $\binom{36}{2} = \dfrac{36\times 35}{2} = \dfrac{1260}{2} = \boxed{630}$ edges.
+- **Careful with the near-miss options:** 36×35 = 1260 double-counts ordered pairs; 36×36 counts impossible self-pairs; 35×34/2 wrongly uses 35 nodes.
+
+✍️ worked example — order÷size of a complete graph
+- A 6-person team as a complete graph `T`: `T.order()` = 6, `T.size()` = $\binom{6}{2}$ = 15.
+- So `A = T.order()/T.size()` = 6/15 = $\boxed{2/5}$.
+- In general the ratio is $\dfrac{n}{n(n-1)/2} = \dfrac{2}{\,n-1\,}$; for n = 6 that's 2/5. ✓
+
+#### complete graph K₆ — all 15 edges
+
+6 nodes, every pair joined → 6·5/2 = **15** edges.
+
+#### gnp_random_graph(8, p) — a coin per edge
+
+Only some pairs joined — each edge added with probability p (a coin toss). Not complete.
+
+⚙️ what `gnp_random_graph(n, p)` really does
+For every one of the $\binom{n}{2}$ possible edges, flip a biased coin: include it with probability p, skip it with probability 1−p. So the edge count is **random** and only averages $p\binom{n}{2}$ — it is not fixed. For `nx.gnp_random_graph(36, 0.1)`: each of 630 edges is present independently with prob 0.1 (≈63 edges on average, but varies). Node degrees are not fixed either.
+
+LECTURE 6
+
+## NetworkX — part 2
+
+a weighted city network · Graph vs DiGraph · connectivity · Dijkstra · exception handling
+
+## 6 A real model: cities, roads, and shortest routes
+
+Now we model something real: cities as nodes, roads as edges, and each road's **travel cost** as the edge's weight. Because a road works both ways at equal cost, we use an **undirected** graph.
+
+📖 Graph vs DiGraph & weighted edges
+- `nx.Graph()` — undirected: one edge serves both directions (A–B = B–A).
+- `nx.DiGraph()` — directed: an edge `u→v` does **not** imply `v→u` (used later for the web/PageRank).
+- Weighted edge — an edge carrying a number, e.g. `G.add_edge("Delhi","Jaipur", weight=300)`.
+
+cities_model.pypython
+
+```
+import networkx as nx
+import random
+import matplotlib.pyplot as plt
+
+G = nx.Graph()                          # undirected road network
+
+city_set = ["Delhi", "Jaipur", "Mumbai", "Ahmedabad", "Hyderabad",
+            "Chennai", "Bangalore", "Surat"]
+for each in city_set:                   # 'each' iterates over the list
+    G.add_node(each)                    # one node per city
+
+costs = []                              # candidate road costs 100,200,...,2000
+value = 100
+while value <= 2000:
+    costs.append(value)
+    value = value + 100
+
+while G.number_of_edges() < 16:         # keep adding until 16 edges exist
+    c1 = random.choice(list(G.nodes())) # pick two cities at random
+    c2 = random.choice(list(G.nodes()))
+    if c1 != c2 and G.has_edge(c1, c2) == 0:   # not same, not already joined
+        w = random.choice(costs)               # random road cost
+        G.add_edge(c1, c2, weight=w)            # weighted edge
+
+pos = nx.circular_layout(G)             # a tidy layout (also spring/spectral)
+nx.draw(G, pos, with_labels=True)
+nx.draw_networkx_edge_labels(G, pos)    # show the weights on edges
+plt.show()
+```
+
+⚙️ the two guard conditions when adding a random edge
+- `c1 != c2` — never join a city to itself (no self-loops).
+- `G.has_edge(c1, c2) == 0` — don't duplicate an edge that already exists. (`has_edge` returns True/False; `== 0` means "no edge yet".)
+
+Layouts only change the drawing, not the graph: `nx.circular_layout`, `nx.spring_layout`, `nx.spectral_layout`.
+
+### Connectivity checks
+
+connectivity.pypython
+
+```
+nx.is_connected(G)          # True/False: is EVERY city reachable from every other?
+nx.has_path(G, "Delhi", "Mumbai")   # True/False: is there ANY route between these two?
+
+for u in G.nodes():
+    for v in G.nodes():
+        print(u, v, nx.has_path(G, u, v))   # reachability for every pair
+```
+
+The instructor observes: 8 cities with 16 edges → connected; drop to 10 edges → still connected; drop to 5 → now disconnected (some city stranded). Same lesson as the classroom: few edges already connect everyone, but too few leaves islands.
+
+### Dijkstra — cheapest routes on a weighted graph
+
+📖 Dijkstra's algorithm (the two functions)
+- `nx.dijkstra_path(G, s, t)` → the cheapest route as a **list of nodes**, e.g. `["Delhi","Jaipur","Mumbai"]`.
+- `nx.dijkstra_path_length(G, s, t)` → just the **total cost** (a number) of that cheapest route.
+
+Dijkstra minimises total weight, not the number of hops. Related: `single_source_dijkstra_path` (from one source to all) and `all_pairs_dijkstra_path`.
+
+✍️ worked example — cheapest Delhi → Mumbai
+Roads: Delhi–Jaipur 300, Jaipur–Mumbai 1100, Delhi–Ahmedabad 900, Ahmedabad–Mumbai 600, Jaipur–Ahmedabad 650. (No direct Delhi–Mumbai road.)
+
+| candidate route | add up the weights | total |
+| Delhi → Jaipur → Mumbai | 300 + 1100 | 1400 ✓ cheapest |
+| Delhi → Ahmedabad → Mumbai | 900 + 600 | 1500 |
+| Delhi → Jaipur → Ahmedabad → Mumbai | 300 + 650 + 600 | 1550 |
+
+`nx.dijkstra_path_length(G,"Delhi","Mumbai")` → **1400**; `nx.dijkstra_path(G,"Delhi","Mumbai")` → **["Delhi","Jaipur","Mumbai"]**. Note: the Ahmedabad route also has 2 hops but costs more, so Dijkstra rejects it — it minimises cost, not hops.
+
+### Exception handling — when there is no route
+
+If two cities are in different components, `dijkstra_path_length` **raises an exception** ("node not reachable") — it does not return 0. We catch it with `try/except` and substitute a big number as a stand-in for infinity:
+
+safe_distance.pypython
+
+```
+try:
+    L = nx.dijkstra_path_length(G, "Delhi", "Mumbai")
+except:                       # runs only if the line above threw an error
+    L = 100000                # stand-in for "infinity" (no route exists)
+print(L)
+```
+
+⚠️ common bugs in the routing code
+- Calling `nx.dijkstra_path_length(s, t)` without `G` → `TypeError` (must pass the graph first).
+- Assuming "no path" returns 0 — it **raises**; you need `try/except` (or check `nx.has_path` first).
+- A list index like `cities[3]` on a 3-element list raises `IndexError` (valid indices are 0,1,2) → caught by `except`.
+- Forgetting `plt.show()` after each draw → nothing appears.
+
+### Putting it together — the "cost drops as roads are added" plot
+
+The lecture's finale ties everything together: start with two cities not connected, keep adding random edges, and watch the cheapest route between them **shrink**. Because the "path length" here is a travel cost (not a hop count, so it never reaches 1), we just loop a fixed number of steps and use `try/except` to catch the early "no route" case.
+
+cost_vs_edges.pypython
+
+```
+x = []           # time step (how many roads added so far)
+y = []           # cheapest Delhi->Bangalore cost at that step
+for t in range(60):
+    add_random_edge(G, costs)          # add one random weighted road
+    try:
+        L = nx.dijkstra_path_length(G, "Delhi", "Bangalore")
+    except:
+        L = 10000                      # stand-in for "infinity" (still no route)
+    x.append(t)
+    y.append(L)
+plt.plot(x, y)
+plt.xlabel("roads added"); plt.ylabel("travel cost")
+plt.title("change in travelling cost as more roads are added")
+plt.show()      # cost falls from ~10000 (disconnected) to ~3000 after ~11 roads
+```
+
+The curve starts at the big "infinity" stand-in (the two cities are unreachable) and drops sharply once a connecting route appears — the same "few links suffice" lesson, now measured in cost.
+
+LECTURE 7
+
+## Social Networks: The Challenge
+
+more graphs than atoms in the universe
+
+## 7 Why studying networks is genuinely hard
+
+Here is the deep motivation. Fix n people. Every one of the $\binom{n}{2}$ possible edges is independently either **present** or **absent** — 2 choices each. So the number of distinct graphs you could draw is:
+
+total labelled graphs on n nodes
+
+$$ 2^{\binom{n}{2}} \;=\; 2^{\,n(n-1)/2} $$
+
+read it as: "there are $\binom{n}{2}$ possible friendships; each is a yes/no coin, so multiply 2 by itself that many times." For n = 36 → $2^{630}$. For n = 50 → $2^{1225}$.
+
+🌌 the scale
+The number of atoms in the universe is roughly $2^{200}$. But the graphs on just **50** people number $2^{\binom{50}{2}} = 2^{1225}$ — unimaginably more than every atom in existence. Brute-force enumeration of social networks is hopeless.
+
+**And yet** — this is the whole point of the course — real social networks reliably show nice, predictable emergent properties (like connecting from very few links). The mystery isn't that the space is huge; it's that **structure emerges anyway**, and we can study it.
+
+⚠️ don't over-read the challenge
+"The space is astronomically large" does **not** mean "no regularities can be found." The opposite is true and is the course's thesis: strong regularities do emerge and can be predicted.
+
+LECTURES 8–13
+
+## Coming attractions — the six big ideas
+
+a preview of what the rest of the course answers
+
+## 8 The questions this course will answer
+
+Lectures 8–13 are a trailer: six problems, each solved later, each surprisingly simple in the end. Know them by name.
+
+| big idea | the question | the teaser answer |
+| Google PageRank (Lec 8) | Given a network of web pages linking to each other, which is the most important ? Is importance just "most links"? | A seemingly obvious idea (importance flows from important endorsers) became a ~450-billion-dollar industry. Covered in the Link-Analysis chapter (Weeks 6, 8). |
+| Searching a network (Lec 9) | In a network of ~1 billion nodes, can you find a target starting from a random node? | Yes — in only about log n steps (the instructor notes it's more precisely ~ log² n ; ~20 for a billion either way), via the small-world phenomenon. "log n = number of digits in n." |
+| Link prediction (Lec 10) | Can you predict who will become your next friend? | Yes, remarkably well — it's the maths behind "People You May Know" (Facebook friend suggestions), not just "most common friends". |
+| The contagions (Lec 11) | Is obesity contagious? Is happiness? Can a friend-of-a-friend you've never met affect you? | Yes — happiness/behaviours spread up to 2–3 levels through the network (a well-established scientific finding). |
+| Importance of acquaintances (Lec 12) | What kind of friends help you land a dream job? | Your weak ties — acquaintances, not close friends — the Strength of Weak Ties (Week 3). New jobs and even spouses often come via far-off contacts. |
+| Marketing on networks (Lec 13) | How do you make a product or video go viral ? | By understanding how information/belief cascades through a network (Week 7). Not TV ads — network structure. |
+
+### A social network is a graph of people; the surprise is that a few random links already make the whole thing connected.
+
+Model people as nodes and relationships as edges — then use Python + NetworkX (`nx.Graph`, `order/size`, `complete_graph`, `gnp_random_graph`, `is_connected`, `dijkstra_path`) to build and measure it. Max edges = n(n−1)/2; total graphs = 2^(n(n−1)/2) — more than the atoms in the universe.
+
+- A rumour reaches all 36 students exactly when the acquaintance graph has which property?
+**Connected** — a path between every pair. (Not "complete" and not "min degree 3", which are sufficient-looking but unnecessary.)
+
+- Maximum number of edges among 36 students?
+$\binom{36}{2} = 36\cdot35/2 = \textbf{630}$.
+
+- Two groups of 18 with acquaintances only inside each — how many cross-group edges are possible, and why is a perfect split improbable?
+**18 × 18 = 324** possible cross-edges. All 324 must be absent for a clean split; even one present merges the groups — so with 324 independent chances, a perfect split is almost impossible.
+
+- `T = nx.complete_graph(6); print(T.size(), T.order())` prints what?
+**15 6** — size() (edges = 15) is printed first, then order() (nodes = 6).
+
+- How many distinct acquaintance graphs are possible on 36 labelled students?
+$2^{630} = 2^{\,n(n-1)/2}$ — each of the 630 possible edges is independently present or absent.
+
+- What does `nx.gnp_random_graph(36, 0.1)` build?
+36 nodes; each of the 630 possible edges included **independently with probability 0.1** (a coin per edge). The edge count is random (≈63 on average), not fixed.
+
+- `nx.dijkstra_path(G,"Delhi","Mumbai")` vs `nx.dijkstra_path_length(...)` — difference?
+`dijkstra_path` → the **node list** of the cheapest route `["Delhi","Jaipur","Mumbai"]`; `dijkstra_path_length` → the **cost** (1400).
+
+- Delhi and Mumbai fall in different components. What does `nx.dijkstra_path_length(G,"Delhi","Mumbai")` do, and how do you handle it?
+It **raises an exception** ("not reachable") — it does not return 0. Wrap it in `try/except` and set `L = 100000` as a stand-in for infinity (or check `nx.has_path` first).
+
+- One student, Ravi, ends up with zero acquaintances. What happens to the notice?
+The graph is **disconnected**; the notice reaches everyone except Ravi (an isolated node has no path to anyone).
+
+- Why is analysing social networks fundamentally hard, yet still possible?
+The number of possible graphs, $2^{n(n-1)/2}$, is astronomically larger than the atoms in the universe — so brute force is hopeless. But real networks show reliable **emergent properties** (e.g. connectedness from few links) that we can study.
+
+— end of Week 1 ✏️
+↑ back to top

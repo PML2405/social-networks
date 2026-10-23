@@ -1,0 +1,318 @@
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 11 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Six Hops to Anyone: The Small-World Effect
+Case Study
+A researcher, Leila, revisits a classic question on a modern messaging app: if you pick two strangers
+anywhere in the world, how many people stand between them in the chain of acquaintances? To test it she
+seeds many participants with a token addressed to a distant target person and asks each holder to forward
+it only to a single acquaintance they believe is somehow closer to the target — never directly to the target.
+She then records, for the tokens that arrive, how many forwarding steps the chain took.
+Most arriving chains turn out to be remarkably short — only a handful of steps on average. At first this
+seems impossible: the world holds billions of people, so surely a stranger must be very far away. Yet Leila
+reasons about reach level by level: if each person has, say, a hundred acquaintances, and each of those has
+a hundred more, the tally he can reach swells many times over with each new level, so the whole
+population is covered after only a few of them. The world is enormous and tiny at the same time.
+To explain why such short chains exist, Leila draws on two ideas. People mostly befriend others who are
+near them or like them, which packs the network into tight local clusters. But a few of everyone's ties reach
+far outside their immediate circle — to a different city, profession, or country. It is this small minority of
+long-range ties, laid over the dense local clustering, that stitches the distant clusters together and makes the
+whole world reachable in only a few hops.
+Questions 1–10
+Q1.  [MCQ]  What did the original version of this experiment (Milgram's) find about the chains that reached
+the target?
+A.  They reached the target through a direct connection in fewer than three steps every time.
+B.  They showed there was no measurable typical number of steps between two people.
+C.  They took about six forwarding steps on average, the “six degrees” result.
+D.  They reached the target only after passing through more than a hundred steps.
+Answer:  C
+Reference:  Lecture 144 – Milgram's Experiments (≈00:08–end)
+Solution:  Milgram observed that the chains that arrived took roughly six steps on average — the celebrated
+“six degrees of separation.” They did not arrive in under three steps, the average was clearly measurable,
+and the count was around six rather than in the hundreds.
+
+Q2.  [MCQ]  Why is the “only a few hops” result less surprising once Leila reasons level by level?
+A.  Because the number of people reachable multiplies at every level, covering the population fast.
+B.  Because a central directory quietly connects every participant straight to the target person.
+
+[p.2]
+C.  Because almost everyone in the world already knows the target person personally to begin with.
+D.  Because each person has only one acquaintance, so the chain is forced to stay extremely short.
+Answer:  A
+Reference:  Lecture 144 – Milgram's Experiments (≈07:16–end)
+Solution:  Reach grows multiplicatively: a hundred acquaintances, each with a hundred more, gives ten
+thousand at two steps and so on, so the whole population is covered within a few levels. There is no central
+directory, strangers are not already known, and people have many acquaintances, not one.
+
+Q3.  [Match the following]  Match each term in Column A with its description in Column B.
+Column A (term)
+Column B (description)
+1. Small-world property
+a. a long-range tie reaching outside one's local
+cluster
+2. Homophily
+b. forwarding using only knowledge of one's own
+contacts
+3. Weak tie
+c. any two nodes are joined by a surprisingly short
+path
+4. Decentralized search
+d. the tendency to befriend nearby or similar people
+
+A.  1-c, 2-d, 3-a, 4-b
+B.  1-d, 2-c, 3-b, 4-a
+C.  1-c, 2-a, 3-d, 4-b
+D.  1-c, 2-d, 3-b, 4-a
+Answer:  A (1-c, 2-d, 3-a, 4-b)
+Reference:  Lectures 143–147 – Small-world effect, homophily, weak ties, search
+Solution:  The small-world property is the short-path fact (1-c); homophily is befriending nearby or similar
+people (2-d); a weak tie is a long-range link out of one's cluster (3-a); and decentralized search forwards
+using only local knowledge (4-b).
+
+Q4.  [MCQ]  According to Watts and Strogatz, which two ingredients together produce the small-world
+effect?
+A.  Dense local clustering from homophily, plus a few long-range weak ties between clusters.
+B.  A complete graph in which every person is directly connected to every other person.
+C.  Purely random connections everywhere, with no local clustering of any kind at all.
+D.  A central hub that every single person in the world must connect to directly.
+Answer:  A
+Reference:  Lecture 145 – The Reason (≈00:07–end)
+Solution:  Watts and Strogatz attributed the effect to homophily, which creates tight local clusters,
+combined with a few weak ties that bridge those clusters. It does not require a complete graph, it is not
+purely random (clustering remains), and there is no universal central hub.
+
+[p.3]
+Q5.  [MCQ]  Leila runs the snippet below on her reconstructed acquaintance network. What does it report?
+import networkx as nx​
+L = nx.average_shortest_path_length(G)​
+print(L)
+A.  The largest number of acquaintances that any single person in the network has.
+B.  The total count of people in the network, regardless of how they are connected.
+C.  The average number of hops on the shortest path between pairs of people.
+D.  The fraction of a person's acquaintances who are themselves acquainted.
+Answer:  C
+Reference:  Lecture 143 – Small World Effect: An Introduction (≈10:00–end)
+Solution:  average_shortest_path_length returns the mean shortest-path distance over all pairs of nodes —
+the typical number of hops, which the small-world effect predicts is small. It is not the maximum degree,
+not the node count, and not the clustering coefficient.
+
+Q6.  [Statement type]  Consider the two statements about the small-world experiment and decide their truth.
+Statement I: The experiment found an average of about six hops between two random people.
+Statement II: This short average shows that the world's acquaintance network is disconnected.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  C
+Reference:  Lectures 143–144 – Small-world effect and Milgram
+Solution:  The first statement is correct: the average chain length was about six. The second is wrong: a
+short average path actually shows the network is connected — reachable in few hops — not disconnected.
+So the first holds and the second fails.
+
+Q7.  [MCQ]  What role do the few long-range weak ties play in producing short chains?
+A.  They lock everyone inside their own local cluster, lengthening the chains between clusters.
+B.  They bridge distant clusters, providing shortcuts that sharply reduce path lengths.
+C.  They duplicate the existing local ties, adding no new shortcuts to the network at all.
+D.  They disconnect the network into isolated pieces with no path between most people.
+Answer:  B
+Reference:  Lecture 145 – The Reason (≈04:55–end)
+Solution:  Weak ties act as bridges between otherwise distant clusters, creating shortcuts that collapse long
+local detours into a few hops. They do not trap people locally, they are not redundant copies of local ties,
+and they connect rather than disconnect the network.
+
+[p.4]
+Q8.  [MCQ]  What does homophily contribute to the structure of the acquaintance network?
+A.  A guarantee that no two acquaintances of a person are ever acquainted with each other.
+B.  A perfectly uniform network in which every person has an identical set of acquaintances.
+C.  Ties formed only with the most distant strangers, leaving no local connections at all.
+D.  Dense clusters of ties among nearby or similar people, rather than ties spread at random.
+Answer:  D
+Reference:  Lecture 145 – The Reason (≈02:47–end)
+Solution:  Homophily — befriending nearby or similar people — packs ties into dense local clusters rather
+than scattering them at random. It does not make everyone identical, it is not about distant strangers, and it
+tends to make a person's acquaintances acquainted, not the reverse.
+
+Q9.  [MSQ]  Which statements about the small-world effect are correct? (Select all that apply.)
+I.   Two random people are typically separated by only a few hops.
+II.  Homophily creates dense local clustering in the network.
+III. A few long-range weak ties act as shortcuts between clusters.
+IV.  The short chains prove the friendship network is disconnected.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 143–145 – Small-world effect and its reasons
+Solution:  Short separation (I), homophily-driven clustering (II), and weak-tie shortcuts (III) are all correct.
+Short chains show the network is connected, not disconnected, so IV is false.
+
+Q10.  [MCQ]  Leila calls the result “counterintuitive but true.” What is the counterintuitive contrast?
+A.  The world has only a few people, yet the chains between them are surprisingly long.
+B.  The world has billions of people, yet any two are separated by only about six hops.
+C.  The world is small in population, and accordingly the chains are also very short.
+D.  The world is large in population, and the chains are correspondingly enormous.
+Answer:  B
+Reference:  Lecture 144 – Milgram's Experiments (≈05:35–end)
+Solution:  The surprise is that despite billions of people — a huge world — any two are linked by only about
+six hops, so the world is at once big and small. The other options misstate either the population size or the
+chain length.
+
+[p.5]
+Comprehension 2 — Simulating a Small World and Routing Through It
+Case Study
+A developer builds the Watts–Strogatz generative model and then routes messages across it. The
+construction begins with a ring lattice: the nodes are placed on a cycle and each one is wired to a handful of
+its closest neighbours on the ring — the homophily links. A small fraction of edges is then rewired at
+random (equivalently, a few extra long-range edges are added), and these shortcuts are the weak ties that
+turn the lattice into a small-world network with short average path lengths.
+On a richer two-dimensional grid, the long-range links are not placed uniformly. A node is joined to a
+far-away node with a probability that falls off with the grid distance d between them, governed by a
+clustering exponent: the chance of a link is proportional to 1/d raised to that exponent. Tuning the
+exponent controls how reachable distant nodes are, and the developer notes there is a particular value of
+the exponent at which routing on the grid works best.
+Routing itself uses decentralized (“myopic”) search. A node holding the message looks only at its own
+neighbours, estimates each neighbour's distance to the target along the lattice — without knowing its
+neighbours' long-range links — and forwards to whichever neighbour is closest to the target, repeating until
+the message arrives. Because it sees only local structure, this greedy routing need not trace the globally
+shortest path, yet across growing networks the number of hops it uses grows slowly. Key fragments:
+import networkx as nx, random​
+ ​
+# ring lattice of n nodes, each joined to its nearest neighbours, then rewired​
+G = nx.watts_strogatz_graph(n, k_near, p_rewire)​
+ ​
+# myopic step: forward to the neighbour closest to the target on the lattice H​
+def best_neighbor(G, H, current, target):​
+    return min(G.neighbors(current),​
+               key=lambda x: nx.shortest_path_length(H, x, target))
+Questions 1–10
+Q1.  [MCQ]  How does the Watts–Strogatz construction begin, before any rewiring?
+A.  With a complete graph in which every node is already joined to every other node.
+B.  With a ring lattice in which each node is joined to a few of its nearest neighbours.
+C.  With an empty graph of isolated nodes and no edges of any kind between them.
+D.  With a star in which every node is joined only to one central hub node.
+Answer:  B
+Reference:  Lecture 146 – The Generative Model (≈01:11–end)
+Solution:  The model starts from a ring lattice — nodes on a cycle, each linked to a few nearest neighbours
+— representing local homophily ties. It does not start complete, empty, or as a star; the shortcuts are added
+only later by rewiring.
+
+[p.6]
+Q2.  [MCQ]  What does the random rewiring (a small rewiring probability) accomplish?
+A.  It removes all local ties, leaving a purely random graph with no clustering left.
+B.  It adds a few long-range shortcuts that sharply shorten the average path length.
+C.  It joins every pair of nodes, turning the lattice into a complete graph at once.
+D.  It leaves the lattice unchanged, since rewiring a few edges has no measurable effect.
+Answer:  B
+Reference:  Lecture 146 – The Generative Model (≈01:11–end)
+Solution:  Rewiring a small fraction of edges introduces a few long-range shortcuts (weak ties) that collapse
+long detours, giving the small-world property of short average paths while keeping most local clustering
+intact. It neither erases all local ties, nor completes the graph, nor leaves paths unchanged.
+
+Q3.  [MCQ]  In the grid model, a node links to a far-away node with probability proportional to which
+quantity (d is the grid distance, q the clustering exponent)?
+# probability that node u links to a far node v, distance d apart:​
+p_link  ∝  1 / (d ** q)
+A.  d raised to the power q, so farther nodes are more likely to be linked.
+B.  q raised to the power d, growing sharply as the distance increases.
+C.  1 divided by d raised to the power q, so farther nodes are less likely.
+D.  d multiplied by q, the distance scaled by the clustering exponent.
+Answer:  C
+Reference:  Lectures 148–149 – Decentralized Search II–III (≈16:15–end)
+Solution:  The link probability is proportional to 1/d^q, so the chance of a long-range tie falls as the distance
+d grows — nearby far-nodes are more likely than very distant ones. The other forms make distant links more
+likely, grow with distance, or scale linearly.
+
+Q4.  [Arrange in order]  Arrange the steps of one myopic (decentralized) search in the correct order.
+Steps (in scrambled order):
+(i)   Among those neighbours, find the one whose lattice distance to the target is smallest.
+(ii)  Start at the source node holding the message.
+(iii) Forward the message to that closest neighbour and make it the current node.
+(iv)  At the current node, look only at its own immediate neighbours.
+(v)   Repeat until the current node is the target, then report the path.
+A.  ii → iv → i → iii → v
+B.  iv → ii → i → iii → v
+C.  ii → i → iv → iii → v
+D.  ii → iv → iii → i → v
+Answer:  A (ii → iv → i → iii → v)
+Reference:  Lectures 147–148 – Decentralized Search I–II
+
+[p.7]
+Solution:  Start at the source (ii), look only at the current node's own neighbours (iv), pick the neighbour
+closest to the target on the lattice (i), forward to it and advance (iii), and repeat until the target is reached
+(v).
+
+Q5.  [MCQ]  What makes decentralized (myopic) search a “local” method?
+A.  Each node knows the entire global network and computes the true shortest path directly.
+B.  A central controller inspects the whole graph and tells each node exactly where to forward.
+C.  Each node knows only its own neighbours and forwards to the one closest to the target.
+D.  Each node forwards the message to a neighbour chosen uniformly at random each time.
+Answer:  C
+Reference:  Lecture 147 – Decentralized Search I (≈01:55–end)
+Solution:  Myopic search is local because each holder knows only its own contacts and greedily forwards to
+the neighbour it judges closest to the target — no global map and no central authority. It is neither globally
+informed, centrally directed, nor random.
+
+Q6.  [Statement type]  Consider the two statements about myopic (decentralized) search and decide their
+truth.
+Statement I: Myopic search always returns the globally shortest path between source and target.
+Statement II: Myopic search uses only local information about the current node's own neighbours.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  D
+Reference:  Lectures 147–148, 156 – Decentralized / myopic search
+Solution:  The first statement is wrong: being greedy and local, myopic search can return a longer path than
+the true shortest one. The second is correct: it relies only on the current node's own neighbours. So the first
+fails and the second holds.
+
+Q7.  [MCQ]  When the current node estimates a neighbour's distance to the target, which links does it use?
+A.  Only the lattice (homophily) links, ignoring the neighbour's unknown long-range ties.
+B.  All links including the neighbour's long-range ties, which it always knows in full.
+C.  Only the neighbour's long-range ties, ignoring every lattice link in the network.
+D.  A randomly chosen half of all the links present in the entire network each time.
+Answer:  A
+Reference:  Lecture 155 – Myopic Search Introduction (≈03:13–end)
+Solution:  Distances are judged along the lattice only, because a node does not know its neighbours'
+long-range ties; that is why the search is short-sighted. It cannot use unknown long-range ties, cannot
+ignore the lattice, and does not sample links at random.
+
+[p.8]
+Q8.  [MCQ]  For efficient decentralized search on a two-dimensional grid, which clustering exponent works
+best?
+A.  An exponent of 0, making every far-away node equally likely to be linked.
+B.  An exponent of 4, so that almost no long-range links are ever formed.
+C.  An exponent of 1, which is the best value for a one-dimensional ring, not a grid.
+D.  An exponent of 2, balancing short-range and long-range links on the grid.
+Answer:  D
+Reference:  Lecture 149 – Decentralized Search III (≈20:43–end)
+Solution:  On a two-dimensional grid the search-path length is minimised when the clustering exponent
+equals 2, the value that balances links across all distance scales. An exponent of 0 makes far links uniform, 1
+is the optimum for a one-dimensional ring, and 4 suppresses long-range links almost entirely.
+
+Q9.  [MCQ]  As the network size n grows, how does the number of hops used by myopic search behave?
+A.  It grows in direct proportion to n, doubling whenever the network doubles in size.
+B.  It grows roughly like log n, increasing only slowly as the network gets larger.
+C.  It stays fixed at exactly six hops no matter how large the network becomes.
+D.  It grows like n squared, exploding far faster than the network itself grows.
+Answer:  B
+Reference:  Lecture 158 – Time Taken by Myopic Search (≈11:33–end)
+Solution:  Experiments show the myopic search path length grows roughly logarithmically with n — slowly
+— not linearly. It is neither a fixed six hops nor a quadratic blow-up.
+
+Q10.  [MSQ]  Which statements about the model and its search are correct? (Select all that apply.)
+I.   Watts–Strogatz starts from a ring lattice and rewires a few edges.
+II.  Myopic search forwards to the neighbour closest to the target on the lattice.
+III. On a 2-D grid the best clustering exponent for search is 2.
+IV.  Myopic search always finds the globally shortest path.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 146–149, 156–158 – WS model and myopic search
+Solution:  The ring-lattice-plus-rewiring construction (I), greedy local forwarding (II), and the optimal grid
+exponent of 2 (III) are all correct. Myopic search is not guaranteed to be optimal, so IV is false.
+
+End of Week 11 Question Paper  —  20 questions  •  2 comprehensions

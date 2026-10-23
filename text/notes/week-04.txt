@@ -1,0 +1,344 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 4 — Homophily, Selection & Influence
+
+Lectures 41–53 · "birds of a feather" made precise — and a full NetworkX simulation (the Fatman model) of a city evolving under homophily, closure & influence.
+
+🧠 the big picture, first
+
+Why does your parents' advice "watch your company" hold? Because traits — even **obesity** and **happiness** — spread through friendship networks like contagions (up to 3 levels out). Two forces shape who befriends whom: **selection** (you pick friends already like you) and **social influence** (you grow like the friends you pick). The tendency of similar people to link is **homophily**, which we measure as `1 − actual/expected` cross-group edges. Friendships also form through shared **foci** (clubs, gyms) — giving **triadic, foci & membership closure**. Finally we build all of this into one running simulation: the **Fatman Evolutionary Model**.
+
+### 📒 what's inside Week 4
+
+- Watch your company — contagion of obesity & happiness
+- Selection vs social influence
+
+the Wikipedia study, similarity measure
+- Homophily — definition & measurement
+
+1 − actual/expected, and its sign
+- Three closures: triadic, foci, membership
+- The Fatman Evolutionary Model (full code)
+
+build order · homophily · closure · influence · longitudinal data
+
+LECTURE 41
+
+## Should you watch your company?
+
+obesity and happiness are contagious — up to three levels
+
+## 1 Traits spread through the network
+
+"Tell me who your friends are and I'll tell you who you are." A 2007 study by **Christakis and Fowler** gave this teeth: tracking ~5000 people over ~12 years, they found obesity is contagious — if your friends become obese, your risk rises — and, even more strikingly, **happiness is contagious up to three levels out**: your happiness is linked to your friends', their friends', and their friends'.
+
+📖 contagion & longitudinal study
+A longitudinal study = one that tracks the same people over many years; here ~5000 people over ~12 years — that time depth is what lets it show a trait spreading through the network rather than just co-occurring.
+
+A contagion is a trait/behaviour that spreads along friendship edges rather than staying with one person. It means we don't just connect — we **permeate** each other's states. Both obesity and happiness were shown to spread this way (happiness to 3 levels).
+
+LECTURES 42–43
+
+## Selection vs Social Influence
+
+did you pick a similar friend, or grow similar after? — the Wikipedia study
+
+## 2 Two forces behind every friendship
+
+📖 selection vs social influence
+- Selection — you befriend people already similar to you (similarity comes **first**). E.g. two French-speakers become friends; same-social-status people befriend; a class topper's friends are toppers.
+- Social influence — you become similar to friends after befriending them (friendship comes first). E.g. you start smoking / eating junk / partying because a friend does.
+
+### The similarity measure
+
+similarity of two people
+
+$$ \text{sim}(A,B)=\frac{|\,\text{interests}(A)\cap\text{interests}(B)\,|}{|\,\text{interests}(A)\cup\text{interests}(B)\,|} $$
+
+read it as: "shared interests ÷ all distinct interests between them." (Same shape as neighbourhood overlap, but over interests/edited-pages, not friends.)
+
+✍️ worked example — Anita & Bina
+Anita = {chess, hiking, jazz}; Bina = {hiking, jazz, baking, cycling}. Shared = {hiking, jazz} = 2; union = {chess, hiking, jazz, baking, cycling} = 5. $$\text{sim}=\frac{2}{5}=\boxed{0.4}.$$
+
+#### similarity of two Wikipedia editors around first contact
+
+[diagram: time (t=0 = first talk) | similarity | first talk | selection | influence]
+
+Average similarity climbs **before** first contact (selection — similar people choose to interact) and climbs further **after** (influence). On Wikipedia the **pre-contact (selection) rise is steeper**.
+
+⚙️ how the Wikipedia study separates the two
+Plot average editor-similarity vs time around their first talk-page conversation (t=0). The rise **before** t=0 = **selection**; the rise **after** = **influence**. On Wikipedia selection dominated; on obesity data the reverse held (more influence). So which force wins is **context-dependent**.
+
+LECTURE 44
+
+## Homophily — definition & measurement
+
+a coin-toss baseline, then 1 − actual/expected
+
+## 3 Measuring homophily
+
+📖 homophily
+Homophily = "birds of a feather flock together" — similar people befriend one another more than chance predicts. First ask does the network show it (yes/no), then how much.
+
+**The chance baseline.** At a party of 50 teenagers + 50 middle-aged, picking a random friendship is like tossing two coins: two teens = ¼, two middle-aged = ¼, one of each (cross-group) = ½. So **half** the friendships should be cross-group by chance. If far fewer are cross-group → homophily.
+
+homophily measure
+
+$$ H = 1 - \frac{\text{actual cross-group edges}}{\text{expected cross-group edges}} $$
+
+read it as: "how far below chance is the number of cross-group friendships." **H > 0** = homophily (fewer cross ties than chance); **H = 0** = chance-level/random mixing; **H < 0** = **heterophily** (more cross ties than chance — e.g. an actors-vs-actresses party).
+
+✍️ worked examples — homophily value
+- **Club of 20** (10 first-years + 10 final-years), 30 friendships, 9 cross-year. 50–50 split → expected cross = ½·30 = 15. $$H = 1 - \frac{9}{15} = 1 - 0.6 = \boxed{0.4}\ (\text{positive} \Rightarrow \text{homophily}).$$
+- **Transcript's class of 10** (4 girls, 6 boys), 18 edges, 3 boy–girl. Expected cross = ½·18 = 9. $H = 1 - \frac{3}{9} = 1 - 0.33 = 0.67$ (strong homophily).
+
+The ½ is exact only for a 50–50 split; for other splits use the appropriate expected-cross fraction. The measure isn't limited to 50–50.
+
+LECTURE 45
+
+## Three kinds of closure
+
+triadic · foci · membership
+
+## 4 How friendships (and memberships) form
+
+#### triadic · foci · membership closure
+
+[diagram: triadic | common friend | foci | yoga | shared focus | membership | music | friend joins my focus]
+
+coral dashed = the new link formed.
+
+📖 the three closures
+- Triadic closure — two people with a **common friend** befriend each other.
+- Foci closure — two people meet through a **shared focus** (club, class, gym) and befriend.
+- Membership closure — you bring an existing **friend into a focus** you belong to (they become a member because you are).
+
+A focus (plural foci) is a shared activity/place that draws people together.
+
+📈 quantifying closure pressure — the 1−(1−p)^k law
+More common friends → more pressure to befriend. If a single common friend gives probability p of connecting, then k independent common friends all failing has probability $(1-p)^k$, so the chance they **do** connect is:
+
+$$ T(k) = 1 - (1-p)^{k} $$
+
+On real e-mail data this matches the (roughly linear, small) observed rise. We'll reuse this exact formula for all three closures in code.
+
+✍️ worked example — closure probability
+p = 0.1, k = 3 common neighbours: $1-(1-0.1)^3 = 1-0.9^3 = 1-0.729 = \boxed{0.271}$.
+
+LECTURES 46–53
+
+## The Fatman Evolutionary Model
+
+a city that evolves under homophily, closure & social influence — in NetworkX
+
+## 5 Simulating a city
+
+We build a "city": **100 person nodes** (each with a random BMI) + **5 focus nodes** (gym, eat-out, movie, karate, yoga). Every node carries two attributes: `name` (the BMI for a person, or the label for a focus) and `type` (`'person'` or `'foci'`). Each person starts linked to exactly one random focus; foci never link to each other.
+
+⚙️ build order (memorise)
+- Create the graph + add 100 person nodes.
+- Assign each a random BMI (`name`) and `type='person'`.
+- Add the 5 focus nodes.
+- Link each person to exactly one random focus.
+- Each round: apply **homophily → closure → change BMIs (social influence)**, and save a snapshot.
+
+fatman_build.pypython
+
+```
+import networkx as nx, random, math
+
+def create_graph():
+    G = nx.Graph()
+    G.add_nodes_from(range(1, 101))            # 100 person nodes: 1..100
+    return G
+
+def assign_bmi(G):
+    for v in G.nodes():
+        G.node[v]['name'] = random.randint(15, 40)   # BMI 15..40 (stored in 'name')
+        G.node[v]['type'] = 'person'
+
+def add_foci_nodes(G):
+    i = G.number_of_nodes() + 1                # start numbering after the people
+    foci = ['gym', 'eat out', 'movie club', 'karate club', 'yoga club']
+    for j in range(0, 5):
+        G.add_node(i)
+        G.node[i]['name'] = foci[j]            # the focus label (stored in 'name')
+        G.node[i]['type'] = 'foci'
+        i = i + 1
+
+def add_foci_edges(G):
+    foci = [v for v in G.nodes() if G.node[v]['type'] == 'foci']
+    persons = [v for v in G.nodes() if G.node[v]['type'] == 'person']
+    for person in persons:
+        r = random.choice(foci)                # one random focus per person
+        G.add_edge(person, r)
+```
+
+⚠️ why one attribute called `name` for both?
+A person's key feature is its **BMI**; a focus's is its **label**. Storing both under `name` lets one function (labels, sizes, colours) work for either kind; `type` tells them apart. (NetworkX 1.x uses `G.node[v]`; in 2.x it's `G.nodes[v]`.)
+
+### Homophily — closer BMIs, higher link probability
+
+homophily link probability
+
+$$ p = \frac{1}{\,|\,\text{BMI}_u-\text{BMI}_v\,| + 1000\,} $$
+
+read it as: "the closer their BMIs, the higher the chance they befriend." The **+1000** does two jobs: (1) avoids divide-by-zero when BMIs are equal (gap 0), and (2) scales all probabilities down so edges accrue gradually.
+
+fatman_homophily.pypython
+
+```
+def homophily(G):
+    pnodes = [v for v in G.nodes() if G.node[v]['type'] == 'person']
+    for u in pnodes:
+        for v in pnodes:
+            if u != v:
+                gap = abs(G.node[u]['name'] - G.node[v]['name'])   # BMI difference
+                p = 1.0 / (gap + 1000)          # closer BMI -> higher p
+                if random.random() < p:         # realise an event of probability p
+                    G.add_edge(u, v)
+```
+
+✍️ worked example — p for BMIs 22 & 27
+gap = |22 − 27| = 5, so $p = \frac{1}{5+1000} = \frac{1}{1005}\approx \boxed{0.000995}$.
+
+📖 the "draw and compare" trick — `if random.random() < p`
+`random.random()` returns a uniform real in [0,1]. The chance it lands in [0, p) is exactly p, so `if random.random() < p: do X` makes X happen with probability p — the standard way to simulate any probabilistic event.
+
+### Closure — the 1−(1−p)^k law, applied to shared neighbours
+
+fatman_closure.pypython
+
+```
+def cmn(u, v, G):                              # count common neighbours
+    nu = set(G.neighbors(u))
+    nv = set(G.neighbors(v))
+    return len(nu & nv)                         # set intersection size
+
+def closure(G):
+    p = 0.01                                   # one common neighbour's contribution
+    array1 = []                                # decide ALL edges first (independence)
+    for u in G.nodes():
+        for v in G.nodes():
+            # at least one must be a person (two foci never share/close an edge)
+            if u != v and (G.node[u]['type'] == 'person' or G.node[v]['type'] == 'person'):
+                k = cmn(u, v, G)               # common neighbours
+                prob = 1 - math.pow(1 - p, k)  # 1-(1-p)^k
+                array1.append([u, v, prob])
+    for u, v, prob in array1:                  # now realise them
+        if random.uniform(0, 1) < prob:
+            G.add_edge(u, v)
+```
+
+⚙️ one formula, all three closures
+- `k = len(set(G.neighbors(u)) & set(G.neighbors(v)))` = **common neighbours**; the same $1-(1-p)^k$ handles all three cases, distinguished by the pair's types:
+- **person–person**, common neighbour is a **person** → **triadic** closure;
+- **person–person**, common neighbour is a **focus** → **foci** closure (they met there);
+- **person–focus**, common neighbours are **persons** → **membership** closure (a person joins a focus because friends belong).
+
+- The guard `type=='person' or ...` requires **at least one person**: two foci are never linked, so an edge between two foci is meaningless.
+- Edges are collected into `array1` first, then added — so each edge's decision is independent of edges added earlier in the same round.
+
+### Social influence — implemented indirectly via the foci
+
+fatman_influence.pypython
+
+```
+def change_bmi(G):
+    foci = [v for v in G.nodes() if G.node[v]['type'] == 'foci']
+    for f in foci:
+        if G.node[f]['name'] == 'eat out':
+            for nb in G.neighbors(f):
+                if G.node[nb]['name'] != 40:            # cap at 40
+                    G.node[nb]['name'] = G.node[nb]['name'] + 1   # gain weight
+        if G.node[f]['name'] == 'gym':
+            for nb in G.neighbors(f):
+                if G.node[nb]['name'] != 15:            # floor at 15
+                    G.node[nb]['name'] = G.node[nb]['name'] - 1   # lose weight
+```
+
+read it as: "each round, gym members lose 1 BMI (never below 15); eat-out members gain 1 BMI (never above 40)." Social influence emerges **indirectly**: membership closure pulls your friends into your gym, and then they start losing weight too — your habit spread to them without any direct "make obese people friends" rule.
+
+**Note:** social influence has several causes; this model captures just one — **shared context** (two people at the same focus influence each other). The BMI change is applied to a focus's neighbours each round.
+
+⚠️ a real debugging lesson from the screencast
+After `change_bmi` mutates BMIs each round, the **colour, size and label arrays go stale** — you must recompute them inside `visualize(G)` every round, not reuse the ones built once at the start (a classic bug). To watch the evolution the screencast also swaps `plt.show()` for `plt.savefig('evolution.jpg')` + a `time.sleep(1)` so the image updates like an animation.
+
+### The main loop + storing longitudinal data
+
+fatman_run.pypython
+
+```
+G = create_graph()
+assign_bmi(G)
+add_foci_nodes(G)
+add_foci_edges(G)
+nx.write_gml(G, 'evolution_0.gml')             # snapshot BEFORE evolving
+
+for t in range(0, 10):                         # 10 rounds
+    homophily(G)                               # 1) similar BMIs befriend
+    closure(G)                                 # 2) shared neighbours befriend
+    change_bmi(G)                              # 3) social influence via gym/eat-out
+    nx.write_gml(G, 'evolution_' + str(t + 1) + '.gml')   # save each round
+
+# later analysis: for each snapshot, H = nx.read_gml('evolution_i.gml');
+# density RISES steadily as homophily + closures keep adding edges.
+# obesity count = number of person nodes whose 'name' (BMI) == 40.
+```
+
+⚠️ Fatman model — key facts & gotchas
+- Save with `nx.write_gml('evolution_t.gml')`, reload with `nx.read_gml`. Plotting **density across rounds → it rises** (edges keep being added).
+- **Obesity** = count of person nodes with BMI (`name`) == 40; underweight = BMI == 15.
+- Social influence is **not** "add edges between obese people" — it's the gym/eat-out BMI change plus membership closure.
+- Assumption: only new edges appear (existing ones aren't deleted). Easy to extend.
+
+#### the Fatman city (node colour set by BMI value; foci red)
+
+[diagram: gym | eat out]
+
+Colour is by **BMI value** (not by focus): green = BMI 15 (underweight), yellow = BMI 40 (obese), blue = in-between; foci red. Node **size** ∝ BMI (×20). Gym/eat-out change BMI over rounds, which then changes the colour.
+
+Over the rounds you watch homophily wire similar-BMI people together, closures thicken the clusters, and the gym/eat-out foci pull members' BMIs apart — so obesity visibly spreads through the friendship structure, exactly the contagion we started with.
+
+### Similar people befriend (selection/homophily) and friends grow similar (influence) — and you can simulate the whole thing.
+
+homophily H = 1 − actual/expected cross-group edges (H>0 homophily, 0 random, <0 heterophily) · similarity = shared/union · closure prob = 1−(1−p)^k · Fatman link p = 1/(|ΔBMI|+1000) with `if random.random() < p`.
+
+- "Birds of a feather flock together" names which phenomenon?
+**Homophily** — similar people tend to befriend one another.
+
+- Classify: two French-speakers befriend / you smoke after befriending a smoker / strangers meet at yoga / you bring a friend to your music club.
+Selection / social influence / foci closure / membership closure, respectively.
+
+- Similarity of Anita {chess,hiking,jazz} and Bina {hiking,jazz,baking,cycling}?
+shared/union = {hiking,jazz}/{chess,hiking,jazz,baking,cycling} = **2/5 = 0.4**.
+
+- Club of 20 (10+10), 30 friendships, 9 cross-year — homophily value?
+Expected cross = ½·30 = 15; H = 1 − 9/15 = **0.4** (positive → homophily).
+
+- What do H > 0, H = 0, H < 0 mean?
+Positive = homophily; 0 = chance-level (random) mixing; negative = **heterophily** (more cross-group ties than chance).
+
+- In the Wikipedia study, what separates selection from influence?
+Similarity rise **before** first contact = selection; rise **after** = influence. On Wikipedia the pre-contact (selection) rise was steeper.
+
+- Contagion findings (Christakis–Fowler)?
+Both obesity and happiness are contagious; **happiness spreads up to three levels** out.
+
+- How is a person node initialised in the Fatman model?
+`name = random.randint(15,40)` (its BMI) and `type = 'person'`.
+
+- Homophily `p = 1/(|ΔBMI|+1000)` for BMIs 22 & 27 — value and why +1000?
+$p = 1/1005 ≈ 0.000995$. +1000 avoids divide-by-zero (equal BMIs) and scales all probabilities down (gradual growth).
+
+- Closure prob with p = 0.1 and k = 3 common neighbours?
+$1-(1-0.1)^3 = 1-0.729 = 0.271$.
+
+- Why must at least one of the two closure nodes be a person?
+Foci are never linked to each other, so an edge between two foci is meaningless — closure applies to person–person or person–foci pairs.
+
+- How is social influence implemented, and how does density change over rounds?
+Gym neighbours lose 1 BMI (floor 15), eat-out neighbours gain 1 BMI (cap 40); membership closure spreads it. Saved via `nx.write_gml`; **density rises** over rounds.
+
+— end of Week 4 ✏️
+↑ back to top

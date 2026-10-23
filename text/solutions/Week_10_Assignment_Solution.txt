@@ -1,0 +1,329 @@
+[p.1]
+SOCIAL NETWORKS
+NPTEL Online Course  •  Prof. Sudarshan Iyengar, IIT Ropar
+Week 10 — Question Paper  (Comprehension-Based MCQ / MSQ)
+Comprehension 1 — Bestsellers and the Long Tail
+Case Study
+An analyst, Farah, studies the catalogue of an online retailer. She ranks every product by how much it sells
+most popular first and plots sales against this popularity rank. The curve starts very high for the top few
+products and falls steeply, then stretches far out to the right as a low, thin line over thousands of
+rarely-bought products. The steep front is the handful of bestsellers; the long thin stretch is the catalogue's
+many niche items.
+A shopkeeper's instinct says to stock only the bestsellers and drop the rest. Farah checks this by comparing
+two areas under the curve: the sales contributed by the few bestsellers against the sales contributed by the
+enormous number of niche products added together. She finds the niche stretch, precisely because it is so
+long, can account for a surprisingly large share of total sales — in many catalogues a clear majority. The
+same lopsided shape appears far beyond shopping; the frequencies of words in a language, for instance, fall
+off with rank in just this way.
+Farah also asks why some products became bestsellers in the first place. She recalls an experiment in which
+the very same items were offered to several separate groups of people, with each group shown how often
+items had already been chosen. Different groups crowned different winners and once an item pulled ahead,
+the visible head-start drew still more buyers to it. This suggests that early, partly accidental popularity can
+compound into a large lead, so that the precise ranking at the very top owes as much to cumulative
+advantage as to intrinsic quality.
+Questions 1–10
+Q1.  [MCQ]  What does the “long tail” of Farah's curve refer to, and why does it matter?
+A.  The few bestsellers, which together make up nearly all of the catalogue's total sales.
+B.  The many niche products, which together can make up a large share of total sales.
+C.  A small group of mid-ranked products that sell at exactly the catalogue's average rate.
+D.  The empty rank positions beyond the last product, which contribute no sales at all.
+Answer:  B
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail (≈06:00–end)
+Solution:  The long tail is the vast number of niche, rarely-bought products stretching out to the right;
+because there are so many of them, their combined sales can be a large share — often the majority — of
+the total. It is not the bestsellers, not a mid-ranked average group, and not empty positions.
+
+[p.2]
+Q2.  [MCQ]  Why does the shopkeeper's instinct to “stock only the bestsellers” lose money?
+A.  Because the bestsellers actually sell less in total than any single niche product does.
+B.  Because the bestsellers stop selling the instant a niche product is taken off sale.
+C.  Because customers only ever buy products ranked exactly in the middle of the list.
+D.  Because dropping the niche items discards a stretch that can contribute most sales.
+Answer:  D
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail (≈06:00–11:36)
+Solution:  Although each niche product sells little, the long tail collectively can contribute the larger part of
+total sales, so cutting it away sacrifices a big slice of revenue. The bestsellers still sell well individually, their
+sales do not depend on the niche items, and buying is not confined to mid-ranked products.
+
+Q3.  [Match the following]  Match each term in Column A with its description in Column B.
+Column A (term)
+Column B (description)
+1. Head (bestsellers)
+a. word (or item) frequency falls off as 1/rank
+2. Long tail
+b. early popularity compounds into a widening lead
+3. Zipf's law
+c. a few products, each selling in very high volume
+4. Rich-get-richer
+d. very many products, each selling in low volume
+
+A.  1-c, 2-a, 3-d, 4-b
+B.  1-d, 2-c, 3-a, 4-b
+C.  1-c, 2-d, 3-a, 4-b
+D.  1-c, 2-d, 3-b, 4-a
+Answer:  C (1-c, 2-d, 3-a, 4-b)
+Reference:  Lectures 126–127 – Rich-get-richer and the long tail
+Solution:  The head is the few high-volume bestsellers (1-c); the long tail is the many low-volume niche
+products (2-d); Zipf's law is the 1/rank fall-off of frequency (3-a); and rich-get-richer is the compounding of
+an early lead (4-b).
+
+Q4.  [MCQ]  Farah notes that word frequencies follow Zipf's law. What does that say?
+A.  Every word in the language is used with one and the same fixed frequency throughout.
+B.  A word's frequency grows in direct proportion to its popularity rank number.
+C.  Only the single most frequent word is ever used, while all the others go unused.
+D.  A word's frequency is roughly proportional to 1 divided by its rank.
+Answer:  D
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail (≈13:22–end)
+Solution:  Zipf's law says a word's frequency is roughly proportional to 1/rank — the second-ranked word
+appears about half as often as the first, the third about a third as often, and so on. Frequencies are not all
+equal, do not grow with rank, and the lower-ranked words are still used.
+
+[p.3]
+Q5.  [MCQ]  Farah runs the snippet below on the ranked sales. What does share measure?
+sales = sorted(product_sales, reverse=True)   # sales, most popular first​
+head = sum(sales[:k])      # the top k 'bestseller' products​
+tail = sum(sales[k:])      # all the remaining 'niche' products​
+share = tail / (head + tail)
+A.  The fraction of total sales that comes from the niche (long-tail) products.
+B.  The fraction of total sales that comes from the top k bestseller products.
+C.  The number of niche products in the catalogue, divided by the bestsellers.
+D.  The average price of a niche product relative to a bestseller product.
+Answer:  A
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail (≈06:00–end)
+Solution:  head sums the top-k sales and tail sums everything below them, so tail / (head + tail) is the niche
+products' portion of total sales — the long tail's share. It is not the bestsellers' share (that would be head
+over the total), not a count of products, and not a price ratio.
+
+Q6.  [Statement type]  Consider the two statements about the long-tail catalogue and decide their truth.
+Statement I: The long tail contains many niche products, each selling relatively little.
+Statement II: The combined sales of the long tail are always negligible next to the bestsellers.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  C
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail
+Solution:  The first statement is correct: the tail is made of many low-selling niche products. The second is
+wrong: precisely because there are so many of them, their combined sales are often large — frequently a
+majority of the total — not negligible. So the first holds and the second fails.
+
+Q7.  [MCQ]  In the experiment where the same items were shown to several separate groups, what was
+observed, and what does it imply?
+A.  Every group crowned the identical winner, showing popularity is fixed purely by quality.
+B.  Different groups crowned different winners, suggesting cumulative advantage shapes the top ranks.
+C.  No item was ever chosen by any group, showing visible popularity counts deter all buyers.
+D.  The groups always reversed the true ranking, proving popularity is the opposite of quality.
+Answer:  B
+Reference:  Lecture 126 – Rich Get Richer: A Possible Reason (≈04:49–end)
+Solution:  Different groups produced different winners, and an early lead drew still more choices, so the top
+of the ranking reflects cumulative advantage (and some luck), not quality alone. The winners were not
+identical, items were chosen, and the ranking was not systematically reversed.
+
+[p.4]
+Q8.  [MCQ]  How does the long-tail / rich-get-richer pattern relate to power law from the previous chapter?
+A.  They are unrelated; sales curves never resemble a network's degree distribution at all.
+B.  The long tail is a perfectly symmetric bell curve, the exact opposite of a power law.
+C.  The two contradict each other, since a power law forbids any product from selling well.
+D.  The sales-versus-rank curve is power-law-like, driven by the same compounding force.
+Answer:  D
+Reference:  Lectures 119, 127 – Rich-get-richer and the long tail
+Solution:  The steep-then-trailing sales curve has the same heavy-tailed, power-law-like shape as a degree
+distribution, and the same rich-get-richer mechanism drives both. It is not unrelated, not a symmetric bell
+curve, and the two ideas reinforce rather than contradict each other.
+
+Q9.  [MSQ]  Which statements about the long tail and rich-get-richer are correct? (Select all that apply.)
+I.   The niche products are many, but each sells only a little.
+II.  The long tail's combined sales can exceed those of the bestsellers.
+III. Showing how popular items already are can bias new buyers toward them.
+IV.  Stocking only the bestsellers is always the most profitable strategy.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, II, III
+D.  I, III
+Answer:  C (statements I, II, III)
+Reference:  Lectures 126–127 – Rich-get-richer and the long tail
+Solution:  Many low-selling niche items (I), a long tail that can outsell the bestsellers in aggregate (II), and
+popularity cues biasing new buyers (III) are all correct. Because the tail can dominate sales, stocking only
+bestsellers is not always best, so IV is false.
+
+Q10.  [MCQ]  Farah summarises the long-tail phenomenon in one sentence. Which is it?
+A.  Popular products are few but each sells a lot, while niche products are many but each sells little.
+B.  Popular products are many and niche products are few, so the catalogue is dominated by hits.
+C.  Every product sells the same amount, so the ranking by popularity carries no information.
+D.  Niche products each outsell every bestseller, which is why bestsellers are eventually dropped.
+Answer:  A
+Reference:  Lecture 127 – Rich Get Richer: The Long Tail (≈11:36–end)
+Solution:  The long tail is exactly this contrast: a few popular products selling in high volume, set against
+very many niche products each selling little but together commanding a large share. The other options
+invert the head/tail sizes, deny any ranking, or wrongly claim each niche item beats the bestsellers.
+
+[p.5]
+Comprehension 2 — Modelling an Outbreak Across a Network of Farms
+Case Study
+An epidemiologist models a contagious livestock disease spreading across a network of farms linked by
+animal-transport routes. Two ingredients drive the model: the pathogen, summarised by a probability p that
+an infected farm passes the disease along any one transport link, and the network itself, whose density
+decides how easily the disease travels. As a first approximation she treats the network as a tree in which
+each farm trades with about k others, and asks how the outbreak grows level by level.
+Across one link the transmission is a coin toss: the infection crosses with probability p and fails with
+probability 1 − p. Since an infected farm has about k outgoing links, the count it infects is a sum of k such
+tosses, whose expected value is the key quantity the model watches a single number summarising how
+many fresh infections one infected farm typically produces. The epidemiologist explains that this number
+sits on a knife-edge: on one side the outbreak fades out for certain, while on the other it can grow into an
+epidemic, and public-health measures work precisely by nudging it across that edge — lowering either the
+per-link transmission risk or the number of trading partners a farm has.
+Moving from the tree to a realistic network, she uses the SIR model, in which each farm is Susceptible, then
+Infected for a fixed infectious period, then Recovered or Removed (immune, or culled and gone). A variant,
+the SIS model, sends a farm from Infected back to Susceptible, so it can be struck again. She also reframes
+the whole stochastic process statically: rather than stepping through time, decide each link's fate up front
+by one coin toss, then read off which farms the infection reaches. The day-by-day simulation steps through
+time instead:
+import random​
+infected = {seed};  recovered = set()​
+for day in range(T_I):                 # one infected farm stays infectious for T_I days​
+    newly = set()​
+    for u in infected:​
+        for v in G.neighbors(u):​
+            if v not in recovered and random.random() <= p:​
+                newly.add(v)           # the coin toss crosses this link​
+    infected |= newly​
+# after T_I days an infected farm moves on (recovered/removed, or back to susceptible)
+Questions 1–10
+Q1.  [MCQ]  In the tree approximation, level 1 holds 10 farms and every farm trades with 10 farms at the
+next level. How many farms sit at level 5?
+A.  10^5, ten times more farms at each successive level.
+B.  5^10, swapping the base and the exponent over.
+C.  10 × 5 = 50, ten farms on each of the five levels.
+D.  10^10, squaring the exponent at the last level.
+Answer:  A
+
+[p.6]
+Reference:  Lecture 131 – Simple Branching Process (Continued) (≈00:09–03:06)
+Solution:  Level 1 holds 10 farms and each farm has 10 children, so every level is ten times the one before:
+level i holds 10^i farms, giving 10^5 at level 5. Swapping base and exponent, a flat 10 × 5, and 10^10 all
+misapply the level-by-level multiplication.
+
+Q2.  [MCQ]  In the tree approximation, what is the expected number of farms that one infected farm directly
+infects?
+A.  p + k, the infection probability added to the number of transport links.
+B.  p × k, the per-link probability times the number of links the farm has.
+C.  k ÷ p, the number of links divided by the infection probability.
+D.  1 − p, the probability that the infection fails to cross a single link.
+Answer:  B
+Reference:  Lecture 130 – Simple Branching Process (≈13:53–end)
+Solution:  Each of the k links transmits independently with probability p, so the expected number of direct
+infections is the sum of k such chances, p + p + … (k times) = p × k. It is not a sum p + k, not k ÷ p, and 1 − p
+is the per-link failure probability.
+
+Q3.  [MCQ]  The single number p × k is the basic reproductive number R₀. A disease has p = 0.25 and k = 40.
+What is R₀, and what does it imply?
+A.  R₀ = 0.5, below 1, so the outbreak is certain to die out before long.
+B.  R₀ = 1, exactly on the edge, so the outbreak neither grows nor fades away.
+C.  R₀ = 40, equal to k, so every farm is infected within just a single day.
+D.  R₀ = 10, well above 1, so the outbreak can grow into an epidemic.
+Answer:  D
+Reference:  Lecture 132 – Basic Reproductive Number (≈03:25–end)
+Solution:  R₀ = p × k = 0.25 × 40 = 10, which is well above 1, so each infected farm produces many secondary
+infections and the outbreak can become an epidemic. The values 0.5, 1, and 40 misuse the formula or
+confuse R₀ with k.
+
+Q4.  [Arrange in order]  Arrange the steps of one SIR simulation pass in the correct order.
+Steps (in scrambled order):
+(i)   For each infected farm, toss a coin (probability p) along each link to a susceptible neighbour.
+(ii)  Seed the network by marking one farm as infected.
+(iii) Move farms that have finished their infectious period to recovered/removed.
+(iv)  Add the neighbours whose coin toss succeeded to the infected set.
+(v)   Repeat until no infected farms remain, then report which farms were hit.
+A.  ii → iv → i → iii → v
+B.  i → ii → iv → iii → v
+C.  ii → i → iv → iii → v
+D.  ii → i → iii → iv → v
+
+[p.7]
+Answer:  C (ii → i → iv → iii → v)
+Reference:  Lecture 134 – SIR and SIS Spreading Models
+Solution:  Seed one infected farm (ii), toss the coin along each link from infected to susceptible farms (i),
+add the successful neighbours to the infected set (iv), retire farms past their infectious period to
+recovered/removed (iii), and repeat until no infected farms are left, then report the result (v).
+
+Q5.  [MCQ]  The modeller computes the value below. What does epidemic tell her?
+R0 = p * k          # p: infection prob per link;  k: links per farm​
+epidemic = R0 > 1
+A.  Whether the outbreak tends to grow (R₀ > 1) rather than die out (R₀ < 1).
+B.  The exact number of farms that will end up infected by the end of the outbreak.
+C.  The number of days the infectious period T_I lasts for each infected farm here.
+D.  Whether the network is connected enough for any transport link to exist at all.
+Answer:  A
+Reference:  Lecture 132 – Basic Reproductive Number (≈00:26–03:25)
+Solution:  epidemic is true exactly when R₀ = p × k exceeds 1, the threshold separating an outbreak that
+tends to grow from one that dies out. It is not a head-count of eventual infections, not the infectious period,
+and not a connectivity test.
+
+Q6.  [Statement type]  Consider the two statements about the SIR and SIS models and decide their truth.
+Statement I: An SIR outbreak on a finite network always eventually comes to a stop.
+Statement II: An SIS outbreak is likewise guaranteed to stop after finitely many steps.
+A.  Both statements are true.
+B.  Both statements are false.
+C.  Statement I is true, but Statement II is false.
+D.  Statement I is false, but Statement II is true.
+Answer:  C
+Reference:  Lecture 135 – Comparison between SIR and SIS
+Solution:  The first statement is correct: under SIR, infected farms keep moving permanently into the
+recovered/removed state, so the supply of reinfectable farms runs out and the process must end. The
+second is wrong: under SIS farms return to susceptible and can be reinfected, so the outbreak can cycle on
+indefinitely. So the first holds and the second fails.
+
+Q7.  [MCQ]  What is the key difference between the SIR and SIS models?
+A.  SIR sends a recovered farm straight back to susceptible; SIS keeps it infected forever.
+B.  SIR has a recovered/removed state (immune or culled); SIS returns the farm to susceptible.
+C.  SIR ignores the infectious period entirely, whereas SIS infects every farm on day one.
+D.  SIR applies only to trees and SIS only to complete graphs; otherwise they are identical.
+Answer:  B
+
+[p.8]
+Reference:  Lecture 134 – SIR and SIS Spreading Models (≈09:23–end)
+Solution:  In SIR a farm ends up Recovered or Removed (immune, or culled and gone for good), while in SIS
+it goes from Infected back to Susceptible and can catch the disease again. SIR does not loop back to
+susceptible, both use an infectious period, and neither is restricted to a particular graph shape.
+
+Q8.  [MCQ]  Public-health measures aim to push R₀ across its threshold of 1. Which actions do this, and how?
+A.  Raising p through more transport, or raising k by merging farms, to drop R₀ below 1.
+B.  Cutting p via biosecurity, or cutting k by restricting movement, to push R₀ under 1.
+C.  Leaving p and k untouched, since R₀ cannot be changed once the outbreak has begun.
+D.  Cutting p and k only after R₀ has already fallen below 1 on its own accord.
+Answer:  B
+Reference:  Lecture 132 – Basic Reproductive Number (≈06:25–end)
+Solution:  Since R₀ = p × k, lowering either factor lowers R₀: biosecurity reduces the per-link probability p,
+and movement restrictions (quarantine) reduce the number of contacts k. Pushing R₀ below 1 turns a
+would-be epidemic into one that dies out. Raising p or k does the opposite, and R₀ can certainly be
+influenced during an outbreak.
+
+Q9.  [MCQ]  In the percolation reformulation, how is the spread decided without stepping through time?
+A.  Pre-toss a coin per link (open with prob p); a farm is hit if an open path reaches it.
+B.  Toss one coin per farm in advance; a farm is hit only if its own coin comes up heads.
+C.  Open every link with certainty, so that every farm in the network is always infected.
+D.  Remove all links first, so that no farm beyond the seed can ever be reached.
+Answer:  A
+Reference:  Lecture 137 – Percolation model (≈06:30–end)
+Solution:  Percolation fixes each link's outcome up front — open with probability p, closed otherwise — and
+a farm is infected exactly when an all-open path connects it to the seed, removing the need to track time.
+The coin is tossed per link (not per farm), links are not all open, and not all removed.
+
+Q10.  [MSQ]  Which statements about the epidemic models are correct? (Select all that apply.)
+I.   The basic reproductive number is R₀ = p × k.
+II.  If R₀ < 1 the outbreak dies out with certainty.
+III. An SIS outbreak can keep running indefinitely.
+IV.  The percolation view tracks the spread day by day through time.
+A.  I, II, IV
+B.  II, III, IV
+C.  I, III
+D.  I, II, III
+Answer:  D (statements I, II, III)
+Reference:  Lectures 132–137 – R₀, SIR/SIS, and percolation
+
+[p.9]
+Solution:  R₀ = p × k (I), an R₀ below 1 means certain die-out (II), and an SIS outbreak can cycle on forever
+(III). The percolation view deliberately removes the time dimension — deciding links up front — so IV is
+false.
+
+End of Week 10 Question Paper  —  20 questions  •  2 comprehensions

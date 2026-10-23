@@ -1,0 +1,441 @@
+=== LECTURE 101: Introduction to Hubs and Authorities (A Story) (Week 8, transcript PDF page 2) ===
+
+[p.2] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 101 Introduction to Hubs and Authorities (A Story)
+
+It has been customary that we start the chapter with an example. Now telling you everything about the chapter, we are going to follow the tradition. In this chapter too, I am going to start with an example and slowly after the example I will ask you few questions and then start telling you what this chapter is all about.
+
+(Refer Slide Time: 00:26)
+
+So, assume I went to a new city. I have no clue what is the city all about and if I type in what are the best things to, what are the nice tourist spots in this place. There will be some ten hits online Wikipedia or some tourist information and things like that. That may not really interest me. We need it is very personality dependent. So, what do we generally do? We ask the good friend of ours.
+
+[p.3] (Refer Slide Time: 00:56)
+
+Let me assume I ask this friend I go to the city in the first place and then I ask I ring this good friend of mine who stays in the same city his name is let us say Ramesh. I ask Ramesh. Ramesh, can you please tell me a nice place to visit. I am done with my I came here for a business trip I am done with my business whatever was the official work, now I am free to go around the city and then see the city. Tell me what all I can do in your city. Ramesh will say my city has beautiful beach which is very close by to where you are staying. You should go and explore it I ask him where exactly it is he tells me the place and exactly route and I go there. So, Ramesh suggested that I go to this beach on the seaside. I see the place a lot of eat outs nice things to shop at things like that. But now the person that I am I do not really enjoy let us say I did not enjoy going to this seaside and eating something which is considered sea food and things like that. I did not enjoyed I come back, then next day I have more time to explore the city. I will probably not ask Ramesh, why? I will infer that Ramesh recommendation that he gave he does not suit my personality type. If I ask him once again, he will give a similar suggestion. So, I will not now talk to Ramesh I will ring another friend of mine by name Raj, I call up Raj and Raj says Sudarshan, there is a beautiful place near by a couple of kilometers from where you stay it is a beautiful book stores you can sit there read
+
+[p.4] whatever book you want and buy a book if you wish that is a nice place with the great ambience. You must visit there I say fine let us let me try over Raj’s suggestion. So, Ramesh just said the beach I did not like I did not ask Ramesh anything further. Now Raj comes and he suggests go and see this book centre. I got the book centre at it is plane awesome. I really loved the book centre. It is a great experience to go through the popular science books and the fiction side in the general reading side, great stationary stuff there a something that really a gives me a high. I thoroughly enjoyed visiting this place I comeback and I message Raj I tell him; dude thank you very much. This is one of the best things I can ever do in a new city. I was extremely happy. What do I do? What just happened, I asked Ramesh. He said something, I did not like. So, I did not ask Ramesh. And then I rang Raj, Raj said go to a book centre I loved going to this book centre and then I now like Raj’s recommendation. For the next day, I again ring him ring, whom? Raj and ask him to come on give me another suggestion as good as what you did yesterday. And raj says go to this coffee store which is famous. Go with a notebook and pen and you can we can scribe something there are or write something there. It is a nice place; we can even read a magazine or two sipping the cities best possible freshly brewed coffee. Fine, I go there and again I enjoy the ambience. It is a fantastic place; I drink my favorite espresso and I am on caffeine high I start writing on what is the next NPTEL course I must offer and I am all very happy. I come back and I now have high regards for Raj right.
+
+[p.5] (Refer Slide Time: 04:55).
+
+Let us see what just happened. Here is a person who recommends me a place is the place is good, you give some star rating to the place not only to the place, you also give some rating to the person who recommends this place. The place is good, the person gets more points. The person has more points whatever recommendation he says will be valued by me. Let us think of this slowly, patiently and observe what just happened.
+
+=== LECTURE 102: Principle of Repeated Improvement (A Story) (Week 8, transcript PDF page 6) ===
+
+[p.6] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 102 Principle of Repeated Improvement (A story)
+
+Let us try to, go beyond the simple example; that I gave you what role did Raj take here?
+
+(Refer Slide Time: 00:10)
+
+He was a recommender, what are the places here? The places to visit, tourist attraction right, Raj; was a pointer, to a nice place. Now I will trust Raj, if he points me to a nice place. If the place is nice, I will more trust Raj. When I all the more trust raj, his points increase, correct; he becomes more trustworthy, he points to a place, the place is good, the place gets better rating ok. Do you see; what exactly is happening here?
+
+[p.7] (Refer Slide Time: 00:57)
+
+I give you another example; assume you and your spouse. If you treat your spouse well. If you are good, you will treat your spouse well. Let us say you are in the best of your moods; you are mentally very fit; very fit. So, or you are physically, and you have all comforts of your life, you are good; your spouse is good. If your spouse is good, you get support, you become better, you become better, your spouse gets good support, and she becomes he or she becomes better so on and so forth, right; this is called the concept of repeated improvement. Because of, the um mother; the daughter does really well in her life? Because the daughter; mother is very happy she does better, she does better; she does better; she does better, he or she does better, he or she does better this goes on improving right. This is true with, happiness is a nice quote in English which says, divide your sorrow, multiply your; multiply your happiness and divide your sorrow, which means, if you are sad you probably should divide it to your friends, everyone should take an equal share so, that the, an amount of sorrow per person is less.
+
+[p.8] (Refer Slide Time: 02:14)
+
+If it is happiness, you should probably multiply it. the more you give happiness, the many folds it becomes. So, the point that I am trying to make here is happiness yields happiness and this happiness yields more happiness this side and so on and so forth ok, all right. So, this is very true with Raj and his recommendations.
+
+(Refer Slide Time: 02:32)
+
+Raj role is what is called, a list, a list of recommendations. Assume there are plenty many such lists available for tourists to come to the city, Raj is basically a bold; he says go to this place, this place, this place, this place.
+
+[p.9] Ramesh is another bold; basically it is a sheet of paper, which says go to this place, this place, this place, this place. And people come read this list, and go to the place. If the place is good they give some rating for the place, and come back and give some rating for the person, for the list right.
+
+(Refer Slide Time: 03:12)
+
+Now, better rated lists; should point to better rated places, and better rated places should be pointed by better rated lists, correct very intuitive. If you did not get the intuition, you do not worry, as I proceed with this example, you will get good intuition. So, all I am trying to say here, is that; the pointer to a resource, and the resource itself, pointer and the resource. If the resource is good, the pointer get some credit, if the pointer has good credit, whatever he points to; also is a good resource, and resource gets good credit to; is all I am that I am saying. What has this to do; with our subject, what has this to do with let us say networks.
+
+=== LECTURE 103: Principle of Repeated Improvement (An Example) (Week 8, transcript PDF page 10) ===
+
+[p.10] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 103 Principle of Repeated Improvement (An example)
+
+(Refer Slide Time: 00:05)
+
+Let me consider 3 people on the lab and five places on the right: place 1, place 2 and so on. And there on the left you have people A B C, recommending, these five places to you. Let us say A recommends P 1, A also recommends P 2 so on A recommends P 3 so on and so forth, right assume this is the given graph. So, what do you think is A 1 here? A 1 will be P 1 plus P 2 plus P 3 as I was saying, the principle of repeated improvement is what this is called as, I will assign the score P 1 + P 2 + P 3 to A. I will start P 1, P 2, P 3, P 4, P 5, A B and C with 1 1 1 point. So, I go and doing this; B is so much, C is so much; may be you may want to pause, and take a look at how this is be it true? I am writing this now so on, so on, so on and that is it. So, what I am trying to do right now is I (Refer Time: 01:16) am going to open an excel sheet, spreadsheet rather any spreadsheet; we will do. I am going to open a Google spreadsheet, and I am going to try these values there; and I am going to see, whether it
+
+[p.11] will converge or not. It will help, if you can make a note of this graph and also this, A B C, P 1, P 2, P 3, P 4, P 5 here. So that, you know what are the formulas which you can try punching and on the Google search.
+
+(Refer Slide Time: 01:42)
+
+I have now come to the Google spreadsheet; as you can see, you have, A B C D, A B C, P 1, P 2, P 3, P 4, P 5 here, let me try making it bold and the underline it, perfect. And then, I start with the value; A is 1, B is 1, C is 1, P 1, P 2, P 3, P 4, P 5 are all 1s. And the value of a as you can see, is P 1 + P 2, because D 2, E 2 and F 2, P 1 + P 2 + P 3. You can see, I have punched in all the values of A B and C. Since B is, what is B? B is P 1 I have asked it a write down the graph, I am show you have written it down. If you can cross check, you will see that; B is P 1, P 4 and P 5. So, it will be, 1 + 1 + 1, which is three, so on and so forth; C is simply you are picking. So, I go on like this, I write down everything that is this row. And then the next row; is I, normalize it; what do I do? I take this 3, 3. 1 which is 3 + 3 is 6 + 1 is 7 and I divide it 3 by 7. The 3 is divided as you can see; the entry of A 3 is divided by the entry of A 3 + B 3 + C 3. For a change, I am using a spreadsheet, they are instances where spreadsheets easier than, programming; all the programming is a, very
+
+[p.12] powerful thing to do. Sometimes spreadsheet is a quick reference for you to compute and see, what is happening. So, you see; that I am just trying to normalize it here. Similarly for P 1, P 2, P 3, P 4, P 5; I have normalize this, which is 2 plus 1, 3, 4, 5, 6. I am dividing everything by this sum; I will draw formula here. So, what I do is, when I keep repeating this, repeating what? These assignments, I do this, what is called, principle of repeated improvement. I add the corresponding entities, and then keep normalizing it. Then I do it in the second iteration I get, so much. So, what is this? This will obviously be, the sum of; as you can see, D E F. Which is this one, this one and this one; this P 1 plus P 2 plus P 3. Just above it D 4, E 4, F 4 is simply this, this and this; values added together is this so on and so forth is automatic gets added. That is the power of the spreadsheet, when you pull it the automatic values are being flooded. And then, as and always; as I told you, what I did here, similarly the same thing is repeating here I am normalizing it. Now you see the value are changing here 0.42 became 0.45. Let me do this one more iteration; so, this is what is important for us right; this value. So, let me make this, bold; bold. This is what we get after normalizing it, go back. So, you see it sort of getting closer and closer may not be here this is going here, via this is going somewhere else; 0.14, 0.18, 0.13. So, I do not think, it is very, very in anyway close to converge it; maybe I may have to do this again let me try continuing this, maybe up to 20 right. So, what do I see? I see that 0.45, 0.46 0.45 still not converging right. So, I will do is, I will try pulling this till 100. When I keep doing this as I keep doing this, maybe even 200 I will go until, mean around 200 iterations, and I stop it here it is flooding, yeah, its flooded.
+
+[p.13] (Refer Slide Time: 06:00)
+
+Now, you see something start line, it is converging. So, the values 0.4608111272 that the node A had remains the same, right. Look at this, this and this is the same. So, this is the same. It is exactly the same, this is called the principle of iterated improvement, where in you observe that, when you keep I am come to the first line, when you assign all the nodes to have 0.1, and I and you keep doing this point assignment thinking, you will see that the values converge. We will use this in a, fourth coming lectures to explain what exactly one can infer from this.
+
+=== LECTURE 104: Hubs and Authorities (Week 8, transcript PDF page 14) ===
+
+[p.14] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 104 Hubs and Authorities
+
+(Refer Slide Time: 00:08)
+
+So, as we saw; there is A B C this side; P 1, P 2, P 3, P 4, P 5 this side, someone if a recommends a person this side, he gets a point, and A gets the point, of the person. That he is recommending to whether place that he is recommending B, gets some points based on the places that B recommends. And the places get the points based on the points that B has, correct.
+
+[p.15] (Refer Slide Time: 00:39)
+
+So, it sounds very weird you see, I am famous and if I say you are famous you become famous, you become famous and you say I am famous, and I become famous. And I am famous, and I say you are famous you become famous and this sort of goes on I have been using this animation from the beginning of this chapter right. So, because you are pointing to this, he gets your reputation, you are pointing to this person. So, you get his reputation, so, on and so on and so, on. You climb up like this; correct this is called the principle of repeated improvement.
+
+(Refer Slide Time: 01:11)
+
+[p.16] Now the question is in a complicated graph, a graph which is G of V comma E, every single node is adjacent to a few nodes. Let us first consider that, a node acts as both, the left side like A B C as well as on the right side, let us say P 1, P 2, P 3, P 4, P 5. So, what do I mean by this? This is a recommender; this is a place. So, a recommender is let us call it by a name, the standard name for it. Let us call it hubs, hub means a place where you get information. And the place itself P 1, P 2, P 3, P 4, P 5, we will call it authorities, ok; if you want some advise, you go and ask this A B Cs. They point you to P 1, P 2, P 3, P 4, P 5, where you have your solution. In the previous example, it was people recommend my friends recommending places to visit, it can be anything for that matter. So, given a graph G, all I am saying is a node can be given points as hubs. It can even be given points as authorities; what do I mean by this? So, let us take a nice example and try explaining this concept.
+
+(Refer Slide Time: 02:40)
+
+You have, let us say 30 people in a class, in a room, you go to some person randomly; and ask, can you help me with a solution to this problem? And that person says, I cannot help you, but I can point you to someone who can help. That person points to someone; and who points to whom is given as a directed graph, for example, Sonia is a node; there are 30 nodes 30 people in this room Sonia is one of them and she has arrows going to some three people.
+
+[p.17] So, she will point to these 3 people. If I ask her for solution, there are people who point to Sonia also, maybe 10 people point to Sonia ok.
+
+(Refer Slide Time: 03:29)
+
+Who points to you and whom do you point, are two different things are you pointing to good people? Is one way of measuring a person or good people pointing to you, or good number of people pointing to you; is another measure. So, every person has this two parameters, are you pointing to good resources: good people or good people pointing to you right. This is exactly similar to the previous case, where people who are recommending and people who and the places or people who are advising that there is a solution this side and you go and find the solution this side, these were two different shells. Now I can combine them, I am trying to combine them, and I am give trying to you in easy piece. That given a node, you try to give both the values stored. How well the node is being pointed to is one value to the node, how well is the node pointing to is another value of the node. So, as you saw there is a hubs score and authorities score for a node. There are two parameters that decide how important a node is. One is what does it point to, second one is what is it pointed to, who are pointing to him, him to a particular node? As you can see that definition itself is slightly recursive, you see a node is good if it is pointing to people; and people are good, if they are being pointed at by good people. And how do
+
+[p.18] you achieve this? You achieve this by repeated improvement. where are our earth is this useful? But then, in the late 90s; it was a requirement for people to maintain pages, which had the list of all possible news material right.
+
+(Refer Slide Time: 05:20)
+
+And they were called the news lists; how do you trust a news list If it is good or not. If it has some good articles; point us to good articles. Now how do you know an article is good or not? You would click on it go there and see that it is good, and then you would say this news list is good. Because it points me to the right articles, just the Raj, Ramesh example I gave you right. So, this was the way in which you could rate a bunch of bolts, which would point you to nice news articles.
+
+[p.19] (Refer Slide Time: 05:53)
+
+And that was a birth of this concept called hubs and authorities. Mathematically speaking, in fact, one can show that; whenever you take a graph and start with this hubs and authorities repeated improvement process. You will always converge to a point, what do I mean by converging to a point? You see this repeated improvement, results in points getting accumulated in a node, at the end after a long process. Let us say you tried several iterations; and you will observe that the proportion of allocation, the proportion of points; that each node takes with respect to other nodes this always remains the same. For example, a node A and node B, if node a accumulates half as much as node B it will continue to accumulate; half as much as node B in the future, that is called the convergence state. So, given any graph, the hub and authorities score, as you keep doing this principle of repeated improvement it converges.
+
+=== LECTURE 105: PageRank Revisited - An Example (Week 8, transcript PDF page 20) ===
+
+[p.20] Social Networks Prof. S.R.S Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 105 PageRank Revisited – An example
+
+(Refer Slide Time: 00:10)
+
+We have been discussing about pagerank all this while we will see it in a brand-new light. If you can recollect, I told you what exactly pagerank does, it is all about what you are is decided by who your friends are. If good people point to you it means that you are good. So, you are good if all these people who are pointing it to you are good. Now, that is a very vague way to put it, can we quantify it nicely? We saw of program a whole lot of programming we are programming screen casts you saw where we exactly show you how pagerank is computed. And why exactly its done that way is what will be our focus right now in our discussion for this lecture and the forthcoming lectures ok.
+
+[p.21] (Refer Slide Time: 01:09)
+
+So, let us start with a nice example, let me try writing a graph for you all a very simple three node graph. So, here is the graph here are three nodes let me name it A, B and C we put edges from B does a edge from B to C and there is an edge from C to B and there is one edge from B to A and one from A to C. So, what do you observe? You observe that there is this edge only one edge comes from A to C while this one edge coming from C to B, but there are 2 edges going from B right one to A and one to C correct ok. So now, let me do the following let me write down table and make a note of what is happening here I need three columns let me write that down; one for A, one for B and one for C ok. So, here we are. So, I am going to write the values of A and B and C and what we are going to do with it I am going to start with some value for A, B and C let me write that down a here B here and C here. Let us start with the value of a being so, assume we had resources; we had resources allocated to A, B and C equally, what do I mean by that?
+
+[p.22] (Refer Slide Time: 03:24)
+
+By that I mean I take A, B and C and I give one-third my resource to A and one-third of all the resources to C and the remaining one-third to B, which means I start with one- thirds to A one-thirds to B and one-thirds to C. What happens next? If you remember the programming screencast all that we did there was we took these values A is 1/3, B is 1/3, C is 1/3 and we told them and we observed and we told you all that A is going to give 1/3 to C correct ok. So, which means the new value of C, the new value of C is going to come from A correct. So, C will be 1/3 exactly the value that it had before all right ok. So, what would be the value of B let us see, what is going to be the value of B? B takes the value from C as you can observe, which means B will be whatever C was 1/3 right. Let me write that down 1/3 and what we A, B? A what we A B? A is taking whatever B had, but B has two edges going which means it will divide its 1/3 equally to A and C, giving A half of 1/3 which is 1/6 and C gets half of 1/3 which is 1/6 once again. So, let us see what happens to A; A gets 1/6 let me write that down 1/6, but then again as you can see B gives 1/6 to C correct. So, what should I do? I should increments C here by 1/6. So, this is the second nitration value. So, let me write this down what is 1/3 plus 1/6 here this is nothing else, but 1/2 correct a simple calculation tells me its 1/2, let me write it down 1/2 well this was my first iteration this was my second iteration, let me go ahead and do the third iteration just for clarity sake.
+
+[p.23] So, once again what is what will be the value of let us say C? C gets all that A had ok, A this value was 1/6. So, C gets whatever A had. So, C becomes 1/6 correct. So, please note this value 1/3, 1/3 and 1/3 is what we started from correct and that need not necessarily continue to be the values, the values change. You saw we start with 1/3, 1/3, 1/3 and it became 1/6 1/3 and 1/2 and now we are computing the third iteration right ok. So, let us see what happens in the third iteration um. So, let me remove all the annotations that I did and let me compute the third iteration. So, what is the third iteration? It is very clear that we wrote C as 1/6 because C takes the value of whatever was the value of A so, it became 1/6 correct. Now, what would be the value of B? B simply takes whatever was the value of C. What is the value of C? The value of C was 1/2. So, which means my B will be 1/2 right let me write that down 1/2 perfect so far so good. So, what is the value of A? Now here is a small problem as you know A takes half of B right, which means B was 1/3 and A takes half of this as you can see A takes half of what B was? B was 1/3 as you can see. So, A becomes 1 over 6 which is 1/2 of B, 1 over 6 correct perfect. Now, now as you can observe B also gives 1/2 of its existing value to C which means B was 1/3 and half of that is 1/6 and C gets 1/6 more correct plus 1/6. What happens to this? This becomes 2/6 correct which is 1/3. So, let me replace this by 1/3 and it goes on like this. So, my question for you all is the following, if this process keeps continuing like this where will it reach? So, let me remove all these things. So, my question is this. If this keeps continuing like this goes on like this where will it reach, will it at all will it converge will this process, converge? So, what do I mean by that? By that I mean we will just go on like this randomly 1/3 becoming 1/6 and then 1/6 1/3 becoming 1/3 and 1/2, 1/3 becoming 1/2 and then 1/3 and so on. What will happen, will it ever converge, or will it keep continuing with its random values? So, let us try verifying what exactly happens in our next lecture.
+
+=== LECTURE 106: PageRank Revisited - Convergence in the Example (Week 8, transcript PDF page 24) ===
+
+[p.24] Social Networks Prof. S.R.S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 106 PageRank Revisited – Convergence in the Example
+
+(Refer Slide Time: 00:05)
+
+We just now saw graph with three vertices A B and C and now going to use a spreadsheet to see the convergence question that I post in the previous lecture. So, if you recollect A was the node on top, B was the node on the left and C was the node on the right. So, the value of C completely the value of all these three vertices started off with 1/3, 1/3 and 1/3 correct. And the value of C if you remember if you do not, maybe you should watch the previous lecture and make note of the graph there right the value of C completely dependent on the value of A. So, I will say is equal to A as value which is A 3 that is how that is how you use a spreadsheet. So, I am sort of bored using python interpreter for such easy and trivial things so, I am using spreadsheet. That is one reason one reason is because I find it very easy that is why I am using a spreadsheet, the second reason is that when you want to observe convergence it is very easy to use a excel sheet and then see the convergence, especially when it comes to topic such as this.
+
+[p.25] So, getting back C’s value will be same as A 3 correct C was the bottom right node and the value of B if you remember was simply the value of C right, but then the value of A was half has let me just write this down was equal to what is that this I am sorry B’s value was simply the value of C fine. And the value of A was half of the value of B, I write B3; B3 stands for this the column B and then row3. So, 0.5 times B 3 was the value of A, but then the value of C also had 0.5 times the value of B 3 correct. Please not what I am doing here the formulas are visible here 0.5 times B3, the value of A is half of B3. And then the value of B is exactly the value of C 3 in the previous iteration whatever that was. And the value of C turns out to be the value of A3, if you remember from A it takes everything and half of what B 3 had B had which is this much right. So, this is perfect so what I do is the facility that a spreadsheet gives is, when I just select this and come down and paste it. It will do the same thing that you did here for the next step. For example, A was equal to 0.5 as you can see A was equal to 0.5 times B3 right this should be 0.5 times B 4 you will observe it will automatically, see look at this it became B 4. When you copy paste it excel gives you that liberty to automatically repeat the pattern of formula. So, B 5 happens to be C 4 and C 5 as you can see happens to be whatever was in A 4 plus half of whatever was in B 4. The best part now is if you just select these things and then pull this down it will populate the rest of the values. Now, you see the values are changing tremendously of a let us see when you look at A it is so on, so on, so on and you see the sort of values are same here, values are same here, it looks like it is converging right. So, let us look at it, let us continue this formula for more and then see whether it converges.
+
+[p.26] (Refer Slide Time: 04:01)
+
+Well, look at this it is almost0.2, 0.39, 0.4 the values are not changing. Let me continue it even further right, its getting more and more sort of refined and even further let me go even further keep going, keep going, please note excel this just Google spreadsheet approximates the values here right.
+
+(Refer Slide Time: 04:33)
+
+Eventually, let us see what happens not much of a change. You still have 0.2 0.4 0.4 happening, but then you see what is happening here this is very, very, close to 0.2very
+
+[p.27] close to 0.4,, very close to 0.4 A’s I keep continuing it you will be surprised to see that it will converge to the exact value.
+
+(Refer Slide Time: 04:49)
+
+ Now look at this hip; hip hooray there is 0.2 here, 0.4 here, and 0.4 here. And this is the place where I would say it converges not just here; here itself right converges that is right. So, what just happened? Let us switch back to the screen cast, in my next lecture and then see what exactly we did here and what did we observe. Please note the values A turned out to be 0.2, B turned out to be 0.4 and C turned out to be 0.4.
+
+=== LECTURE 107: PageRank Revisited - Conservation and Convergence (Week 8, transcript PDF page 28) ===
+
+[p.28] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 107 PageRank Revisited - Conservation and Convergence
+
+(Refer Slide Time: 00:05)
+
+So, let us look at what exactly happened, we took Google sheets and tried seeing what happens as we repeat this process alright. What is the process? Initially you give 1/3, 1/3 and 1/3 to all the notes correct you start with the same values, it is the resources that you have, we have used the example of gold coins if you remember I repeat. We have used the example of gold coins I am saying resources, from now onwards I will say just an assignment right it is the value that I assigned and every time in every iteration what you do is you the value of let us say A is transferred to C, the value of C is transferred to B the value of B is transferred equally to A and C right we understand this so far so good. Now when I observed where it converges, we observed that it indeed converges do you remember the values, the values were 0.2, 0.4 and 0.4 you see that the total is equal to 1, why is that? That is very easy to see the resources that you have distributed to these nodes do not go out anywhere, they just remain in the network itself. This is like the law
+
+[p.29] if you remember let me write this down this is like the law of conservation of energy correct, the law of conservation of energy says energy can neither be created, it cannot be created nor can it be destroyed. What is happening here is exactly analogous to the law of conservation of energy. The sum total was 1 that is how you started off with right and it remains 1 until the end, but what just happened this process has actually converged that is what you need to understand. How did it converge? I suspect this was a coincidence that it converged. It may not so happen for all the graph; will it happen for any random graph? If I take and then see assign values to it and I will observe that it converges, may not be true. Let us check for another graph to understand this. In this case the graph, that I considered here look slightly trivial, by trivial I mean what is it just 3 vertices and some 4 edges maybe it looked very symmetric and that is why the convergence happened. Maybe it may not converge, just in case I took some other graph; let us take some other graph and then see whether it converges or not.
+
+=== LECTURE 108: PageRank, Conservation and Convergence - Another Example (Week 8, transcript PDF page 30) ===
+
+[p.30] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 108 PageRank, conservation, and convergence - Another example
+
+(Refer Slide Time: 00:09)
+
+Let me consider a new graph with 5 vertices, let me call them A B C D and E and then let me put some random edges here and there. So, that every edge has some incoming links and some outgoing links. So, this is my graph, fine. And now let me create a table for this A B C D values and then start off with some values for A B C D E; I divided my resources equally to A B C D E resources or gold coins as in the previous example that we have seen in our lectures. So, what will that do? It will be 1/5 1/5 1/5 and 1/5 correct. So, if I continue like this, we observed that it converged for 3 nodes. Now, I have taken 5 nodes not so, easy looking graph will it converge here as well is my big question, will it converge here or not. Let us go to the excel sheet and then the Google spreadsheet and then try doing the same thing that we did before, and we will see whether it converges or not. So, let us be prepared to go and edit there, let us observe what is happening here so, that the punching in of the equation will be easier for it.
+
+[p.31] (Refer Slide Time: 01:28)
+
+Now, look at this A is actually equal to C by 3 correct, why is that? From C you see that there are 3 edges going out. So, the value of C will be divided between these 3 people. So, I will say A = C/3, good next: B = A + E/2. You can check why, maybe you should pause and then check for each value. I have written it down; I will just go through it is for you to check whether its right or not. B gets all the values from A; it also gets half the value from E because it have 2 edges going from E as you can observe ok. So, C will be B because there is only one thing that is coming inside C and B sends only 1 edge to see; I mean from emanating from B there are only 1 there is only 1 edge. And, then D is C/3 + E/2 you can check why and finally, E = D. So, we will keep these things and then try to go to our spreadsheet and then try to code it. So, what I will do is I will directly go there to the spreadsheet, finish this assignments of A B C D E, start with 1/5 1/5 1/5 and bring you people there. And, then show you as I pull down the values on excel, on Google spreadsheet you will observe that I am populating everything, and we will see whether it converges or not. So, that I forgot something here. So, let me just write that down E as you saw has incoming link from C as well not just from D. So, you have an incoming link from C. So, let me make a note of this E is not just equal to D, it is plus C/3; a good way to see if all of them add up to 1 is to see if these things add up to, if these 5 things add up to, if you add these things you must get; what should you get guess. You must get A + B + C + D
+
+[p.32] + E, see if you are getting this and you just think of how and why exactly do I say they should add to A + B + C + D + E; it is a simple quiz question.
+
+(Refer Slide Time: 04:08)
+
+I have now opened the Google spreadsheet and the values of A B C D and E as you would have guessed starts from 1/5. So, I am going to populate it with 1/5 throughout and as we computed in our previous lecture the value of A is going to be C divided by 3. I think you all know how Google spreadsheet works, as I told you earlier you just need to take the value of this which is C column and the third row. You should in fact, punch in is equal to C 3/3 ok. And then what was B? B was simply same as A plus what was in E divided by 2, is not it ok. What was my C? My C was nothing else but, B you may want to look at my previous lecture if you are not following what I am doing. It is a pretty straightforward process my D is going to be D was slightly complicated. It was C/3 C/3 + E/2, E/2 that is it. And what was E? E was equal to my D + C/3, a good way to check whether it is right or not is just to see if it is equal to the entire row, is this equal to A 4 + B 4 plus; what is that A 4 + B 4 + C 4 + D 4 + E 4. It should be 1 perfect, which means the values are properly put; let me delete this now ok. So, now what I do is I copy this and paste this and this creates a new iteration, as you see the value of this changes, but this value remains the same because it is simply again 0.2/3
+
+[p.33] C/3 and so on and so forth. Let me just pull this and see whether it converges or not, it is no way converging maybe it does not converge I do not know.
+
+(Refer Slide Time: 06:35)
+
+Let me go ahead and see well I see something promising; it looks like it is converging. You see 0.07 and 0.07 here 0.21 and 0.21 although the third decimal digit is not change, it is something else. I sort of see a ray of hope here maybe it will converge. Let me go on, let me go on the point is to keep going until you get the same values. It looks like it is converging, you see the last 3 the 3 decimal digits after the point looks like the same. But I am not really happy I want to see the exact converged values. Let me go on, like go on and on I am still not happy, let me pull this too let us say as you can see, I am in 76th row. I have repeated this 76 times, if I go on to let us say 200 or let us say little over 100 I see that the values are exactly the same right. It looks like it is exactly the same. When it is exactly the same no matter where, until what point I go, I am going to 250 it will still be the same. You see these 2 cells it was so much and it still remains the same. Let us make a note of this, we are observing that the graphs here that the graph given graph here with 5 notes A B C D E; when you start with 1/5 1/5 1/5 it is converging right, it is converging to these values. So, let us go to the next lecture and see what can one say about this, why exactly this is happening.
+
+=== LECTURE 109: Matrix Multiplication (Prerequisite 1) (Week 8, transcript PDF page 34) ===
+
+[p.34] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture – 109 Matrix Multiplication (Pre-requisite 1)
+
+(Refer Slide Time: 00:05)
+
+So, let us look at a few Pre-requisites before going further. These are nothing, but elementary let us say high school level mathematics precisely speaking it is matrix multiplication and we will understand what happens when you multiply a matrix. Although you would have understood what matrix multiplication is. You would not have seen this part that I am explaining next. Observe carefully, it is an interesting observation you can make about matrices ok.
+
+[p.35] (Refer Slide Time: 00:36)
+
+So, let us look at this very elementary matrix question you take a matrix [1 2 3 4] all right. We are going to play around this matrix only a simple 2 × 2 matrix right. Multiply it with this vector (1 1), what do you get? You simply get 1 + 2 and then 3 + 4 right fine. We all understand this much of matrices at least right next. This is equal to (3 7), so, (1 1), is giving rise to (3 7), right good and then.
+
+(Refer Slide Time: 01:15)
+
+[p.36] Let me see how one can represent points on this two-dimensional plane, two-dimensional coordinate system ok. So, we got (3 7), right. Now let me take a point (5, 4) somewhere in this coordinate axis. I will tell you what 1 means by pulling this to a circle ok. You will understand it very soon it is a quite easy concept. So, look at the vector of this typically by this point (5, 4). It is simply the line joining the origin and (5, 4) right and now what I do? I draw a unit circle. What do you mean by unit circle? By this you mean what is the unit circle? By a unit circle we mean, a circle with radius 1 with center as the origin all right. So, what happens next? Here is a quiz question for you all. Can you compute what is this point? This very point here. What is this point? Pause the video and then compute this. Please note I have given you a point (5, 4) and I am giving you a unit circle and I am asking you where does this line joining the origin and (5, 4) intersect the unit circle right. This is some basic thing. You compute the coordinates of this point extremely basic right. What you do is you first write 5 and then divide this by the square root of the sum of the squares right. We all have seen this. It takes a minutes pause and then observe this if you unable to see this. It is an extremely high school level coordinate system mathematics nothing beyond that. And then you have similarly 4/√52 + 42 and this is your point on the unit circle. Given any point (a, b), you can write the corresponding point intersecting the unit circle in the same direction as a/√a2 + b2. Here a is 5 and b is 4. So, 4/√52 + 42 all right? Particularly I showed it for the example (5, 4) so far so good you are understand what has happened so far. Let us observe something an obvious observation is that both the points are in the same direction right. They are both in the same direction correct. From origin if you can see, these two vectors (5, 4) and 5/√52 + 42 both are in the same direction. Now let me look at what just happened before.
+
+[p.37] (Refer Slide Time: 04:08)
+
+We took let me repeat this, it was an elementary matrix question and we took matrix [1 2 3 4] and multiplied with (1 1). We got (3 7), so, right. Now, what do I do? I take this (3 7), and then try to see what the point on the unit circle in the same direction is. What do I mean by this? Just now we did that before right. Before the previous video that I showed you whatever we did here, I am going to ask you to do the same thing for the next slide. 3 by 7 when it is pulled to the unit circle will give you so much right. Again, a/√a2 + b2 and b/√a2 + b2 is the corresponding point on the unit circle. What is this equal to? Let me compute I use my calculator and I saw this comes out to be (0.39 0.91), good. What next? What now? I multiplied [1 2 3 4]with (1 2). I am sorry (1 1) and I got (3 7) and I sort of this is called normalization. I normalized it; I got this value on the unit circle.
+
+[p.38] (Refer Slide Time: 05:32)
+
+What if I continue doing this process right? I got this (3 7). I continue this I pull it to the unit circle I got so much. What if I take these two things look at this from the previous slide, I simply take this (0.39 0.91).
+
+(Refer Slide Time: 05:46)
+
+And I apply [1 2 3 4] matrix on it ok.
+
+[p.39] (Refer Slide Time: 05:54)
+
+What do I get? I get my calculator says I get (2.21 4.81),. Again, I repeat this process, I normalize this, and I see as I keep repeating this process, what exactly do I get.
+
+(Refer Slide Time: 06:13)
+
+So, what I see I took a matrix, I took a matrix applied it to a vector; I got another vector. So, a vector a matrix I got another vector. What I do is I take this matrix and apply it to the same vector. Now before that I sort of, I normalized it normalizing is just to ensure that you do not get bigger values. All you care about is the direction I will tell you what I am trying to do, and I get a new vector another vector. Let us say this was vector 1, this is
+
+[p.40] vector 2. Now you get a vector 3 all right and then again apply this matrix on this vector, you get a vector 4. At every instance you are normalizing by normalizing I mean; you pull it to the circle, and you see where exactly this is going where exactly this is going. Somehow, we seem to be interested in repeating the same process again and again and we see what happens. We saw what happened with the iterated value of this matrix. Remember 1/3, 1/3, 1/3 not of the matrix that of the graph. We took a graph with 3 nodes, we are saying the values 1/3, 1/3, 1/3 and we saw that it converged. And now we are asking a matrix question; it converged right now we are asking a matrix question right.
+
+(Refer Slide Time: 07:48)
+
+When you apply a matrix repeatedly on a vector, what happens to it? Will it also converge or not? Obviously when you apply a matrix like [1 2 3 4] on a vector the values become bigger and bigger and that is why I am trying to pull it back to the unit circle right. I am normalizing it, what I will do is, I will switch to screen cast mode and I will try to understand this matrix multiplication process nicely.
+
+=== LECTURE 110: Convergence in Repeated Matrix Multiplication (Prerequisite 1) (Week 8, transcript PDF page 41) ===
+
+[p.41] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture – 110 Convergence in Repeated Matrix Multiplication (Pre-requisite 1)
+
+(Refer Slide Time: 00:05)
+
+Let me now open our ipython shell and let me try coding whatever I observed just now . So, before which I will try to help you understand a few commands, there is something called the numpy library which is a storehouse of a lot of matrix operations functions which help you meddle with matrices. So, how do you declare a matrix? You simply say A equals numpy.mat and then you write down your matrix in the form of the 1st row followed by a semicolon and then the 2nd row. If you remember it right from a previous lecture we are taking this matrix (1 2 3 4) and then there is a new vector v that I defined which is if you remember [1, 1], that is defined in python as 1 space 1, no that is not right 1 semicolon and then 1 isn’t that right. So, what is it denote, I am sorry what is it denote? 1 is the first row, 1 is the second row right. So, when I say A times v now A is a matrix (1 2 3 4) and v is the matrix (1 1).
+
+[p.42] (Refer Slide Time: 01:16)
+
+I get [[3], [7]] which is 1 + 2 and then 3 + 4 correct that is the way in which you multiply a matrix with the vector. So, let me now open a new shell ipython shell and then type a piece of code, to observe what happens when you keep repeatedly applying A on the vector v of course, you keep normalizing it every now and then ok.
+
+(Refer Slide Time: 01:50)
+
+So, let me edit mat.py and what I do is I say import numpy and then I will declare my matrix which is A = numpy.mat (‘1;2 ; 3 4’)the close and then my initial vector is going to be numpy.mat (‘1; 1’). And now what I am doing is, for i in range 10 you know what I
+
+[p.43] am doing here; I say z = A * v right and then I need to normalize this vector right. Do you remember (1 2 3 4)supplication on [1, 1] gave us some value and we pulled that to the unit circle? That pulling to the unit circle is done by the following operation, what you do is z = z/numpy.linalg this is a linear algebra package that is available within numpy you say norm(z). So, this one is going to be a real number which is basically that what you get. So, 1 plus 2 is 3 3 + 4 is 7 this becomes [[3], [7]] when you apply this matrix on [1, 1]. And, [[3], [7]] you normalize it what do you do 3 divided by 3, 7 divided by square root of 3 square + 7 squared right. Remember in the previous lecture I am just doing the same thing here. After doing this what I do is, I print my z and I print some stars here. So, that it looks neat it separates two things and then I go back here, and I simply display my v for clarity sake; just to tell you from where we started from correct. And, this is just beautification do not worry much this is just for us to read the output clearly nothing else ok. So, I am going to say this if you want let us go through the code once import numpy that imports all the library functions, that numpy has and I declare a matrix (1 2 3 4). And, then the next line is I declare this column matrix [1, 1]. I simply display what is this matrix [1, 1] here. And, then I repeat this loop 10 times what do I do, I apply my matrix A on v and call it z and then I normalize z. What do you mean by normalizing z? You pull it to the unit circle right, that is what this does linear algebra norm precisely does that square root of sum of squares nothing right. So, now let us say you print z.
+
+[p.44] (Refer Slide Time: 04:47)
+
+Let us see what the output of this is, forget the warning message that you keep getting like this that generally happens because of the it is relation problems. And, you would not output the write editor and stuff like that anyway let us ignore it.
+
+(Refer Slide Time: 05:03)
+
+So, what I do is run mat.py and I get some answer here yes. So, I start with [1, 1], it is application whose application? The matrix (1 2 3 4)application on [1, 1] gives me [[3], [7]]. When I normalize [[3], [7]], if you remember from my previous lecture, I indeed got
+
+[p.45] 0.39 and 0.91 there. The question there was if I repeatedly apply what do I get? I am getting the same values as you can see.
+
+(Refer Slide Time: 05:32)
+
+It is simply 0.3939193 and 0.91914503 I hope there is no error with the code, let me just check the code.
+
+(Refer Slide Time: 05:38)
+
+So, there is a problem here indeed this is the reason why I think it is good for us to code together and if there is an error I will not redo the coding I will correct it here; so, that you will realize what kind of mistakes one can do. So, I have made a very silly mistake here, I
+
+[p.46] am simply taking z and then applying assigning A of v we do it right. What I should do is, if I want repeated application after displaying z I should say v = z. So, that when I come here, I am sorry when I come here the next z will be A applied to my previous z which was v right. So, the output that I got previously was incorrect let us redo this. So, let me say run mat.py and I get some values here, let me see what this is 0.39 0.91 as expected and then the next one is something else. You see 4175 something the next one is 4158 something, 4159 something, 415973, but this was 415980 so on and so forth you will observe that oh my goodness it is converging. 0.41597356 here the next iteration the 10th iteration was 41597356 precisely the same as the previous iteration, you will even observe it with this. So, these two column vectors sort of are the same, maybe this was this converged. What if, let me do something what if what was that mat.py and so, edit mat.py and I will go here and I will try to vary this [1, 1] to let us say 1 comma let us say let us say some 3 comma sometime 11 alright. Now, let us see what happens to this, I come out the code remains the same I come out and I execute this; you see what happens looks like I am getting the same values how is that.
+
+(Refer Slide Time: 07:45)
+
+So, [[3], [11]] gave me this value after normalizing and application of the matrix A on this gives me this. An application of my matrix A on this gives me this right you see that finally; I am getting 41597356 and 90937671 this looks familiar. Why? Let me scroll up
+
+[p.47] and see do you see that this is precisely the value that we got before, 41599093 come down 41599093 it is exactly the same. What do we conclude here? No, matter where you start from what vector you start from, when you start applying the same matrix 1 2 3 4 on any vector, you get a constant vector. It converges to a constant vector.
+
+=== LECTURE 111: Addition of Two Vectors (Prerequisite 2) (Week 8, transcript PDF page 48) ===
+
+[p.48] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar Link Analysis (Continued)
+
+Lecture – 111 Addition of Two Vectors (Pre-requisite 2)
+
+(Refer Slide Time: 00:05)
+
+Let us start with another prerequisite right now. I spoke about the first prerequisite which is the fact that the matrix multiplication on a vector leads it to convergence state. And now I am talking about the second prerequisite which is which is actually a very straightforward observation. It is about addition of two vectors. We have studied the notion of scalars and vectors in our high school days; I am just going to revise that and make some subtle observation about them ok. What happens when you add two vectors? Is a very straightforward question we all have added (a, b) vector, (a, b) added with (c, d) gives you a + c and b + d correct, but we have not observed something important here. Let us observe that now.
+
+[p.49] (Refer Slide Time: 00:55)
+
+So, here is my question. What is the sum of two points in two dimension? Let us say this is my two-dimension plane; and this is my first point. I will give it some name; let us say at the point (30, 70) all right. And another point sort of relatively close to origin and this point is (5, 3) all right. So, let me join the corresponding vector. What do you mean by that? You just join the, origin and the point by a line this is called the position vectors right. As you saw I did that for both ok this one as well as this one; Next what is the sum of these two vectors? What can you say about the sum of these two vectors? This is the right time for you to pause the video and compute the sum. And look at where exactly the sum comes. What is the sum 30 plus 5, 70 plus 3, (35, 73)? Where exactly is this point? What is its direction? My direction I mean when you join the origin and this point. Is it close to the point (30, 70) or is it close to the point (5, 3) is a question in hand? Let us see that in detail now.
+
+[p.50] (Refer Slide Time: 02:13)
+
+So, let me write that once again. And my question is what is the sum of these two vectors right and I will try to find the sum very; obviously, the sum is simply this point that is the sum of (30, 70) and (5, 3) right.
+
+(Refer Slide Time: 02:34)
+
+And I did not mean to exaggerate this concept. It is a very straightforward concept, but there is the observation is not so straightforward. The observation comes next. This (35, 73) is close to (30, 70) than (5, 3).
+
+[p.51] This vector as you can see (5, 3). The resultant vector is somewhere (35, 73) is somewhere close to this vector than to this vector; did you observe that? Yeah and I am sure you know the reason as well ok. We observed this next.
+
+(Refer Slide Time: 03:10)
+
+So, let us see what exactly this means. The resultant point is close, when you add the resultant point is close to the big vector. Whatever I mean the big vector, the vector that is big in amplitude. This is the big vector I am talking about; the resultant point which is this is close to the big vector. Because the vector we added was a small vector, please note if two vectors which are of the same amplitude when you add, this may not happen. This will happen only when you take a big vector and add it to the small vector. What do you mean by a big vector? A vector with a big amplitude is called a big vector. And this is a small vector because it the amplitude is small right ok.
+
+[p.52] (Refer Slide Time: 04:09)
+
+So, this is a small vector right ok. What is a model that we learned just now? What do we observed just now? So, you can pause and think about what we just now said. And then continue the video. When we add a big vector to a small vector, the resultant vector is close to the direction of the big vector big in codes right; perfect although pretty obvious you will even be wondering why I even had, a lecture on this such a simple concept. This is the displays a key role in understanding the convergence of the matrix that we discussed previously right. So, it is important for us to spend some time on these seemingly trivial concepts. Most of the concepts are trivial, but their significance is very high. So, it is important for us to understand although appealingly trivial example. And it is important to us to understand these concepts one level deep. Because they will come in not so obvious places; and we may not be able to interpret them properly. So, big and small by big and small I mean in the amplitude as I told you people right, perfect. So, this is the distance from the origin and its revising whatever. So, simply the moral is very clear to you people when you add a big victor to a small vector, you get a vector close to the big vector both in direction as well as amplitude ok.
+
+[p.53] (Refer Slide Time: 05:41)
+
+So, Big plus small is equal to something close to big both in direction, as well as amplitude. So, this was our prerequisite 2. And it will help if we can recollect prerequisite 1. Can you all recollect? What is prerequisite 1? Was this prerequisite 1 was simply the fact that when you multiply a matrix to a vector repeatedly it converges. So, please ensure that you do not go further without understanding this prerequisite 1 and 2.
+
+=== LECTURE 112: Convergence in Repeated Matrix Multiplication - The Details (Week 8, transcript PDF page 54) ===
+
+[p.54] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 112 Convergence in Repeated Matrix Multiplication- The Details
+
+So, we saw a couple of prerequisites and we are all set to go ahead and then make our required observations. Let us go very slowly. I will help you all recollect what has happened so far and then try to connect different pieces of the puzzle.
+
+(Refer Slide Time: 00:22)
+
+So, what does one observe of this matrix multiplication process right? So, we observe that no matter what vector we choose, irrespective of what vector we choose remember the screen cast that I did of the python programming code. I took different vectors. No matter what vector I chose, I landed up with the same vector right. We all converged we observe that every single vector, no matter where you start from the repeated application of the matrix results in the very same vector. By very same vector, I mean the same direction right. This we observe. Why did this happen? What makes this process of applying the matrix repeatedly on a vector and scaling it down of course, scaling it down is to ensure that the numbers do not become big that is all, nothing else. As you
+
+[p.55] keep applying the matrix on any given random vector, it always goes to the same point in r 2 plane; r 2 is that two-dimensional plane correct. Why is this happening? What is the physics behind it? What is the logic behind it? Let us unravel that slowly.
+
+(Refer Slide Time: 01:42)
+
+So, let us recollect some basics from our again high school mathematics. Throughout our discussion we are not going to use anything HiFi. All we are going to use is some very basic matrix theory. I am sure you all heard of eigen values and eigenvectors right. So, let us recollect that. So, given a matrix we know there is something called an eigenvector and eigen value. Now, what is that? Let me help you recollect it and eigenvector is something of a matrix A eigenvector v is defined as something that simply gets scaled up by a lambda factor. Then lambda is called an eigen value and the v is called an eigenvector correct ok. So, this is a right time for you to open let us say Wikipedia or any other online reference and then refresh your basics of eigenvalues and eigenvectors. You only need this definition that Av = 𝜆v. This is first thing that we need to know and second thing that we need to know is for a 2 ×2 matrix, let us say A 2 × 2 matrix A; there are 2 eigenvectors not always, but mostly you will always have 2 eigenvectors ok. And these eigenvectors are
+
+[p.56] independent. They are independent. What do I mean by that? By that I mean you take any vector any vector of your choice. Let us say any vector Z you can always write Z as a linear combination of v1 plus some 𝛽*v2 because that they are what is called linearly independent you can always write any vector as the linear combination of v1 and v2. If you do not know these things, you probably should brush up your basics. So, this is the third one. First one is the definition of Eigen values and eigenvectors, second one is given 2×2 matrices is matrix. There is always 2 eigenvectors and they are linearly independent. What do you mean by linearly independent? Two vectors that are linearly independent in r2 given any point in r2 that point can be written as the linear combination of these 2 eigenvectors. So, this point is Z you can always write Z as 𝛼∗𝑣1 + 𝛽∗𝑣2. This is the basics of matrix theory, I am sure all of you are familiar, if not please take a pause and look at it. You need not know the reasoning behind all these things, you just need to recollect these things that should be enough ok.
+
+(Refer Slide Time: 04:35)
+
+So, let us go further now ok. So, please revise now before going any further. You should know what eigenvectors and eigenvalues are, I am not going to apply them in any not so obvious manner, every single application of this concept will be pretty straightforward.
+
+[p.57] (Refer Slide Time: 04:57)
+
+So, I hope you have recollected what is eigenvector and what is an eigenvalue and I proceed further ok. Now how and why of eigenvectors and eigenvalues here? So, what did we do in our programming screen cast? What did we observe of this matrix multiplication? Whenever a matrix A acts on any vector v any vector v please observe that A is a matrix v is some random vector v, then you can always write v as a linear combination of 𝜆1 ∗ 𝑣1 + 𝜆2 ∗𝑣2. This is always possible right. We just now saw in that in our previous prerequisite. This is always possible; let us note this ok. Next so, this v1, v2 are eigenvectors and 𝜆1, 𝜆2 are eigenvalues. We observed it already ok, I am just helping you recollect it by saying it once more so far so good. So, all I am saying here is any given vector v if a matrix A is applied on it, then you can always see it as A being applied on a linear combination of eigenvectors v1 and v2 no matter what v you choose. Now what is this equal to? This is equal to A is A matrix. Its application on a scalar 𝜆1 ∗𝑣1, you can always pull out the scalar here as; you can see you can pull out the scalar here correct. So, you can write it as 𝜆1 ∗𝐴(𝑣1) + 𝜆2 ∗𝐴(𝑣 2). But then, observe carefully, what are v1 and v2? v1 and v2 are eigenvectors and so, what if they are eigenvectors? If they are eigenvectors, you can further write this 𝐴(𝑣1) as 𝜆1 ∗𝑣1 right; 𝐴(𝑣1) is 𝜆1 ∗𝑣1, 𝐴(𝑣2) is 𝜆2 ∗𝑣2 and you finally, get this correct.
+
+[p.58] (Refer Slide Time: 07:00)
+
+As I continue this process, look at my previous slide; as I continue this process, I apply A again on this, I continue to apply A gain on this. What do I get? I repeatedly apply A that is equivalent to me applying 𝐴𝑘(𝑣). So, I am talking a lot of things sort of very quickly. I suggest that you take a pause and then look at what I am saying all right. So, I am applying 𝐴𝑘(𝑣) which gives me 𝜆1 𝑘∗𝑣1, why? Pretty obvious look at the previous slide if you are confused look at this, understand this carefully and you will understand what I am doing here. This gives me 𝜆1 𝑘∗𝑣1 + 𝜆2 𝑘∗𝑣2 correct perfect so far so good absolutely no confusion so far right. Carefully observe this 𝜆1. Let me assume is greater than 𝜆2 all right. This always holds good. Eigenvalues are most of the times distinct; when they are distinct one of them is greater than the other one. So, when one of them is greater than the other one, what happens? 𝜆1 is basically the amplitude right 𝜆1 𝑘; if 𝜆1 is some let us say 2 a, number greater than 1, then 𝜆1 𝑘 for a huge k will be a huge value right. This is what we call as amplitude for the vector v1. When you multiply 𝜆1 𝑘 to v1 it sort of scales v1 up, 𝜆2 𝑘 being a big number when multiplied to a vector v1 it just makes this vector shoot away from origin right. We have discussed this already. So, think about it for a minute. v1 simply signifies the direction and this product tells us the final vector which is extremely scaled right. The value the existing v1 is getting pushed by this value 𝜆1 𝑘 that is what this means ok.
+
+[p.59] (Refer Slide Time: 09:10).
+
+Let us note something here. Let us observe this carefully. Let us take these two numbers 2 and 3 right just plane simple 2 number 2 number 3 and look at this 3 is one more than 2 correct as simple as that 3 is 1 more than 1 right which is like saying 3 is 50 percent more than 2 correct. But then when you square it 22 gives you 4, 32 gives you 9 and then what happens? This 9 is more than twice of 4. When you take 2 numbers A and B, if B > A, if you look at their proportion by what factor it is greater, you observe that this number is 50 percent greater than this number. But when you square them, you observe that it turns out to be twice as much as this number. As you continue this way you will observe that look at this what happened. If you cube it, you get 8 and 27; now that is surprisingly more than 3 times. So, this is like saying let me give you a nice fictitious example. Look at your bank balance look at my bank balance. Assume your bank balance is 2 lakhs and my bank balance are 3 lakhs. Let make you feel happy by making you rich. Assume your bank balance is 3 lakhs and my bank balance is 2 lakhs all right which is like you are just 1 lakh richer than me. So, assume God comes and cubes our bank balance, he cubes. So, my bank balance was 2 he makes it to cube and your bank balance was 3 lakhs, he makes it 3 cube. So, initially you were just 50 percent richer than me, but now you become more than thrice richer than me right. So, this although God came and cubed me as well as you, he did this he gave the
+
+[p.60] same gift worth to me and you depending upon what was the number that we had, we ended up having a bigger number. A person who had more, now has a lot more I think you got the intuition. So, now as we keep going on further, this was more than thrice. We observed we keep doing this. Let us say we empower it by 100 then, we observe something startling. This 3100 is several forces, bigger than 2100. So, big that let us observe what happens. So, big it several force big that so much more than this that if you look at the ratio it is close to 0, why? 2100 divided by 3100 as you can see is (2/3)100. 2/3 is a number smaller than 1 and you are empowering it to the number 100 which is a very big number you take as number less than 1 and keep multiplying it to itself it will quickly go to 0 you see, that is what is happening here. Take a minutes pause and observe what exactly we explained in this slide look at the previous slide right. We are talking about the multiplication of a big number namely 𝜆1 𝑘 and 𝜆1 > 𝜆2. What is the connection between this and what we discussed here? What is the connection between this slide and this slide? Take a minute, I repeat stare at this slide see what is happening here, stare at this slide, what did we just now say and collectively we can say something in the next slide. This is the right time to pause and think about and guarantee yourself that you understand this slide as well as this slide. Now, let us go to the next slide if you are through with these 2 slides.
+
+(Refer Slide Time: 12:49).
+
+[p.61] It is so big that if the ratio is 0, we saw that which implies that 3 to the 100 is several folds bigger than 2 to the 100 ok. I am just stating the same thing repeatedly. So, what? So, we can make a big inference now.
+
+(Refer Slide Time: 13:10)
+
+We observe that when you empower A when you repeatedly apply A on any random vector v, you can always write this as 𝜆1 𝑘∗𝑣1 + 𝜆2 𝑘∗𝑣2. What happens? This is amplitude and this is the direction we discussed that 𝜆1 > 𝜆2 which implies lambda 1 to the k is very greater than 𝜆2 𝑘; if k is big. We saw 2 and 3 example and k was 100. It was huge, huge so much that the bigger one simply completely dominates or the smaller one so much that the smaller one is negligible in front of the bigger one so much so, that the ratio goes to 0 correct ok. So, now this implies that 𝐴𝑘(𝑣) is 𝜆1 𝑘∗𝑣1is a big quantity, why? That is because 𝜆1 > 𝜆2 and this results in 𝜆1 𝑘 being very greater than 𝜆2 𝑘. This is a bigger entity, this is too big, this is small. Small compared to what? Small in comparison to the big thing that is sitting here I am sorry it is not the v1 which is way; it is this entire this entire thing that is big is what I mean here when I say big. So, entire thing is small, small in amplitude is all I am saying ok. Let us go next.
+
+[p.62] (Refer Slide Time: 14:37).
+
+So, we saw that 𝐴𝑘(𝑣) is so much and this one is really huge. This one is small. When I say small, it is comparatively small right ok. So, now, when you take a big vector and add it to the small vector, what do you get? Do you recollect? Do you see the bells ringing in your mind? We saw prerequisite right. We saw that whenever a big vector is added to a small vector, it will simply be in the direction of the bigger vector right which means my 𝐴𝑘(𝑣) will result in 𝜆1 𝑘∗𝑣1 and you can simply ignore this factor here ok, perfect. So, what do we conclude? We conclude, it is in the direction of v1 and please note this v was a random vector. Let me write that down. This is a most important observation, it was a random vector and no matter what you chose for v, no matter what you choose for v it was a random vector, no matter what we chose for v; you always ended up with v1. What is v1? v1 is the eigenvector corresponding to the highest Eigen value. If 𝜆1 > 𝜆2, then I take that corresponding Eigen vector, and this is independent of this v and it is something to do with the matrix that you take. So, whatever vector you take, you always end up with the eigenvector. Do you see why? I just gave the explanation. Again this is the right time to pause and then understand what, I just now said and that completes the proof for the fact that whenever you take a matrix as screen cast if you can recollect, we did a screen cast of our programming where we took a matrix (1 2 3 4) and applied it on different vectors. It was going to the same vector, why? This is the reason.
+
+=== LECTURE 113: PageRank as a Matrix Operation (Week 8, transcript PDF page 63) ===
+
+[p.63] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 113 PageRank as a Matrix Operation
+
+(Refer Slide Time: 00:05)
+
+So, we saw a graph on three nodes right. I would like to see, if this process can be better understood by writing it as a matrix operation. So, that is my motive. This process is a matrix multiplication and we will see how exactly one can see this as matrix multiplication good. So, now, let me try writing 3 cross 3 matrix like this. You will soon understand what the motivation is behind writing it as a matrix, but please bear with me as of now try to see what I am trying to do here ok. It is a very straightforward process. So, I will write down a matrix like this and then I will write down 1/3, 1/3, 1/3 and that is how we start that is where we start from as you can see it is 1/3 here, 1/3 here and 1/3 here correct. So, we start as 1/3, 1/3, 1/3 and what I need is the next vector whatever I am going to get. And what is that? As you all know the value of A B C will respectively be so much, we start with C being 1/3 + 1/6. Why is that? That is because you have this C here, C has 2
+
+[p.64] incoming edges and from B C gets B gives half to A and half to C and we gets 1/6 from C gets 1/6 from B and it gets 1/3 from A correct.
+
+(Refer Slide Time: 01:59)
+
+Now, what next? B gets 1/3 right; how is that? B gets 1/3 from C everything of what C has B gets So, I am going to write 1/3 here. Next A gets 1/6, why is that? That is because from B you have to it just going and half is given to A and the other half is given to C and half is 1/3 happens to be 1/6. So, it is going to be 1 over 6 as you can see.
+
+(Refer Slide Time: 02:39)
+
+[p.65] Next you observe that this converges to want this, this adds up to 1; not converges this adds up to 1 right. And my big question right now is; what is that matrix which when multiplied with this vector gives rise to this vector ok. What is that matrix? Let us investigate it right. So now, I will write a matrix which will give me 1/3 1/3 1/3 as 1/6 1/3 and 1/2; 1/3 + 1/6 as you can see is 1/2 all right. So, can this process be captured as a matrix multiplication process? That is my question all right. Yes, it can be is what you will observe very soon that is because this is the matrix which will give rise to this vector when you multiply this vector and this is my matrix, you can verify it. So, take a minutes pause and see how exactly this matrix is giving rise to the next iteration. Let me go through it slowly so that you all understand. So, when you multiply 0 half and 0 to 1/3 1/3 and 1/3, basically this half gets multiplied which is 1/3 giving you 0. 1/2 gets multiplied with 1/3 giving you 1/6 and 0 gets multiplied with 1/3 giving you 0 right ok. So, as you would have observed, this is precisely the process that is happening here correct that is precisely that is happening here. So, I am just capturing it as a matrix. It is a straightforward thing, you can observe what is happening here; take a couple of minutes and then observe it we will go to the next slide and we will see what is this to do with a page rank.
+
+(Refer Slide Time: 04:43)
+
+[p.66] Now, what have we done so far? For a given network, we start from 1/3 1/3 1/3 and see if it converges or not. We observe that it converges. This is the first point. The second point is that we note that these iterations, these iterations that we are doing right now be matrix multiplication process correct; we just saw it right now. Coming next, we are going to show this next that why does it converge. Whatever we saw in the Google spreadsheet if you remember, it converges right. Why exactly does it converge? What is the process here right? And the fourth point is what is page rank to do with all these things ok. We will see this one by one.
+
+=== LECTURE 114: PageRank Explained (Week 8, transcript PDF page 67) ===
+
+[p.67] Social Networks Prof. S. R. S. Iyengar Department of Computer Science Indian Institute of Technology, Ropar
+
+Link Analysis (Continued) Lecture - 114 PageRank Explained
+
+So we are nearing the conclusion right now. As you can see, let us recollect the big question. What is the question? When you assign values, gold coins or resources whatever you call it to all the nodes and as you start sharing them, respecting the edges that leave and leave a vertex and then enter a vertex right a directed graph, you will observe that the values do indeed converge, right. So, let us take it another example and then see it. We have already seen an example on 3 nodes, another example on 5 nodes. We will see it another example for clarity sake.
+
+(Refer Slide Time: 00:49)
+
+So, let us consider this graph on 4 nodes. This is the corresponding matrix; we have discussed this before right. Take a minutes’ time pause the video and then check this is actually the matrix.
+
+[p.68] Now, let me write down this matrix as the matrix, then I start off with 1/4 1/4 1/4 and 1/4 and then I see where it takes this. 1/4 1/4 1/4 1/4 simply becomes 1/8, 3/8, 3/8 and 1/8 right.
+
+(Refer Slide Time: 01:30)
+
+So, we know this right we saw this. Now let me write a table and then make a note of all the values here a b c d and then I started off with 1/4 1/4 and then I got this what is the next value. Where does it go like this? Where exactly does it converge? So, here is a quiz question for you all. Take a minutes pause and then see that it indeed converges to 19/100 1/3 19/50 9/100. In fact, you need not even take a look at these values; you should verify that you actually arrive at these values as you proceed with this matrix operation all right. Quick quiz for you all, it is good that you check it. Now, as this goes further you know, this assignment is now what is called as stable assignment because it does not change anymore right. You are saying these to the nodes a b c and d, you assign it to a b c and d. Assign what? Assign these values and you will observe that there is no change anymore after this ok.
+
+[p.69] (Refer Slide Time: 02:44)
+
+So, it remains the same correct. So, note something. Here is the situation where a alpha becomes e equal to alpha and that is why the change does not happen or rather the change does not happen because, a alpha equals alpha. It is all the same right. So, this is the matrix way of saying it right ok.
+
+(Refer Slide Time: 03:09)
+
+So, consider the graph. Once again and the assignment, you will observe that this is the assignment where values do not change. You can try doing it when a is assigned 19/100 b is assigned 1/3 and c is assigned 19/50 and d is assigned 9/100. The values do not change
+
+[p.70] after that and such a value such as assignment is unique. And we all have seen it already; I am sort of free iterating it right now in this lecture video.
+
+(Refer Slide Time: 03:43)
+
+So, why does it converge? Why exactly is it converging? Now is not that obvious we have seen that enough. Take the matrix note that what is this, what do you understand by this, have you seen this matrix sometime before. If you are an engineering student, I do not think you would have passed by your semesters without noticing this matrix right. So, any student who has finished his first four semesters of engineering would have definitely passed through a phase where he would have encountered this matrix. It is actually called the Markovian matrix right. So, observe the property here, every column sums to 1. Such a matrix is called a Markovian matrix or simply a Markov matrix.
+
+[p.71] (Refer Slide Time: 04:36)
+
+So, this Markov matrix is a very interesting property. Its highest Eigen value is simply one which means every other Eigen value is less than 1 alright ok.
+
+(Refer Slide Time: 04:50)
+
+So, do you see what happens here? Let us go slowly. 𝐴𝑘(𝑣) of 3 is simply this where v1, v2, 𝑣𝑛 are all eigenvectors and 𝜆1 etcetera are all the corresponding Eigen values good. So, we can always write A’s action on v can be captured with this. So, we have seen this before I am repeating it ok.
+
+[p.72] Next 𝜆1 is 1 here because that is the highest Eigen value. As I told you that is the property of such a matrix and the other Eigen values are less than this Now, what does it mean? Now you would have observed a number which is 1k will make it one itself right. Other numbers are less than 1 here. All these are less than 1 here and when you raise it to the power of k, all of them become 0, right. All of them variably become 0. So, 𝐴𝑘 will simply be equal to 𝜆1 𝑘∗𝑣1 mind you 𝜆1 is 1. So, this is the eigenvector corresponding to the highest Eigen value which is 1 and let me just remove 𝜆1 here because it is equal to 1. So, what do we observe? We observe 𝐴𝑘(𝑣) converges to the Eigen vector corresponding to 1, perfect.
+
+(Refer Slide Time: 06:33)
+
+That is pretty much here we have concluded. So, this was the graph that you took. You saw this was a sort of a stable assignment which means it converges at this value and now it all makes sense as you can see, right. So, such a value assignment is unique and no matter where you start from you always converges to this. So, that is the best part. So, that sort of concludes good amount of discussion on page rank. We have revisited page rank from our previous lectures about some 20 lectures ago, a couple of weeks ago roughly let us say 3 to 4 hours videos before we saw page rank very at a very conceptual level, we did not see the math part of it, we have now seen the math part of it. I hope it is clear to all of you. It is important for you all to look at it may be re-watch the videos because it takes time to sink in especially the mathematics component of a page rank.

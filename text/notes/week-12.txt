@@ -1,0 +1,328 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 12 — How to Go Viral: Search, Cores & Cascades
+
+Lectures 154–166 · watch a ring's diameter collapse, code myopic (decentralized) search, then find the network's most influential spreaders with k-shell decomposition — and the surprise: pseudo-cores work as well as the core.
+
+🧠 the big picture, first
+
+Add just a few **weak ties** to a ring and its diameter **plummets** — the small world, in a plot. Then code **myopic search**: a greedy, purely local walk that forwards toward whichever neighbour looks closest to the target (using only the ring, blind to others' long links). It isn't optimal, but its path length grows only logarithmically with network size. The week's real question: to make a meme go **viral**, which nodes should you seed? Not the highest-degree ones — the **core**. We find it with **k-shell decomposition** (peel off low-degree nodes bucket by bucket; the last bucket is the core), simulate spread with the **independent cascade model**, and discover that coreness predicts influence better than degree, closeness, or betweenness. Final twist: cascade capacity **plateaus** across the inner shells, so a big band of easier-to-reach **pseudo-cores** spreads a meme just as well as the hard-to-reach celebrities at the very centre.
+
+### 📒 what's inside Week 12
+
+- Weak ties collapse the diameter
+- Myopic (decentralized) search — the code
+- Myopic vs optimal & its time complexity
+- Going viral: quality, structure, key nodes
+- The core, k-cores & k-shell decomposition
+- The independent cascade model
+- Coreness predicts influence · pseudo-cores
+
+LECTURE 154
+
+## Weak ties collapse the diameter
+
+the small world, plotted
+
+## 1 Watch the diameter fall
+
+Recall the diameter of a graph: the **longest shortest-path** — over all pairs of nodes, take the shortest distance between them, and report the maximum. Start with last week's ring of 100 nodes (each linked to 2 neighbours per side); its diameter is 25 (you leap 2 nodes per hop, so ~50/2 = 25 hops across). Now add weak ties one at a time and re-measure.
+
+diameter_vs_weakties.pypython
+
+```
+x, y = [], []
+x.append(0)
+y.append(nx.diameter(G))          # diameter with 0 weak ties
+
+for t in range(1, 101):           # add up to 100 weak ties
+    add_long_link(G)              # (from Week 11)
+    x.append(t)
+    y.append(nx.diameter(G))
+
+plt.xlabel("number of weak ties added")
+plt.ylabel("diameter")
+plt.plot(x, y)
+plt.show()
+```
+
+💡 what the curve shows
+The drop is **not linear** — it's steep then flattening. Diameter **25 → 18** after just 1–2 weak ties, then down to **3–4** after ~80 ties. A handful of long-range shortcuts is enough to make a big network small. (Since we only add edges and the ring is already connected, the graph stays connected, so the diameter is always a finite positive number.)
+
+- Define the diameter of a graph.
+The largest of all pairwise shortest-path distances: for every pair of nodes take their shortest distance, then take the maximum. It's the "longest shortest path."
+
+- Why does a ring's diameter fall so fast when you add weak ties?
+Each long-range weak tie is a shortcut that lets paths jump across the ring instead of walking around it, so a few of them slash the worst-case distance. The reduction is sharply non-linear — the first few ties help the most.
+
+LECTURES 155–156
+
+## Myopic (decentralized) search — the code
+
+a greedy local walk toward the target
+
+## 2 Search that only sees its neighbours
+
+Milgram's letter-forwarding is myopic search ("myopia" = short-sightedness): from the node currently holding the letter, look at its neighbours, estimate each one's distance to the target, and forward to the closest. Crucially, when you judge a neighbour's distance you use only the ring (homophily) structure — you don't know your neighbours' long-range ties.
+
+⚙️ the trick: two graphs
+- `G` — the **full** small-world graph (ring + weak ties); you actually move along its edges.
+- `H = G.copy()` built with **homophily only** (the ring, no weak ties); you use it to **estimate distances**, because a searcher doesn't know others' shortcuts.
+
+myopic_search.pypython
+
+```
+import networkx as nx
+
+def find_best_neighbor(G, H, current, target):
+    best, best_dist = None, G.number_of_nodes()   # sentinel: bigger than any real distance
+    for nb in G.neighbors(current):               # move along the FULL graph...
+        # ...but judge distance on the ring H (ignore long-range ties)
+        d = len(nx.shortest_path(H, nb, target)) - 1
+        if d < best_dist:
+            best_dist = d
+            best = nb
+    return best
+
+def myopic_search(G, H, u, v):
+    path = [u]
+    current = u
+    while current != v:
+        current = find_best_neighbor(G, H, current, v)
+        path.append(current)
+    return path
+```
+
+`nx.shortest_path(H, a, b)` returns the node list of a shortest path in `H`; its length minus 1 is the hop-distance. `find_best_neighbor` is the standard "track-the-minimum" pattern (start high, keep the smallest). The optimal path, for comparison, is just `nx.shortest_path(G, u, v)` on the full graph — which needs global knowledge.
+
+✍️ worked example (10-node ring, lecture 155)
+- 10 nodes in a ring, each linked to 1 left + 1 right neighbour, plus weak ties 10–6, 1–8, 4–8. Source = node 1, target = node 6.
+- Node 1's neighbours are 10, 2, 8. Ring-distances to 6: node 2 → 4, node 10 → 4, node 8 → 2. Closest is **8**, so forward to 8.
+- From 8, evaluate all its neighbours' ring-distances to 6: node 9 → 3, node 1 → 5, node 4 → 2, node 7 → **1** (closest) → forward to 7.
+- 7's neighbour is the target 6 → deliver. Myopic path = 1→8→7→6, length **3**.
+- But the true optimal path is 1→10→6 (via the 10–6 weak tie), length **2**. $$ \boxed{\text{myopic is good, but not optimal}} $$
+
+Myopic loses because node 1 can't "see" that its neighbour 10 has a shortcut straight to 6 — it only knows ring-distances. With just local knowledge, a length-3 path is still a fine result.
+
+- Why does myopic search estimate distances on `H` (the ring) rather than on `G` (the full graph)?
+Because a real searcher knows their own long-range ties but not their neighbours'. Judging distance on the homophily ring models that local-only knowledge; moving still happens on the full graph `G`.
+
+- Is myopic search optimal? Explain with the example.
+No. On the 10-node ring it found 1→8→7→6 (length 3), while the true shortest path was 1→10→6 (length 2) via a weak tie node 1 couldn't see. Greedy local choices don't guarantee the global optimum.
+
+LECTURES 157–158
+
+## Myopic vs optimal & its time complexity
+
+how good, and how fast, is decentralized search?
+
+## 3 Measuring the search
+
+**Myopic vs optimal.** On a 100-node ring with 10 weak ties, compare the two on the 51 diametrically-opposite pairs $(0,50),(1,51),\dots,(50,99)$ — the hardest cases. Plotting both path lengths: myopic (red) is usually longer than optimal (blue), but on ~11 of the pairs it happens to match. So myopic ≈ optimal often, and never terrible.
+
+📊 time complexity of myopic search
+Now vary the network size $n = 100, 200, \dots, 1000$ (keeping weak ties at **10% of nodes**), and average the myopic path length over the diametrically-opposite pairs. Plotting average path length vs $n$, the professor asks which growth rate it matches — $O(n)$, $O(n^2)$, $O(n/2)$, $O(\log n)$ or $O(\log^2 n)$? The answer: it's **not linear** — it grows logarithmically. (e.g. 100 nodes → ~13 steps, 200 → ~19.) That's why the world feels small even as it grows: local greedy search scales like $\log n$, not $n$.
+
+- Why pick diametrically-opposite node pairs to test the search?
+They're the farthest-apart pairs on the ring, so they're the hardest cases — the sternest test of whether local search still finds short paths.
+
+- How does myopic-search path length scale with network size $n$, and why does that matter?
+Logarithmically in $n$ (not linearly). It means even huge networks stay navigable with purely local decisions — the essence of "small world."
+
+LECTURES 159–161
+
+## Going viral: quality, structure, key nodes
+
+what you can and can't control to make a meme spread
+
+## 4 Three levers for going viral
+
+An internet meme is anything that spreads online — image, video, text. Like a disease, some memes go **viral** (Gangnam Style, Nyan Cat); most don't (billions of memes, limited attention). Today anyone can go viral just by uploading — the professor's example is **Justin Bieber**: as an 11–12-year-old he and his mother posted his school-singing clips on YouTube; the views and likes grew, a producer noticed the talent and pulled him into the industry. This is exactly the Week-7 cascade question ("will my friend's sports shoes catch on?"). What can you tune?
+
+📖 three levers
+- **The content's quality** — novelty, music, whatever makes it worth sharing. You control this.
+- **The network structure** — how people are wired on Facebook/Twitter. Same for everyone; you can't change it.
+- **Which people you seed** — infect the right key nodes. If Amitabh Bachchan or a public figure re-shares your post, it explodes. This is the lever we can pull cleverly.
+
+So: which nodes are the "key" ones? Candidate measures — highest **degree** (most friends)? highest **closeness** (structurally near everyone)? highest **betweenness** (bridges between communities)? or something else? That's the question the rest of the week answers.
+
+- Of the three levers for going viral, which can you actually manipulate, and which is fixed?
+You can control the **content quality** and **which nodes you seed**. The **network structure** is the same for everyone and can't be changed.
+
+LECTURES 162–163
+
+## The core, k-cores & k-shell decomposition
+
+peeling a network to find its influential centre
+
+## 5 Finding the core
+
+Real networks have a core-periphery structure: a small, densely-interconnected **core** (well-resourced, highly-connected people) plus a large **periphery** on the boundary. Seed one core node and it quickly infects the whole (tightly-knit) core, which is connected to everyone — so the meme reaches the periphery too. So: **infect the core.** But how do you find it? Start with a clean definition:
+
+📖 k-core
+A k-core is a subgraph in which **every node has degree ≥ k** (counting only edges inside the subgraph). So the 1-core needs every node to have ≥1 neighbour, the 2-core ≥2, and so on. Higher $k$ ⇒ deeper, denser core.
+
+### K-shell decomposition — peel the onion
+
+⚙️ the algorithm
+- **Bucket 1:** repeatedly remove every node of degree ≤ 1 (removing a node deletes its edges, which can drop other nodes to degree 1 — keep going) until no node has degree ≤ 1. Those removed form **shell 1**.
+- **Bucket 2:** now repeatedly remove nodes of degree ≤ 2 until none remain → **shell 2**.
+- Continue with 3, 4, … until the network is empty.
+- The core = the **last** (innermost) shell removed. A node's core number is the shell it was peeled in.
+
+read it as: "peel off the flimsiest nodes first, then the next-flimsiest, until only the tough centre is left." Careful: a bucket is a shell, not the whole k-core. The actual **k-core** is the union of shell $k$ and all deeper shells: $\;\text{k-core}=\bigcup_{j\ge k}\text{bucket}_j\;$ (anything with degree ≥ 3 trivially has degree ≥ 2, so it sits in every lower core too).
+
+k_shell_decomposition.pypython
+
+```
+import networkx as nx
+
+def find_low_degree(H, it):
+    return [v for v in H.nodes() if H.degree(v) <= it]
+
+def k_shell_decomposition(G):
+    H = G.copy()
+    buckets = []          # buckets[k-1] will be shell k
+    it = 1                # current degree threshold
+    tmp = []              # shell being filled
+    while True:
+        low = find_low_degree(H, it)
+        if low:                       # nodes of degree <= it still exist
+            for v in low:
+                H.remove_node(v)      # removing a node also drops its edges
+                tmp.append(v)
+            if H.number_of_nodes() == 0:   # network emptied → close last shell
+                buckets.append(tmp)
+                break
+        else:                         # no degree<=it nodes left: close this shell
+            buckets.append(tmp)
+            tmp = []
+            it += 1
+    return buckets                    # buckets[-1] is the CORE
+```
+
+NetworkX gives this for free: `nx.core_number(G)` returns each node's core number directly.
+
+✍️ worked example (peeling a labelled network, lecture 163)
+- **Shell 1:** first peel the degree-1 nodes (say 14, 12, 11); removing them drops others to degree 1, so keep peeling — more nodes (2, 4, 8, 6, 7, 9, 17, 3) then 1 and 5 leave — until no node has degree ≤ 1.
+- **Shell 2:** now peel degree-≤2 nodes (say 11, 12, then 10 once its neighbours are gone).
+- **Shell 3 (the core):** whatever survives to the end — the innermost, most tightly-knit nodes.
+- Each node's **core number** = the shell it was peeled in; the last shell is the network's core. $$ \boxed{\text{peel degree} \le 1,\ \text{then} \le 2,\ \dots\ \text{— the survivors are the core}} $$
+
+⚠️ common bugs
+- Work on a **copy** (`H = G.copy()`) — you're destroying the graph as you peel, and you'll still want the original.
+- Check degrees on `H`, not `G` — after peeling, `H` has fewer nodes/edges; using `G` reads stale degrees.
+- Don't loop forever: add the **terminating check** — when `H.number_of_nodes() == 0`, append the final shell and `break`.
+- When a peel drops a node below the current threshold, it goes in the **current** bucket (that's why the test is degree ≤ it, not exactly it).
+
+- What is a k-core, and where is a network's "core" in a k-shell decomposition?
+A k-core is a subgraph where every node has degree ≥ k. The core is the **innermost (last) shell** peeled off — the nodes with the highest core number.
+
+- Bucket 3 of the decomposition holds some nodes. Are those the entire 3-core?
+No — bucket 3 is just shell 3. The 3-core is the union of shell 3 and every deeper shell ($\bigcup_{j\ge3}\text{bucket}_j$), since deeper-shell nodes also satisfy degree ≥ 3.
+
+- Why must k-shell decomposition read degrees from the shrinking copy `H`?
+Because peeling removes nodes and edges; a node's current degree (which decides when it's peeled) only makes sense on the reduced graph `H`, not on the original `G`.
+
+LECTURE 164
+
+## The independent cascade model
+
+simulating a meme spreading from a seed set
+
+## 6 Measuring influence by simulation
+
+To measure how good a seed set is, simulate the spread with the independent cascade model — a close cousin of SIR. Seed nodes are infected at $t=0$. Each newly-infected node gets **one** chance to infect each not-yet-infected neighbour, independently, with probability $p$. When no new node is infected in a round, stop. The influential power of the seed set = the final number of infected nodes.
+
+⚙️ three lists drive it
+- `seed` — the initially infected nodes (fixed).
+- `just_infected` — nodes infected in the latest round (only these get to spread next).
+- `infected` — everyone infected so far. Stop when `just_infected` is empty; return `infected`.
+
+independent_cascade.pypython
+
+```
+import random
+
+def independent_cascade(G, seed, p=0.5):
+    just_infected = list(seed)
+    infected      = list(seed)
+    while just_infected:                 # stop when no new infections
+        tmp = []                         # nodes infected in THIS round
+        for u in just_infected:
+            for x in G.neighbors(u):
+                if x not in infected and x not in tmp:   # not already caught / queued
+                    if random.random() < p:              # infect with probability p
+                        tmp.append(x)
+        infected += tmp
+        just_infected = tmp
+    return infected            # len(infected) = influential power of `seed`
+```
+
+⚠️ why the double guard `x not in infected and x not in tmp`
+Because it's a graph, not a tree, one susceptible node can be a neighbour of two just-infected nodes. Without the `x not in tmp` check you'd add it twice (duplicate). And `x not in infected` stops re-infecting someone already caught — a node gets only one chance to be infected, and infectors get only one chance to spread.
+
+It's essentially SIR (susceptible → infected → recovered), and the professor's school analogy fits: infected students spread on their first day but get no further chance the next day.
+
+✍️ worked example (one cascade run, seed = {12, 10}, p = 0.5)
+- **t=0:** nodes 12 and 10 infected.
+- **Round 1:** node 12 infects neighbour 14; node 10 infects neighbour 5. Now 12 and 10 are spent (they get no further turn).
+- **Round 2:** 14 infects 13; 5 infects 7.
+- **Round 3:** 13 and 7 infect no one → `just_infected` is empty → **stop**. Total infected = {12,10,14,5,13,7} → influential power = **6**. $$ \boxed{\text{influential power of a seed set} = \text{final } |\text{infected}|} $$
+
+To rank seed sets: seeding {1, 6, 10} might end with 6 infected (power 6), while {2, 16, 17} ends with 8 (power 8) — so the second set is more influential. Trying all seed sets is exact but very slow, which is why the coreness shortcut (§7) matters.
+
+- In the independent cascade model, when does the process stop, and what is the influential power of the seed set?
+It stops when a round produces no new infections (`just_infected` is empty). The influential power is the **total number of infected nodes** at the end (`len(infected)`).
+
+- Why is it called independent cascade?
+Because each edge's success in passing the infection is decided by its own independent coin flip — whether one edge transmits has no effect on whether another does.
+
+LECTURES 165–166
+
+## Coreness predicts influence · pseudo-cores
+
+which centrality wins, and the easier way to go viral
+
+## 7 The winning measure — and a shortcut
+
+Now the payoff experiment. For each node, rank it by four centrality measures and by actual influence:
+
+- **degree** — `G.degree(v)`
+- **closeness** — `nx.closeness_centrality(G, v)` (how near it is to everyone)
+- **betweenness** — `nx.betweenness_centrality(G)` (how much it bridges communities)
+- **coreness** — `nx.core_number(G)` (its k-shell number)
+- **influence** — average final cascade size when that node is the seed (run `independent_cascade` ~1000 times and average, since it's random)
+
+A caveat when you reproduce this: degree, closeness and coreness are exactly repeatable, but `nx.betweenness_centrality` uses a randomized (sampling) algorithm, so its values — and thus its ranking — can shift slightly between runs.
+
+### Of degree, closeness and betweenness, it is coreness that best matches a node's real influence.
+
+A node deep in the core (high core number) is the best spreader — even a very high-degree node can have low influence if it sits near the periphery.
+
+### Pseudo-cores — the practical twist
+
+Core nodes are the best seeds — but they're the **hardest to reach** (celebrities, public figures; convincing them costs money you may not have). So examine the cascade capacity of each shell: seed from shell 1, measure the final infected count; then shell 2, shell 3, … up to the innermost core.
+
+#### cascade capacity vs shell
+
+[diagram: pseudo-core band | plateau | → core | capacity | shell →]
+
+capacity rises, then flattens well before the innermost core.
+
+You'd expect capacity to keep rising all the way to the innermost core. But on **real social-network datasets** (freely downloadable — Facebook, Google+, Twitter, and almost any other), it **rises, hits a maximum, then stays constant** — a plateau. So a whole band of shells outside the true core already reach the same cascade capacity.
+
+🏁 pseudo-cores
+Those plateau nodes are the pseudo-cores. You don't need the unreachable celebrities at the very centre — a large, easier-to-reach band of pseudo-cores spreads your meme just as effectively.
+
+- Among degree, closeness, betweenness and coreness, which best predicts a node's influence (cascade size)?
+**Coreness** (the k-shell / core number). A deep-core node spreads best; a high-degree node near the periphery can be a poor spreader.
+
+- How is a shell's "cascade capacity" measured, and what surprising shape does it take across shells?
+Seed the independent cascade from that shell and record the final infected count. Instead of rising all the way to the core, capacity rises then **plateaus** — a band of outer shells matches the core's capacity.
+
+- What is a pseudo-core, and why is it useful for going viral?
+Pseudo-cores are the plateau nodes just outside the true innermost core that achieve the same cascade capacity. They're far easier (cheaper) to reach than the celebrity core, yet spread a meme just as widely — so seed them instead.
+
+— end of Week 12 · How to go viral · course notes complete 🎓✏️
+↑ back to contents

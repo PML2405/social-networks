@@ -1,0 +1,259 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 10 — Epidemics: How Diseases Spread on Networks
+
+Lectures 128–142 · from the simple branching model and the basic reproductive number R₀, through the SIR/SIS models and percolation, to a full proof of why R₀ = 1 is the knife-edge between "dies out" and "epidemic".
+
+🧠 the big picture, first
+
+A contagious disease spreads along a network just like an idea — but with two twists: **no choice** (you can reject a song, not a virus) and **invisibility** (you rarely know who infected you). To model it you need two things: the **pathogen** (how contagious, a probability $p$) and the **network** (dense for flu, sparse for HIV). On a simple tree where each node has $k$ children, the expected number of new infections per case is the basic reproductive number $R_0 = p\cdot k$. The single most important fact of the week: if $R_0 < 1$ the disease **dies out for certain**; if $R_0 > 1$ it can become an **epidemic**. We refine the picture with the **SIR** (measles) and **SIS** (common cold) models, recast the whole random process statically as **percolation** (open/closed pipes), and finish with a clean **cobweb proof** that the slope of one curve at the origin is exactly $R_0$.
+
+### 📒 what's inside Week 10
+
+- Disease vs idea; the two ingredients
+- The branching model & expected infections
+- The basic reproductive number R₀
+- SIR and SIS models
+- R₀ on real networks & percolation
+- Proof: why R₀ = 1 is the knife-edge
+
+LECTURES 128–129
+
+## Disease vs idea; the two ingredients
+
+why disease-spread needs its own model, and what that model needs
+
+## 1 Contagion — but a real one
+
+Week 7 studied social contagion — ideas, behaviours and actions spreading person-to-person (sports shoes, smoking, obesity — if your friend is obese your chance rises ~45%, a friend-of-friend ~25%, three hops ~12%; even **depression**, **happiness** and a product like the **iPad** spread this way). This week drops the word "social" and models **actual contagion**: a contagious disease like flu. Why bother? To **fight epidemics** — a contagion that infects a huge fraction of people (Ebola, swine flu, the Black Death). And yes, a network scientist has plenty to say, because a disease spreads on the contact network of the world.
+
+But disease-spread is not identical to idea-spread — there are two crucial differences:
+
+📖 disease-spread ≠ idea-spread
+- No choice. You can hear a song and decide not to adopt it. You cannot decide to refuse a flu virus your friend sneezed onto you — if it infects, it infects.
+- Invisibility. With an idea you often know exactly who you got it from. With a disease you usually can't tell (the professor's story: three family members had eye-flu; he caught it but never knew from whom). So disease-spread is much more of a **random** process.
+
+### The two ingredients of any epidemic model
+
+🦠 the pathogen
+How contagious is it? Modelled as a probability $p$ of transmitting across a contact. Measles/flu are highly contagious; Ebola/HIV much less. (Analogy: a juicy gossip spreads faster than a dull piece of code.)
+
+🕸️ the network
+Denser networks spread faster. And the network depends on the pathogen: flu spreads on a **dense** contact network (even a shared keyboard counts); HIV, spreading by sexual contact, lives on a much **sparser** network.
+
+- Name the two differences between how a disease spreads and how an idea spreads.
+**No choice** (you can't opt out of a virus the way you can ignore an idea) and **invisibility** (you usually can't identify who infected you). Both make disease-spread a more random process.
+
+- Why is the contact network for HIV sparser than the one for flu?
+Because the two pathogens use different transmission routes. Flu passes with casual proximity (many edges → dense); HIV passes via sexual contact (few edges → sparse). The network you draw depends on the pathogen.
+
+LECTURES 130–131
+
+## The branching model & expected infections
+
+a tree, a coin per edge, and the expected number of new cases
+
+## 2 One case, k children, probability p
+
+Start with the simplest possible network: a tree where every node has $k$ children, and every edge transmits the infection with probability $p$. (Real networks have triads and aren't trees — that comes later; for now, simplicity.) If a node is infected, model each child independently by a **coin toss**: heads (prob $p$) → that child is infected, tails → not.
+
+#### one infected node, k = 4 children
+
+[diagram: I | p]
+
+toss a coin per edge; a head infects that child. Here 3 of 4 were infected this round.
+
+How many children get infected on average? Set up an indicator random variable $X_i$ for each child: $X_i = 1$ if infected (head), $0$ otherwise. Then the total infected is $X = X_1 + X_2 + \dots + X_k$.
+
+By **linearity of expectation**, $E[X] = \sum_i E[X_i]$, and the expectation of an indicator is just the probability it's 1, namely $p$. So $E[X] = \underbrace{p + p + \dots + p}_{k} = p\cdot k$.
+
+expected new infections from one case
+
+$$ E[X] = p_1 + p_2 + \cdots + p_k = p\cdot k $$
+
+read it as: "on average, one infected node passes it to $p\cdot k$ of its $k$ children." Intuition check: toss a fair coin ($p=0.5$) 4 times → expect $0.5\times 4 = 2$ heads. With $p=0.25,\,k=4$ → expect $1$.
+
+💡 spreading down the levels
+Level $i$ of the tree holds $k^{\,i}$ people, and the expected number **infected** at level $i$ is $(p\cdot k)^{\,i}$. So the disease is an epidemic if it survives all the way down to the "infinite" level; otherwise it fizzles out at some finite depth.
+
+- A node has $k=6$ children and each edge infects with $p=0.5$. Expected number of children infected?
+$p\cdot k = 0.5\times 6 = \mathbf{3}$. (Sum of 6 indicator variables, each with expectation 0.5.)
+
+- Why does linearity of expectation let us ignore whether the coin tosses are independent?
+$E[X_1+\dots+X_k]=E[X_1]+\dots+E[X_k]$ holds regardless of dependence, so we can add the per-edge probabilities directly to get $p\cdot k$.
+
+LECTURE 132
+
+## The basic reproductive number R₀
+
+one number that decides epidemic or not
+
+## 3 R₀ = p·k, and the knife-edge at 1
+
+That number $p\cdot k$ — the expected count of secondary infections produced by one primary case — is the basic reproductive number, written $R_0$. It alone decides the fate of the disease.
+
+basic reproductive number
+
+$$ R_0 = p\cdot k = \text{expected secondary infections per case} $$
+
+| case | what happens | certainty |
+| $R_0 < 1$ | each case makes fewer than one new case → infection dies out | with probability 1 (certain) |
+| $R_0 > 1$ | each case makes more than one → infection persists / epidemic | with positive probability (not certain — it could still die if, by chance, every early edge fails) |
+
+✍️ worked examples (lecture 132)
+- **Dies out.** $p=0.25$, $k=2$ → $R_0 = 0.5 < 1$. Each case infects half a child on average — can't even sustain one — so it vanishes for sure.
+- **Epidemic.** $p=0.25$, $k=40$ → $R_0 = 10 > 1$. One case → ~10 → ~100 → ~1000 → … it explodes. $$ \boxed{R_0 = p\cdot k \;\; \begin{cases} <1 \Rightarrow \text{dies out}\\ >1 \Rightarrow \text{epidemic}\end{cases}} $$
+
+🔪 the "knife-edge" property — and how to fight epidemics
+Because the threshold sits exactly at **1**, nudging $R_0$ across it flips the outcome. A disease with $R_0 = 1.2$ (epidemic) can be killed by pushing it down to $0.9$. Since $R_0 = p\cdot k$, you either lower $p$ (better hygiene, vaccination, public-health ads — reduce the chance of transmission) or lower $k$ (quarantine — isolate the person so they contact fewer people). Either shove drops $R_0$ below 1 and the epidemic collapses.
+
+- A disease has $p=0.2$ and each person contacts $k=4$ others. Is it an epidemic, and what could a health authority do?
+$R_0 = 0.2\times 4 = 0.8 < 1$ → it dies out on its own. If instead $R_0$ were above 1, they'd lower $p$ (hygiene/vaccines) or lower $k$ (quarantine) to push $R_0$ below 1.
+
+- When $R_0 > 1$, is an epidemic guaranteed?
+No — it persists with positive probability, not certainty. There's always a small chance that every early transmission edge fails and the outbreak dies. When $R_0 < 1$, by contrast, death is certain (probability 1).
+
+LECTURES 133–135
+
+## SIR and SIS models
+
+three states, an infection period, and whether the process ever stops
+
+## 4 Susceptible → Infected → (Recovered or back to Susceptible)
+
+Real networks aren't trees, and a node shouldn't keep infecting forever. The SIR model gives each node one of three states, and it changes over discrete days:
+
+#### SIR state machine
+
+[diagram: Susceptible | Infected | Recovered/ | contact, prob p | after Tᵢ]
+
+Susceptible (blue) → Infected (red, for $T_I$ days) → Recovered/Removed (yellow, out of the game).
+
+📖 the three states + the infection period
+- Susceptible — healthy, can catch it.
+- Infected — sick and contagious for a fixed infection period $T_I$ (e.g. 3 days); each day it tries to infect its susceptible neighbours (coin toss, prob $p$).
+- Recovered / Removed — either gained lifetime immunity (measles) or died and left the network. Either way it's **out** — it can't infect and can't be re-infected.
+
+A node is in exactly one state at a time. "SIR" fits **terminal illness** (I→removed) or a **once-in-a-lifetime** disease like measles (I→immune).
+
+⚙️ how one SIR simulation runs (day by day)
+- Day 0: one node is infected; everyone else susceptible.
+- Each infected node, for each susceptible neighbour, tosses a biased coin (head prob $p$) — a head infects that neighbour.
+- After its $T_I$ days are up, an infected node becomes **recovered** and stops participating.
+- Repeat. The process stops the moment no node is infected (no red nodes left).
+
+Because coins are tossed, every run can differ — unlike the deterministic idea-cascades of Week 7.
+
+✍️ worked example (one SIR run on 6 nodes, $T_I=1$)
+- **Day 0:** node 1 is infected; the other 5 are susceptible.
+- **Day 1:** node 1 tosses a coin for each susceptible neighbour and infects, say, nodes 3 and 5. At day's end node 1 has served its $T_I=1$ day → **recovered**.
+- **Day 2:** nodes 3 and 5 now try their neighbours; say node 5 infects node 4 and node 3 infects no one. End of day → 3 and 5 recover.
+- **Day 3:** node 4 tries its neighbours and infects no one; it recovers.
+- **Day 4:** no node is infected → the process **stops**. Final: 4 recovered, 2 still susceptible. $$ \boxed{\text{with } T_I=2, \text{ each node instead gets two days to infect before recovering}} $$
+
+For a disease you can catch again (common cold), there's no immunity — you go from Infected straight back to **Susceptible**. That's the SIS model (Susceptible → Infected → Susceptible).
+
+| | SIR | SIS |
+| states | S → I → R (recovered/removed) | S → I → S (no recovered state) |
+| fits | measles, terminal illness | common cold / flu (re-catchable) |
+| after infection | immune or removed — out forever | susceptible again — can be re-infected |
+| does it always stop? | Yes — nodes keep getting "locked" into recovered until none are infected. Two end states: some susceptible + rest recovered, or all recovered. | No guarantee — re-infection can cycle forever (A infects B, B re-infects A, …); it may also die out. |
+
+- Which model fits measles, and which fits the common cold? Why?
+**SIR** for measles — one infection gives lifetime immunity (→ Recovered). **SIS** for the common cold — no lasting immunity, so you return to Susceptible and can catch it again.
+
+- Why must an SIR process always terminate, while an SIS process might not?
+In SIR every infected node eventually becomes recovered and is permanently removed; with a finite supply of nodes, infections run out. In SIS nodes cycle back to susceptible, so infection can loop indefinitely (though it can also die out).
+
+- In SIR, why can a recovered node be ignored for the rest of the simulation?
+Because it can neither infect others nor be re-infected — it's out of the dynamics entirely (immune or removed).
+
+LECTURES 136–137
+
+## R₀ on real networks & percolation
+
+why p·k is only a tree-truth, and a static view of the whole process
+
+## 5 Two refinements
+
+**R₀ = p·k doesn't transfer to real networks.** On a tree the formula is exact, but real networks have overlapping neighbourhoods (triadic closure) and recovered nodes that block re-infection — so the same $R_0$ can behave very differently.
+
+⚠️ a counterexample the professor raises
+He builds a network where every node has 2 children and $p = 2/3$, giving $R_0 = 2\times\tfrac{2}{3} = \tfrac{4}{3} > 1$ — which "should" mean epidemic. Yet on that particular structure the disease still dies out. Lesson: on a real network, $R_0 = p\cdot k$ (the tree formula) no longer guarantees an epidemic — you have to account for how paths overlap and how recovered nodes wall off the infection. The clean $R_0$ threshold is a property of the idealized branching/tree model (proved in §6), not of every network.
+
+In the lecture's counterexample each edge fails to transmit with probability $1-p = 1-\tfrac23 = \tfrac13$, and he tracks the chance the infection fails to jump from one level to the next through the level's edges (e.g. $(\tfrac13)^{4}=\tfrac{1}{81}$ for four edges) — the point being that on a real network the outcome is governed by how the paths overlap, not by $R_0=p\cdot k$ alone.
+
+### Percolation — freeze the randomness
+
+The SIR/SIS simulations run dynamically, day by day. The percolation model is a clever trick to make the whole thing **static**: instead of tossing a coin for an edge at the moment infection reaches it, pre-toss a coin for every edge up front.
+
+⚙️ percolation, step by step
+- For each edge, flip a biased coin once (head prob $p$). Head → the edge is an **open pipe**; tail → a **closed pipe**.
+- Imagine the disease as water flowing through open pipes only.
+- **A node ends up infected iff there is a path of open pipes from the source to it.** No open path ⇒ never infected.
+
+This gives exactly the same infected set as the day-by-day SIR run, but with no notion of time — which makes it far easier to analyse. The name: the infection "percolates" through the network like water.
+
+- In the percolation view, how do you tell whether a given node gets infected?
+Check whether there is a path of **open pipes** (edges whose pre-flipped coin came up heads) from the initially infected source to that node. If such a path exists, it's infected; otherwise not.
+
+- The tree formula gives $R_0 = 4/3 > 1$ but the disease dies on a certain real network. What's the moral?
+$R_0 = p\cdot k$ is exact only for the idealized tree/branching model. On real networks, overlapping neighbourhoods and recovered nodes change the dynamics, so $R_0 > 1$ (tree sense) does not guarantee an epidemic.
+
+LECTURES 138–142
+
+## Proof: why R₀ = 1 is the knife-edge
+
+a recurrence, a curve, and the slope at the origin
+
+## 6 The cobweb proof
+
+Now the rigorous version (for the branching/tree model). Let $q_n$ be the probability the disease **reaches level $n$** (at least one node at level $n$ is infected). We want $q^{*} = \lim_{n\to\infty} q_n$: the chance it survives forever. $q^{*} = 1$ (or just $>0$) means epidemic; $q^{*} = 0$ means it dies out.
+
+📖 building the recurrence
+- $q_0 = 1$ — the root (level 0) is infected for sure; that's the whole setup.
+- For infection to reach level $n$ through a particular first edge, that edge must fire (prob $p$) **and** the infection must then travel from that child down $n-1$ more levels (prob $q_{n-1}$). So one branch succeeds with prob $p\,q_{n-1}$.
+- There are $k$ such first-edges. Level $n$ is reached iff **at least one** branch succeeds = $1-$(all $k$ fail).
+
+the recurrence qₙ = f(qₙ₋₁)
+
+$$ q_n = 1-\big(1-p\,q_{n-1}\big)^{k}, \qquad f(x)=1-(1-px)^{k} $$
+
+read it as: "the chance of reaching the next level is 1 minus the chance that all $k$ branches fail, where one branch fails with probability $(1-p\,q_{n-1})$." Iterating this map from $q_0=1$ gives $q^{*}=f(f(f(\cdots f(1))))$ — the value we're chasing.
+
+Study the curve $y=f(x)$ against the line $y=x$ on $[0,1]$:
+
+#### cobweb: iterating f from x = 1
+
+[diagram: y = x | y = f(x) | q* | x=1]
+
+$R_0 > 1$: slope at origin exceeds 1, so $f$ starts above $y=x$ and the cobweb settles at a fixed point $q^{*} > 0$.
+
+Key facts about $f$:
+
+- $f(0)=0$ and $f(1)=1-(1-p)^{k} < 1$.
+- Its slope at the origin is the derivative $f'(x)=k(1-px)^{k-1}\,p$, so $$f'(0)=k\cdot p = R_0.$$
+
+So the slope of $f$ at the origin is exactly $R_0$ — that's the whole trick.
+
+🏁 finishing with the cobweb
+- **$R_0 > 1$:** slope at origin $> 1$, so $f$ climbs above $y=x$ near 0 and crosses it at some point $q^{*} > 0$. Iterating $f$ from $x=1$ (bouncing vertically to the curve, horizontally to $y=x$) converges to that intersection ⇒ $q^{*} > 0$ ⇒ the disease can persist (epidemic).
+- **$R_0 < 1$:** slope at origin $< 1$, so $f$ stays below $y=x$ the whole way; the only fixed point is $0$. The cobweb from $x=1$ marches down to $0$ ⇒ $q^{*}=0$ ⇒ the disease dies out for certain.
+
+That is the rigorous reason the threshold sits precisely at $R_0=1$.
+
+### $R_0 = p\cdot k$ is the slope of the level-survival curve at the origin — above 1 the disease can live, below 1 it must die.
+
+Lower $p$ (hygiene, vaccines) or lower $k$ (quarantine) to drag $R_0$ under 1 and end the epidemic.
+
+- What is $q^{*}$, and what do $q^{*}=0$ and $q^{*}>0$ mean?
+$q^{*}=\lim_{n\to\infty}q_n$, the probability the infection survives to infinitely deep levels. $q^{*}=0$ ⇒ it dies out for sure; $q^{*}>0$ ⇒ it can persist as an epidemic.
+
+- Where does $R_0$ show up in the function $f(x)=1-(1-px)^k$?
+As its slope at the origin: $f'(0)=k p = R_0$. That slope (vs the line $y=x$, slope 1) decides whether the cobweb converges to a positive fixed point ($R_0>1$) or to 0 ($R_0<1$).
+
+- In the cobweb picture, why does $R_0 < 1$ force $q^{*}=0$?
+With slope $<1$ at the origin, $f$ lies entirely below $y=x$, so its only fixed point on $[0,1]$ is 0. Iterating $f$ from 1 therefore slides down to 0 — the disease dies out with probability 1.
+
+— end of Week 10 · Epidemics, R₀ & the branching-process proof ✏️
+↑ back to contents

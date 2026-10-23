@@ -1,0 +1,321 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 8 — Hubs, Authorities & PageRank as a Matrix
+
+Lectures 101–114 · rating the place and the recommender, the Hubs & Authorities (HITS) idea, and finally the **proof** — why PageRank's repeated resource-sharing always converges (eigenvectors + Markov matrices).
+
+🧠 the big picture, first
+
+Two things point at each other: a **recommender** (a list) and a **resource** (a place). A good list points to good places; a good place is pointed to by good lists — a **recursive** rating you solve by the **principle of repeated improvement** (assign, add up your neighbours' scores, normalize, repeat). That gives every node a **hub** score (how well it points out) and an **authority** score (how well it's pointed at) — this is **HITS**. The exact same repeated-sharing process, applied to a directed graph where each node splits its value along its out-edges, is **PageRank**. The whole week then answers one question: why does this always converge? Answer: repeatedly applying a matrix to any vector pulls it onto the **eigenvector of the largest eigenvalue**; and PageRank's sharing matrix is a **Markov matrix** (columns sum to 1), whose largest eigenvalue is exactly **1** — so the total is conserved and the ranking is a unique stable vector.
+
+### 📒 what's inside Week 8
+
+- The story: rate the place AND the recommender
+
+principle of repeated improvement
+- Hubs & Authorities (HITS)
+
+two scores per node, a recursive definition, the algorithm
+- PageRank revisited — resource sharing
+
+the 3-node worked example, conservation, a 5-node example
+- Why it converges · part 1 — a matrix pulls every vector one way
+
+normalization + the numpy experiment
+- Why it converges · part 2 — the eigenvector proof
+
+big + small ≈ big, and λ₁ᵏ dominates
+- PageRank as a matrix operation + the Markov matrix
+
+LECTURES 101–102
+
+## The story: rate the place AND the recommender
+
+a new city, two friends, and the principle of repeated improvement
+
+## 1 A recommendation is really two ratings
+
+The professor opens, as always, with a story. You arrive in a new city for work; once free, you want good places to visit. A generic web search gives ten touristy hits that may not suit you, so you do what people actually do — **ask a friend**. You ring **Ramesh**; he sends you to a beach. You don't enjoy it, so you stop asking Ramesh. You ring **Raj**; he sends you to a book café — you love it. Next day you ask **Raj again**, he nails it again, and now you hold Raj in high regard.
+
+Notice what happened. When a place turns out good, you give a star rating to the place — but you also silently raise your rating of the person who sent you there. And the higher your regard for that person, the more weight their next recommendation carries. So a single "good experience" feeds **two** things at once: the resource, and the pointer to it.
+
+📖 the two roles
+- Pointer / list / recommender — Raj, or a printed list of "places to visit". It **points outward** to resources.
+- Resource / authority — the beach, the book café. It is the thing **pointed at**.
+- The link between them is mutual: a better-rated list should point to better-rated places, and a better-rated place should be pointed to by better-rated lists. The definition of "good" on each side depends on the other — it is **recursive**.
+
+⚙️ the principle of repeated improvement
+The professor's intuition-pumps: if you're in a good mood you treat your spouse well → they feel supported and get better → they support you → you get better… each side lifts the other, round after round. Likewise, "divide your sorrow, multiply your happiness." The formal name for this mutual lifting is the principle of repeated improvement: **assign every node a score, then repeatedly replace each score by the (normalized) sum of the scores it is connected to, until the scores stop changing.**
+
+- Why is rating a recommender "recursive"?
+Because a recommender's score depends on the scores of the places it points to, and those places' scores depend on the scores of the recommenders pointing at them — each side is defined in terms of the other.
+
+- You loved Raj's café and stopped asking Ramesh. In "repeated-improvement" terms, what changed?
+The good resource (café) pushed up the pointer's (Raj's) score; Raj's higher score then makes his next recommendation count for more. Ramesh's score stayed low, so his future advice is down-weighted.
+
+LECTURES 103–104
+
+## Hubs & Authorities (HITS)
+
+two scores per node · a recursive rule · guaranteed convergence
+
+## 2 Two scores for every node
+
+Turn the story into a graph. Put recommenders on the left (**A, B, C**) and places on the right (**P1…P5**), with an arrow from a recommender to each place it suggests. This is a directed bipartite graph (arrows only go left→right).
+
+#### recommenders → places
+
+[diagram: A | B | C | P1 | P2 | P3 | P4 | P5]
+
+a **hub** (left, blue) points out; an **authority** (right, pink) is pointed at. Illustrative edges.
+
+Give the two roles their standard names:
+
+📖 hub & authority
+- A hub is a node that **points outward** to resources — a recommender, a list. "A place where you get information."
+- An authority is a node that is **pointed at** — the resource itself, where the solution lives.
+
+In a **general** directed graph you don't split nodes into "only hubs" and "only authorities" — every node carries BOTH a hub score and an authority score at the same time. You point to some nodes (that's your hub-ness) and some nodes point to you (that's your authority-ness). The professor's picture: a room of 30 people where you ask someone for a solution and they say "I can't help, but I can point you to someone who can" — Sonia might point out to 3 people (her hub side) while 10 people point at her (her authority side).
+
+the two updates (one round of HITS)
+
+$$ h(v)=\!\!\sum_{v \to w} a(w) \qquad a(v)=\!\!\sum_{u \to v} h(u) $$
+
+read it as: "a node's **hub** score is the sum of the **authority** scores of everyone it points to; a node's **authority** score is the sum of the **hub** scores of everyone pointing to it." Do both for all nodes, then **normalize** (divide by the total so scores don't blow up), and repeat.
+
+### Worked example — the "1,1,1 → normalize → repeat" loop
+
+✍️ worked example (the professor's spreadsheet run, lecture 103)
+- **Setup.** A points to {P1,P2,P3}; B points to {P1,P4,P5}; C points to some places too. Start every node — A,B,C and P1…P5 — at score **1**.
+- **Hub scores.** A's score becomes P1+P2+P3 = 1+1+1 = **3**; B's becomes P1+P4+P5 = **3**; and so on for C.
+- **Normalize.** Divide each left score by the left total. If A,B,C are 3,3,1 the total is 7, so A → 3/7 ≈ 0.43. Do the same for the places (divide by the places' total).
+- **Repeat.** Recompute, re-normalize. The professor watched the numbers on a Google Sheet: after a few rounds A drifts 0.42 → 0.45 → 0.46…; not settled yet, so he pulls the formula down to **~200 iterations.**
+- **Converged.** Eventually A locks at **0.4608111272…** and stops changing. $$ \boxed{\text{the scores converge — the proportions between nodes stop moving}} $$
+
+💡 what "convergence" means here
+The raw numbers keep getting rescaled every round, but the **relative proportions** freeze: if node A ever settles at half of node B, it stays half of B forever. That frozen ratio is the ranking. The professor's promise: for ANY graph, the hubs-and-authorities repeated-improvement process always reaches such a stable point.
+
+🕰️ where this came from
+In the late 1990s people kept news lists — pages linking to good news articles. How do you trust a list? If it points to genuinely good articles, it's a good list; and an article is good if good lists point to it. Exactly the Raj/Ramesh loop. That was the birth of **Hubs & Authorities** (the HITS algorithm).
+
+- In a general (non-bipartite) directed graph, how many scores does a single node have, and what are they?
+Two: a hub score (= sum of the authority scores of nodes it points to) and an authority score (= sum of the hub scores of nodes pointing to it).
+
+- You run HITS and the raw scores keep shrinking every round because of normalization. Has it failed to converge?
+No — convergence is about the ratios between nodes, not the raw magnitudes. Once the proportions stop changing (A stays a fixed fraction of B), it has converged, even though every printed number is rescaled each round.
+
+- Why must you normalize each round?
+Because summing neighbours' scores makes the numbers grow without bound; dividing by the total keeps them bounded so you can watch the direction/proportions settle. Only the direction matters, not the size.
+
+LECTURES 105–108
+
+## PageRank revisited — resource sharing
+
+the same idea on a plain directed graph · a full worked trace · conservation
+
+## 3 Sharing gold coins along the edges
+
+PageRank (seen conceptually a few weeks ago) is the same repeated-improvement idea, now on an ordinary directed graph. The rule: give every node some **resource** ("gold coins"); each round, **every node splits its value equally along its out-edges** and passes it on. A node's new value is the sum of what flows in to it.
+
+one PageRank round
+
+$$ r(v)=\sum_{u \to v}\frac{r(u)}{\text{outdeg}(u)} $$
+
+read it as: "a node's new score = for every node **u** that points to it, take u's score and divide by u's number of out-edges, then add them all up." A node with 2 out-edges gives **half** its value down each.
+
+#### the 3-node graph
+
+[diagram: A | B | C]
+
+edges: B→A, A→C, B→C, C→B. Out-degrees: A=1, B=2, C=1.
+
+Start with resources split equally: **A=B=C=1/3**. Now apply the rule, node by node:
+
+- **A** receives only from B; B has 2 out-edges so gives half of 1/3 = **1/6**.
+- **B** receives only from C; C has 1 out-edge so gives all of its 1/3 = **1/3**.
+- **C** receives from A (all of A's 1/3) and from B (half of 1/3 = 1/6): 1/3 + 1/6 = **1/2**.
+
+✍️ worked example (3-node PageRank, lectures 105–106)
+Trace the vector (A, B, C), applying the sharing rule each iteration:
+
+| iteration | A | B | C | sum |
+| 0 (start) | 1/3 | 1/3 | 1/3 | 1 |
+| 1 | 1/6 | 1/3 | 1/2 | 1 |
+| 2 | 1/6 | 1/2 | 1/3 | 1 |
+| ⋯ | ⋯ | ⋯ | ⋯ | 1 |
+| converged | 0.2 | 0.4 | 0.4 | 1 |
+
+On the spreadsheet the digits settle: 0.2, 0.39, 0.4 … then lock at exactly **(0.2, 0.4, 0.4)**. $$ \boxed{A=0.2,\; B=0.4,\; C=0.4} $$
+
+⚖️ conservation — the sum stays 1
+Look at the "sum" column: it's **1** in every row. The resources you handed out never leave the network — they only move along edges — so the total is conserved. The professor calls it the law of conservation of energy for the graph: value can be neither created nor destroyed, only passed around. That's exactly why the converged scores (0.2 + 0.4 + 0.4) add to 1 and can be read as a probability distribution / a ranking.
+
+### A bigger example — 5 nodes
+
+To check convergence isn't a fluke of a tiny symmetric graph, he repeats it on 5 nodes A–E and writes the update equations straight from the edges (each node's new value = the shares flowing in):
+
+5-node update equations
+
+$$ A=\tfrac{C}{3},\;\; B=A+\tfrac{E}{2},\;\; C=B,\;\; D=\tfrac{C}{3}+\tfrac{E}{2},\;\; E=D+\tfrac{C}{3} $$
+
+read it as: C has 3 out-edges, so anyone fed by C gets "C/3"; E has 2 out-edges, so its recipients get "E/2". A handy self-check: add all five right-hand sides — every node's value gets fully distributed, so **A+B+C+D+E must stay = 1**. Starting at 1/5 each, it again converges to a fixed vector.
+
+- Node X has 4 out-edges and current score 0.8. How much does each neighbour receive from X this round?
+0.8 / 4 = **0.2** down each edge. A node always splits its value equally across its out-edges.
+
+- Why does the total score stay exactly 1 every iteration?
+Because each node passes on all of its value (split across its out-edges) and none is lost or added — conservation. The sum of everything sent equals the sum of everything received.
+
+- In the 3-node graph, C's converged score (0.4) equals B's (0.4) even though C has only one out-edge. Why is C highly ranked?
+Because C is pointed to by good nodes — it receives all of A's value and half of B's each round. PageRank rewards who points to you, not how many edges you send out.
+
+LECTURES 109–110
+
+## Why it converges · part 1
+
+a matrix applied over and over pulls every vector to one direction
+
+## 4 Multiply, normalize, repeat
+
+To explain why the sharing always converges, the professor rebuilds it from two "high-school" prerequisites. Here's **prerequisite 1**.
+
+Take a matrix, e.g. $A=\begin{bmatrix}1&2\\3&4\end{bmatrix}$, and a vector $v=\begin{bmatrix}1\\1\end{bmatrix}$. Then $Av=\begin{bmatrix}1+2\\3+4\end{bmatrix}=\begin{bmatrix}3\\7\end{bmatrix}$. The result grows, so we only care about its **direction**: pull it back onto the unit circle (radius 1, centred at origin) by dividing by its length.
+
+normalize a point (a, b) onto the unit circle
+
+$$ (a,b)\;\longmapsto\;\left(\frac{a}{\sqrt{a^2+b^2}},\; \frac{b}{\sqrt{a^2+b^2}}\right) $$
+
+read it as: "keep the direction of the arrow but shrink it to length 1 — divide each coordinate by the arrow's length $\sqrt{a^2+b^2}$." So $(3,7)\mapsto(0.39,\,0.91)$. This is exactly what "normalize" meant back in HITS.
+
+✍️ worked example (repeated multiply-and-normalize, lecture 109)
+- $Av$ with $v=(1,1)$ gives $(3,7)$; normalize → $(0.39,\,0.91)$.
+- Apply $A$ again to $(0.39,0.91)$ → $(2.21,\,4.81)$; normalize.
+- Keep going: vector 1 → vector 2 → vector 3 → … each time **multiply by A, then pull to the unit circle**.
+- The direction stops moving — it **converges**. $$ \boxed{\text{any starting } v \;\to\; \text{one fixed direction}} $$
+
+He codes it live in an iPython shell with `numpy` to watch the convergence:
+
+mat.pypython
+
+```
+import numpy
+
+A = numpy.mat("1 2; 3 4")     # the matrix  [[1,2],[3,4]]
+v = numpy.mat("1; 1")         # column vector [1, 1]^T
+
+for i in range(10):
+    z = A * v                 # apply the matrix
+    z = z / numpy.linalg.norm(z)   # normalize: pull onto the unit circle
+    print(z)
+    print("****")
+    v = z                     # <-- feed the result back in (repeated application)
+```
+
+Output settles to a constant vector: `[0.41597356, 0.90937671]`. Change the start vector to `(3, 11)` or anything else — you still land on the same direction. Complexity per iteration is a matrix–vector product, O(n²) for a dense n×n matrix (cheaper if sparse); a fixed number of iterations makes the whole run O(n²·iters).
+
+⚠️ the bug the professor hit live (learn from it)
+- His first version **forgot `v = z`** at the end of the loop. Without it, every iteration recomputes $Av$ from the same original $v$ — so you never get "repeated" application and the output is wrong.
+- Fix: reassign `v = z` so the next round applies $A$ to the previous result. Only then do you see it converge.
+- Ignore numpy's harmless deprecation/warning messages about `numpy.mat` — they don't affect the result.
+
+### No matter which vector you start from, repeatedly applying a fixed matrix (with normalization) sends you to one direction.
+
+That single direction is the key to everything — the next section names it.
+
+LECTURES 111–112
+
+## Why it converges · part 2
+
+big + small ≈ big, eigenvectors, and λ₁ᵏ domination
+
+## 5 The eigenvector proof
+
+**Prerequisite 2 — adding vectors.** Add a **big** vector to a **small** one and the result points almost exactly like the big one. Example: $(30,70)+(5,3)=(35,73)$, which sits right next to $(30,70)$, not $(5,3)$.
+
+read it as: "big + small ≈ big" — the sum leans toward the vector with the larger amplitude, in both **direction** and **size**. (Only true when one really dominates; two equal-length vectors would split the difference.)
+
+### Now assemble the proof
+
+Recall two facts from basic matrix theory:
+
+📖 the two facts we need
+- Eigenvector / eigenvalue: $Av=\lambda v$ — the matrix $A$ just **scales** the special vector $v$ by the number $\lambda$ (it doesn't rotate it).
+- A 2×2 matrix (usually) has **two independent eigenvectors** $v_1, v_2$. "Independent" means any vector $z$ can be written as a combination $z=c_1 v_1 + c_2 v_2$.
+
+Take any starting vector $v$ and write it in the eigenvector basis. Apply $A$ a total of $k$ times — each eigenvector just picks up its eigenvalue to the power $k$:
+
+applying A, k times
+
+$$ A^k v \;=\; c_1\,\lambda_1^{\,k}\,v_1 \;+\; c_2\,\lambda_2^{\,k}\,v_2 $$
+
+read it as: "after k rounds, the part along $v_1$ has been blown up by $\lambda_1^k$ and the part along $v_2$ by $\lambda_2^k$." Now suppose $\lambda_1>\lambda_2$. As $k$ grows, $\lambda_1^k$ leaves $\lambda_2^k$ far behind.
+
+✍️ worked example (why the bigger eigenvalue runs away — lecture 112)
+- Take 2 and 3. Three is only **50% bigger** than two.
+- Square them: $2^2=4$, $3^2=9$ — now 9 is **more than twice** 4.
+- Cube them: $2^3=8$, $3^3=27$ — **more than 3×**.
+- Raise to 100: the ratio $\dfrac{2^{100}}{3^{100}}=\left(\dfrac{2}{3}\right)^{100}\to 0$ — a number below 1, multiplied by itself 100 times, collapses to essentially 0. $$ \boxed{\left(\tfrac{2}{3}\right)^{100}\approx 0} $$
+
+His analogy: God "cubes" everyone's bank balance. You had ₹3L, I had ₹2L — you were 50% richer. After cubing you're more than 3× richer. The one who started ahead pulls away enormously. That's the rich-get-richer effect of raising to a power (a taste of next week).
+
+So in $A^k v = c_1\lambda_1^k v_1 + c_2\lambda_2^k v_2$, the first term is **huge** and the second is **tiny**. By prerequisite 2 (big + small ≈ big), the sum points in the direction of $c_1\lambda_1^k v_1$ — i.e. of **$v_1$**. The starting vector $v$ was arbitrary, yet:
+
+🏁 the conclusion
+Repeatedly applying $A$ to any vector converges to $v_1$ — the eigenvector of the **largest eigenvalue** $\lambda_1$. That is why the numpy experiment always landed on the same direction, and why HITS / PageRank always converge. The final ranking is that dominant eigenvector.
+
+- What does "$v$ is an eigenvector of $A$ with eigenvalue $\lambda$" mean geometrically?
+$Av=\lambda v$: applying $A$ leaves $v$ pointing the same way and only stretches (or shrinks) it by the factor $\lambda$ — no rotation.
+
+- If $\lambda_1=3$ and $\lambda_2=2$, roughly what fraction of $A^{100}v$ lies along $v_2$?
+Essentially none — the $v_2$ part scales like $2^{100}$ while the $v_1$ part scales like $3^{100}$, and $(2/3)^{100}\approx 0$. The result is almost purely along $v_1$.
+
+- Why do we normalize between multiplications instead of just taking $A^k v$ directly?
+Because $\lambda_1^k$ makes the raw vector explode in size; normalizing keeps it length-1 so we can watch the direction settle. The direction — not the magnitude — is the answer.
+
+LECTURES 113–114
+
+## PageRank as a matrix operation + the Markov matrix
+
+the sharing rule IS a matrix; its largest eigenvalue is exactly 1
+
+## 6 The sharing rule is a matrix multiply
+
+The final connection: one round of "split your value along your out-edges" is exactly **one matrix–vector multiply**. Build the transition matrix $M$ whose entry in row i, column j is the share that flows from node j to node i (i.e. $1/\text{outdeg}(j)$ if $j\to i$, else 0). Then the update is simply $r_{\text{new}} = M\,r_{\text{old}}$.
+
+For the 3-node graph, $M\begin{bmatrix}1/3\\1/3\\1/3\end{bmatrix}=\begin{bmatrix}1/6\\1/3\\1/2\end{bmatrix}$ — the very step we traced by hand. So the whole PageRank process is "apply $M$ over and over" — and by section 5 that converges to $M$'s dominant eigenvector.
+
+📖 Markov matrix (the punchline)
+Because every node gives away **all** of its value (its out-shares sum to 1), every column of $M$ sums to 1. A square matrix whose columns each sum to 1 is a Markov matrix (a.k.a. column-stochastic matrix). Its special property: its **largest eigenvalue is exactly $\lambda_1=1$**, and all others are $<1$.
+
+why a Markov matrix converges cleanly
+
+$$ A^k v = c_1(1)^k v_1 + c_2\lambda_2^{\,k} v_2 \;\xrightarrow{\;k\to\infty\;}\; c_1 v_1 $$
+
+read it as: "with $\lambda_1=1$, the $v_1$ term neither grows nor shrinks ($1^k=1$), while every other $\lambda_i^k\to 0$. So it converges to $v_1$ **without** blowing up — no normalization needed, and the total stays 1." That $v_1$ is the stationary vector: the assignment $\alpha$ with $M\alpha=\alpha$ (it maps to itself, so it stops changing). It is **unique**, and you reach it from any start.
+
+✍️ worked example (4-node PageRank, lecture 114)
+- Start $\big(\tfrac14,\tfrac14,\tfrac14,\tfrac14\big)$. One multiply by $M$ gives $\big(\tfrac18,\tfrac38,\tfrac38,\tfrac18\big)$.
+- Keep applying $M$ (or read it off as the eigenvector for $\lambda=1$).
+- It converges to the unique stable assignment: $$ \boxed{\Big(a,b,c,d\Big)=\left(\tfrac{19}{100},\; \tfrac{1}{3},\; \tfrac{19}{50},\; \tfrac{9}{100}\right)} $$ After this, applying $M$ leaves the vector unchanged ($M\alpha=\alpha$).
+
+| | Hubs & Authorities (HITS) | PageRank |
+| scores per node | two — hub & authority | one — its rank/resource |
+| update | hub = Σ authorities it points to; authority = Σ hubs pointing in | value = Σ (incoming node's value ÷ its out-degree) |
+| the matrix | general; needs normalizing each round (λ₁ may be > 1) | column-stochastic Markov matrix; λ₁ = 1 exactly |
+| why it converges | repeated multiplication → dominant eigenvector $v_1$ (largest eigenvalue) |
+| conservation | via normalization | built in — total stays 1 |
+
+- What makes a matrix a "Markov" matrix, and what is its largest eigenvalue?
+Every column sums to 1 (column-stochastic). Its largest eigenvalue is exactly 1, and all other eigenvalues are < 1 in magnitude.
+
+- Why does PageRank's iteration converge without the numbers exploding, unlike the plain $[[1,2],[3,4]]$ example?
+Because PageRank's matrix is Markov, so its dominant eigenvalue is 1: $1^k=1$ keeps the leading term steady while all others decay to 0. In the $[[1,2],[3,4]]$ case the dominant eigenvalue exceeds 1, so values grow and you must normalize by hand.
+
+- The stable PageRank vector satisfies $M\alpha=\alpha$. In words, what does that say?
+Applying one more round of sharing leaves the scores unchanged — the assignment maps to itself. That fixed point is the eigenvector for eigenvalue 1, it's unique, and you converge to it from any starting distribution.
+
+- Two people start ₹2 lakh and ₹3 lakh; both amounts get raised to the 100th power. Which "eigen" fact does this illustrate?
+That the larger base dominates after repeated powering: $\lambda_1^{k}$ overwhelms $\lambda_2^{k}$ when $\lambda_1>\lambda_2$, so $A^k v$ collapses onto the top eigenvector.
+
+— end of Week 8 · Hubs, Authorities & the PageRank convergence proof ✏️
+↑ back to contents

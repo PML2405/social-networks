@@ -1,0 +1,1346 @@
+{
+ "course": "Social Networks (NPTEL, IIT Ropar, Prof. S. R. S. Iyengar)",
+ "base_url": "https://pml2405.github.io/social-networks/",
+ "repo": "https://github.com/PML2405/social-networks",
+ "generated": "2026-10-23",
+ "all_notes": {
+  "path": "text/all-notes.txt",
+  "bytes": 243692
+ },
+ "weeks": [
+  {
+   "week": 1,
+   "nn": "01",
+   "title": "Introduction, Python & NetworkX",
+   "blurb": "graphs, connectedness, the coding toolkit, the challenge (2^C(n,2))",
+   "lec_first": 1,
+   "lec_last": 13,
+   "lectures": [
+    {
+     "num": 1,
+     "title": "Introduction",
+     "page": 2
+    },
+    {
+     "num": 2,
+     "title": "Answer to the puzzle",
+     "page": 13
+    },
+    {
+     "num": 3,
+     "title": "Introduction to Python-1",
+     "page": 21
+    },
+    {
+     "num": 4,
+     "title": "Introduction to Python-2",
+     "page": 45
+    },
+    {
+     "num": 5,
+     "title": "Introduction to Networkx-1",
+     "page": 74
+    },
+    {
+     "num": 6,
+     "title": "Introduction to Networkx-2",
+     "page": 85
+    },
+    {
+     "num": 7,
+     "title": "Social Networks: The Challenge",
+     "page": 131
+    },
+    {
+     "num": 8,
+     "title": "Google PageRank",
+     "page": 137
+    },
+    {
+     "num": 9,
+     "title": "Searching in a Network",
+     "page": 140
+    },
+    {
+     "num": 10,
+     "title": "Link Prediction",
+     "page": 143
+    },
+    {
+     "num": 11,
+     "title": "The Contagions",
+     "page": 146
+    },
+    {
+     "num": 12,
+     "title": "Importance of Acquaintances",
+     "page": 148
+    },
+    {
+     "num": 13,
+     "title": "Marketing on Social Networks",
+     "page": 150
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-01.html",
+     "bytes": 67028
+    },
+    "notes_text": {
+     "path": "text/notes/week-01.txt",
+     "bytes": 30999
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_01_Assignment_Solution.pdf",
+     "bytes": 213665,
+     "pages": 10
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_01_Assignment_Solution.txt",
+     "bytes": 20136
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_01_Transcript_Lec01-13.pdf",
+     "bytes": 9015327,
+     "pages": 151
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_01_Transcript_Lec01-13.txt",
+     "bytes": 111218
+    },
+    "week_text": {
+     "path": "text/weeks/week-01.txt",
+     "bytes": 163445
+    }
+   }
+  },
+  {
+   "week": 2,
+   "nn": "02",
+   "title": "Datasets & Emergence of Connectedness",
+   "blurb": "formats, degree/density/clustering/diameter, Gephi, ~n·log n links to connect",
+   "lec_first": 14,
+   "lec_last": 26,
+   "lectures": [
+    {
+     "num": 14,
+     "title": "Introduction to Datasets",
+     "page": 2
+    },
+    {
+     "num": 15,
+     "title": "Ingredients Network",
+     "page": 9
+    },
+    {
+     "num": 16,
+     "title": "Synonymy Network",
+     "page": 13
+    },
+    {
+     "num": 17,
+     "title": "Web Graph",
+     "page": 16
+    },
+    {
+     "num": 18,
+     "title": "Social Network Datasets",
+     "page": 19
+    },
+    {
+     "num": 19,
+     "title": "Datasets: Different Formats",
+     "page": 22
+    },
+    {
+     "num": 20,
+     "title": "Datasets: How to Download?",
+     "page": 36
+    },
+    {
+     "num": 21,
+     "title": "Datasets: Analyzing Using Networkx",
+     "page": 50
+    },
+    {
+     "num": 22,
+     "title": "Datasets: Analyzing Using Gephi",
+     "page": 78
+    },
+    {
+     "num": 23,
+     "title": "Introduction: Emergence of Connectedness",
+     "page": 91
+    },
+    {
+     "num": 24,
+     "title": "Advanced Material: Emergence of Connectedness",
+     "page": 96
+    },
+    {
+     "num": 25,
+     "title": "Programming Illustration: Emergence of Connectedness",
+     "page": 104
+    },
+    {
+     "num": 26,
+     "title": "Summary to Datasets",
+     "page": 125
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-02.html",
+     "bytes": 53621
+    },
+    "notes_text": {
+     "path": "text/notes/week-02.txt",
+     "bytes": 24061
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_02_Assignment_Solution.pdf",
+     "bytes": 217612,
+     "pages": 10
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_02_Assignment_Solution.txt",
+     "bytes": 21714
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_02_Transcript_Lec14-26.pdf",
+     "bytes": 7906621,
+     "pages": 126
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_02_Transcript_Lec14-26.txt",
+     "bytes": 130251
+    },
+    "week_text": {
+     "path": "text/weeks/week-02.txt",
+     "bytes": 177126
+    }
+   }
+  },
+  {
+   "week": 3,
+   "nn": "03",
+   "title": "Strong & Weak Ties, Communities",
+   "blurb": "Granovetter, triadic closure, embeddedness, structural holes, Girvan–Newman",
+   "lec_first": 27,
+   "lec_last": 40,
+   "lectures": [
+    {
+     "num": 27,
+     "title": "Introduction",
+     "page": 2
+    },
+    {
+     "num": 28,
+     "title": "Granovetter's Strength of Weak Ties",
+     "page": 5
+    },
+    {
+     "num": 29,
+     "title": "Triads, Clustering Coefficient and Neighborhood Overlap",
+     "page": 9
+    },
+    {
+     "num": 30,
+     "title": "Structure of Weak Ties, Bridges, and Local Bridges",
+     "page": 19
+    },
+    {
+     "num": 31,
+     "title": "Validation of Granovetter's Experiment Using Cell Phone Data",
+     "page": 26
+    },
+    {
+     "num": 32,
+     "title": "Embeddedness",
+     "page": 30
+    },
+    {
+     "num": 33,
+     "title": "Structural Holes",
+     "page": 36
+    },
+    {
+     "num": 34,
+     "title": "Social Capital",
+     "page": 39
+    },
+    {
+     "num": 35,
+     "title": "Finding Communities in a Graph (Brute Force Method)",
+     "page": 47
+    },
+    {
+     "num": 36,
+     "title": "Community Detection Using Girvan Newman Algorithm",
+     "page": 63
+    },
+    {
+     "num": 37,
+     "title": "Visualizing Communities Using Gephi",
+     "page": 71
+    },
+    {
+     "num": 38,
+     "title": "Tie Strength, Social Media and Passive Engagement",
+     "page": 85
+    },
+    {
+     "num": 39,
+     "title": "Betweenness Measures and Graph Partitioning",
+     "page": 93
+    },
+    {
+     "num": 40,
+     "title": "Strong and Weak Relationship - Summary",
+     "page": 102
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-03.html",
+     "bytes": 51701
+    },
+    "notes_text": {
+     "path": "text/notes/week-03.txt",
+     "bytes": 20332
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_03_Assignment_Solution.pdf",
+     "bytes": 225726,
+     "pages": 10
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_03_Assignment_Solution.txt",
+     "bytes": 21741
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_03_Transcript_Lec27-40.pdf",
+     "bytes": 7225789,
+     "pages": 108
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_03_Transcript_Lec27-40.txt",
+     "bytes": 116011
+    },
+    "week_text": {
+     "path": "text/weeks/week-03.txt",
+     "bytes": 159178
+    }
+   }
+  },
+  {
+   "week": 4,
+   "nn": "04",
+   "title": "Homophily, Selection & Influence",
+   "blurb": "homophily measure, foci/membership closure, the Fatman model",
+   "lec_first": 41,
+   "lec_last": 53,
+   "lectures": [
+    {
+     "num": 41,
+     "title": "Introduction to Homophily - Should You Watch Your Company?",
+     "page": 2
+    },
+    {
+     "num": 42,
+     "title": "Selection and Social Influence",
+     "page": 11
+    },
+    {
+     "num": 43,
+     "title": "Interplay Between Selection and Social Influence",
+     "page": 21
+    },
+    {
+     "num": 44,
+     "title": "Homophily - Definition and Measurement",
+     "page": 36
+    },
+    {
+     "num": 45,
+     "title": "Foci Closure and Membership Closure",
+     "page": 50
+    },
+    {
+     "num": 46,
+     "title": "Introduction to Fatman Evolutionary Model",
+     "page": 54
+    },
+    {
+     "num": 47,
+     "title": "Fatman Evolutionary Model - The Base Code (Adding People)",
+     "page": 58
+    },
+    {
+     "num": 48,
+     "title": "Fatman Evolutionary Model - The Base Code (Adding Social Foci)",
+     "page": 73
+    },
+    {
+     "num": 49,
+     "title": "Fatman Evolutionary Model - Implementing Homophily",
+     "page": 89
+    },
+    {
+     "num": 50,
+     "title": "Quantifying the Effect of Triadic Closure",
+     "page": 99
+    },
+    {
+     "num": 51,
+     "title": "Fatman Evolutionary Model - Implementing Closures",
+     "page": 103
+    },
+    {
+     "num": 52,
+     "title": "Fatman Evolutionary Model - Implementing Social Influence",
+     "page": 119
+    },
+    {
+     "num": 53,
+     "title": "Fatman Evolutionary Model - Storing and Analyzing Longitudinal Data",
+     "page": 131
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-04.html",
+     "bytes": 45922
+    },
+    "notes_text": {
+     "path": "text/notes/week-04.txt",
+     "bytes": 18266
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_04_Assignment_Solution.pdf",
+     "bytes": 219069,
+     "pages": 9
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_04_Assignment_Solution.txt",
+     "bytes": 20598
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_04_Transcript_Lec41-53.pdf",
+     "bytes": 7650176,
+     "pages": 142
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_04_Transcript_Lec41-53.txt",
+     "bytes": 122875
+    },
+    "week_text": {
+     "path": "text/weeks/week-04.txt",
+     "bytes": 162834
+    }
+   }
+  },
+  {
+   "week": 5,
+   "nn": "05",
+   "title": "Schelling & Structural Balance",
+   "blurb": "spatial segregation, signed triangles, the Balance Theorem",
+   "lec_first": 54,
+   "lec_last": 74,
+   "lectures": [
+    {
+     "num": 54,
+     "title": "Spatial Segregation: An Introduction",
+     "page": 2
+    },
+    {
+     "num": 55,
+     "title": "Spatial Segregation: Simulation of the Schelling Model",
+     "page": 9
+    },
+    {
+     "num": 56,
+     "title": "Spatial Segregation: Conclusion",
+     "page": 14
+    },
+    {
+     "num": 57,
+     "title": "Schelling Model Implementation-1 (Introduction)",
+     "page": 16
+    },
+    {
+     "num": 58,
+     "title": "Schelling Model Implementation-2 (Base Code)",
+     "page": 21
+    },
+    {
+     "num": 59,
+     "title": "Schelling Model Implementation-3 (Visualization, Boundary and Internal Nodes)",
+     "page": 35
+    },
+    {
+     "num": 60,
+     "title": "Schelling Model Implementation-4 (Getting a List of Unsatisfied Nodes)",
+     "page": 50
+    },
+    {
+     "num": 61,
+     "title": "Schelling Model Implementation-5 (Shifting Unsatisfied Nodes, Final Graph)",
+     "page": 58
+    },
+    {
+     "num": 62,
+     "title": "Chapter 5 - Positive and Negative Relationships (Introduction)",
+     "page": 65
+    },
+    {
+     "num": 63,
+     "title": "Structural Balance",
+     "page": 67
+    },
+    {
+     "num": 64,
+     "title": "Enemy's Enemy is a Friend",
+     "page": 75
+    },
+    {
+     "num": 65,
+     "title": "Characterizing the Structure of Balanced Networks",
+     "page": 83
+    },
+    {
+     "num": 66,
+     "title": "Balance Theorem",
+     "page": 88
+    },
+    {
+     "num": 67,
+     "title": "Proof of Balance Theorem",
+     "page": 94
+    },
+    {
+     "num": 68,
+     "title": "Introduction to Positive and Negative Edges",
+     "page": 99
+    },
+    {
+     "num": 69,
+     "title": "Outline of Implementation",
+     "page": 105
+    },
+    {
+     "num": 70,
+     "title": "Creating Graph, Displaying It and Counting Unstable Triangles",
+     "page": 112
+    },
+    {
+     "num": 71,
+     "title": "Moving a Network from an Unstable to Stable State",
+     "page": 124
+    },
+    {
+     "num": 72,
+     "title": "Forming Two Coalitions",
+     "page": 145
+    },
+    {
+     "num": 73,
+     "title": "Forming Two Coalitions (contd.)",
+     "page": 156
+    },
+    {
+     "num": 74,
+     "title": "Visualizing Coalitions and the Evolution",
+     "page": 160
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-05.html",
+     "bytes": 46901
+    },
+    "notes_text": {
+     "path": "text/notes/week-05.txt",
+     "bytes": 17894
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_05_Assignment_Solution.pdf",
+     "bytes": 203680,
+     "pages": 9
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_05_Assignment_Solution.txt",
+     "bytes": 20489
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_05_Transcript_Lec54-74.pdf",
+     "bytes": 14191400,
+     "pages": 165
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_05_Transcript_Lec54-74.txt",
+     "bytes": 169397
+    },
+    "week_text": {
+     "path": "text/weeks/week-05.txt",
+     "bytes": 208873
+    }
+   }
+  },
+  {
+   "week": 6,
+   "nn": "06",
+   "title": "PageRank & Link Analysis",
+   "blurb": "web graph, points-distribution & random-walk PageRank, DegreeRank",
+   "lec_first": 75,
+   "lec_last": 86,
+   "lectures": [
+    {
+     "num": 75,
+     "title": "The Web Graph",
+     "page": 2
+    },
+    {
+     "num": 76,
+     "title": "Collecting the Web Graph",
+     "page": 8
+    },
+    {
+     "num": 77,
+     "title": "Equal Coin Distribution",
+     "page": 17
+    },
+    {
+     "num": 78,
+     "title": "Random Coin Dropping",
+     "page": 23
+    },
+    {
+     "num": 79,
+     "title": "Google Page Ranking Using Web Graph",
+     "page": 29
+    },
+    {
+     "num": 80,
+     "title": "Implementing PageRank Using Points Distribution Method-1",
+     "page": 32
+    },
+    {
+     "num": 81,
+     "title": "Implementing PageRank Using Points Distribution Method-2",
+     "page": 37
+    },
+    {
+     "num": 82,
+     "title": "Implementing PageRank Using Points Distribution Method-3",
+     "page": 48
+    },
+    {
+     "num": 83,
+     "title": "Implementing PageRank Using Points Distribution Method-4",
+     "page": 60
+    },
+    {
+     "num": 84,
+     "title": "Implementing PageRank Using Random Walk Method-1",
+     "page": 67
+    },
+    {
+     "num": 85,
+     "title": "Implementing PageRank Using Random Walk Method-2",
+     "page": 70
+    },
+    {
+     "num": 86,
+     "title": "DegreeRank versus PageRank",
+     "page": 78
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-06.html",
+     "bytes": 40061
+    },
+    "notes_text": {
+     "path": "text/notes/week-06.txt",
+     "bytes": 14867
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_06_Assignment_Solution.pdf",
+     "bytes": 217756,
+     "pages": 10
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_06_Assignment_Solution.txt",
+     "bytes": 20651
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_06_Transcript_Lec75-86.pdf",
+     "bytes": 5449057,
+     "pages": 82
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_06_Transcript_Lec75-86.txt",
+     "bytes": 96043
+    },
+    "week_text": {
+     "path": "text/weeks/week-06.txt",
+     "bytes": 132648
+    }
+   }
+  },
+  {
+   "week": 7,
+   "nn": "07",
+   "title": "Cascading Behaviour & Diffusion",
+   "blurb": "coordination game q=b/(a+b), cascades vs clusters, collective action",
+   "lec_first": 87,
+   "lec_last": 100,
+   "lectures": [
+    {
+     "num": 87,
+     "title": "We Follow",
+     "page": 2
+    },
+    {
+     "num": 88,
+     "title": "Why Do We Follow?",
+     "page": 8
+    },
+    {
+     "num": 89,
+     "title": "Diffusion in Networks",
+     "page": 15
+    },
+    {
+     "num": 90,
+     "title": "Modeling Diffusion",
+     "page": 18
+    },
+    {
+     "num": 91,
+     "title": "Modeling Diffusion (continued)",
+     "page": 24
+    },
+    {
+     "num": 92,
+     "title": "Impact of Communities on Diffusion",
+     "page": 29
+    },
+    {
+     "num": 93,
+     "title": "Cascade and Clusters",
+     "page": 40
+    },
+    {
+     "num": 94,
+     "title": "Knowledge, Thresholds and the Collective Action",
+     "page": 47
+    },
+    {
+     "num": 95,
+     "title": "Introduction to the Programming Screencast (Coding 4 Major Ideas)",
+     "page": 54
+    },
+    {
+     "num": 96,
+     "title": "The Base Code",
+     "page": 60
+    },
+    {
+     "num": 97,
+     "title": "Coding the First Big Idea - Increasing the Payoff",
+     "page": 72
+    },
+    {
+     "num": 98,
+     "title": "Coding the Second Big Idea - Key People",
+     "page": 88
+    },
+    {
+     "num": 99,
+     "title": "Coding the Third Big Idea - Impact of Communities on Cascades",
+     "page": 94
+    },
+    {
+     "num": 100,
+     "title": "Coding the Fourth Big Idea - Cascades and Clusters",
+     "page": 109
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-07.html",
+     "bytes": 40139
+    },
+    "notes_text": {
+     "path": "text/notes/week-07.txt",
+     "bytes": 15313
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_07_Assignment_Solution.pdf",
+     "bytes": 217314,
+     "pages": 9
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_07_Assignment_Solution.txt",
+     "bytes": 20170
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_07_Transcript_Lec87-100.pdf",
+     "bytes": 8135045,
+     "pages": 120
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_07_Transcript_Lec87-100.txt",
+     "bytes": 113450
+    },
+    "week_text": {
+     "path": "text/weeks/week-07.txt",
+     "bytes": 150029
+    }
+   }
+  },
+  {
+   "week": 8,
+   "nn": "08",
+   "title": "Hubs, Authorities & PageRank as a Matrix",
+   "blurb": "repeated improvement, HITS, eigenvector convergence, Markov matrices",
+   "lec_first": 101,
+   "lec_last": 114,
+   "lectures": [
+    {
+     "num": 101,
+     "title": "Introduction to Hubs and Authorities (A Story)",
+     "page": 2
+    },
+    {
+     "num": 102,
+     "title": "Principle of Repeated Improvement (A Story)",
+     "page": 6
+    },
+    {
+     "num": 103,
+     "title": "Principle of Repeated Improvement (An Example)",
+     "page": 10
+    },
+    {
+     "num": 104,
+     "title": "Hubs and Authorities",
+     "page": 14
+    },
+    {
+     "num": 105,
+     "title": "PageRank Revisited - An Example",
+     "page": 20
+    },
+    {
+     "num": 106,
+     "title": "PageRank Revisited - Convergence in the Example",
+     "page": 24
+    },
+    {
+     "num": 107,
+     "title": "PageRank Revisited - Conservation and Convergence",
+     "page": 28
+    },
+    {
+     "num": 108,
+     "title": "PageRank, Conservation and Convergence - Another Example",
+     "page": 30
+    },
+    {
+     "num": 109,
+     "title": "Matrix Multiplication (Prerequisite 1)",
+     "page": 34
+    },
+    {
+     "num": 110,
+     "title": "Convergence in Repeated Matrix Multiplication (Prerequisite 1)",
+     "page": 41
+    },
+    {
+     "num": 111,
+     "title": "Addition of Two Vectors (Prerequisite 2)",
+     "page": 48
+    },
+    {
+     "num": 112,
+     "title": "Convergence in Repeated Matrix Multiplication - The Details",
+     "page": 54
+    },
+    {
+     "num": 113,
+     "title": "PageRank as a Matrix Operation",
+     "page": 63
+    },
+    {
+     "num": 114,
+     "title": "PageRank Explained",
+     "page": 67
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-08.html",
+     "bytes": 49997
+    },
+    "notes_text": {
+     "path": "text/notes/week-08.txt",
+     "bytes": 22892
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_08_Assignment_Solution.pdf",
+     "bytes": 201634,
+     "pages": 8
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_08_Assignment_Solution.txt",
+     "bytes": 19838
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_08_Transcript_Lec101-114.pdf",
+     "bytes": 3665403,
+     "pages": 72
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_08_Transcript_Lec101-114.txt",
+     "bytes": 80387
+    },
+    "week_text": {
+     "path": "text/weeks/week-08.txt",
+     "bytes": 124224
+    }
+   }
+  },
+  {
+   "week": 9,
+   "nn": "09",
+   "title": "Power Laws & Rich-Get-Richer",
+   "blurb": "bell curve vs power law, Barabási–Albert, Erdős–Rényi, attack survivability, long tail",
+   "lec_first": 115,
+   "lec_last": 125,
+   "lectures": [
+    {
+     "num": 115,
+     "title": "Introduction to Power Law",
+     "page": 2
+    },
+    {
+     "num": 116,
+     "title": "Why Do Normal Distributions Appear?",
+     "page": 9
+    },
+    {
+     "num": 117,
+     "title": "Power Law Emerges in WWW Graphs",
+     "page": 14
+    },
+    {
+     "num": 118,
+     "title": "Detecting the Presence of Power Law",
+     "page": 21
+    },
+    {
+     "num": 119,
+     "title": "Rich Get Richer Phenomenon",
+     "page": 26
+    },
+    {
+     "num": 120,
+     "title": "Summary So Far",
+     "page": 33
+    },
+    {
+     "num": 121,
+     "title": "Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-1",
+     "page": 36
+    },
+    {
+     "num": 122,
+     "title": "Implementing Rich-Getting-Richer Phenomenon (Barabasi-Albert Model)-2",
+     "page": 42
+    },
+    {
+     "num": 123,
+     "title": "Implementing a Random Graph (Erdos-Renyi Model)-1",
+     "page": 68
+    },
+    {
+     "num": 124,
+     "title": "Implementing a Random Graph (Erdos-Renyi Model)-2",
+     "page": 72
+    },
+    {
+     "num": 125,
+     "title": "Forced Versus Random Removal of Nodes (Attack Survivability)",
+     "page": 82
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-09.html",
+     "bytes": 48143
+    },
+    "notes_text": {
+     "path": "text/notes/week-09.txt",
+     "bytes": 23611
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_09_Assignment_Solution.pdf",
+     "bytes": 231350,
+     "pages": 10
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_09_Assignment_Solution.txt",
+     "bytes": 21348
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_09_Transcript_Lec115-125.pdf",
+     "bytes": 4584702,
+     "pages": 94
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_09_Transcript_Lec115-125.txt",
+     "bytes": 115134
+    },
+    "week_text": {
+     "path": "text/weeks/week-09.txt",
+     "bytes": 161188
+    }
+   }
+  },
+  {
+   "week": 10,
+   "nn": "10",
+   "title": "Epidemics on Networks",
+   "blurb": "branching model, R₀, SIR/SIS, percolation, the cobweb proof",
+   "lec_first": 126,
+   "lec_last": 142,
+   "lectures": [
+    {
+     "num": 126,
+     "title": "Rich Get Richer - A Possible Reason",
+     "page": 2
+    },
+    {
+     "num": 127,
+     "title": "Rich Get Richer - The Long Tail",
+     "page": 11
+    },
+    {
+     "num": 128,
+     "title": "Epidemics - An Introduction",
+     "page": 19
+    },
+    {
+     "num": 129,
+     "title": "Introduction to Epidemics (contd.)",
+     "page": 27
+    },
+    {
+     "num": 130,
+     "title": "Simple Branching Process for Modeling Epidemics",
+     "page": 30
+    },
+    {
+     "num": 131,
+     "title": "Simple Branching Process for Modeling Epidemics (contd.)",
+     "page": 38
+    },
+    {
+     "num": 132,
+     "title": "Basic Reproductive Number",
+     "page": 43
+    },
+    {
+     "num": 133,
+     "title": "Modeling Epidemics on Complex Networks",
+     "page": 49
+    },
+    {
+     "num": 134,
+     "title": "SIR and SIS Spreading Models",
+     "page": 54
+    },
+    {
+     "num": 135,
+     "title": "Comparison Between SIR and SIS Spreading Models",
+     "page": 68
+    },
+    {
+     "num": 136,
+     "title": "Basic Reproductive Number Revisited for Complex Networks",
+     "page": 74
+    },
+    {
+     "num": 137,
+     "title": "Percolation Model",
+     "page": 79
+    },
+    {
+     "num": 138,
+     "title": "Analysis of Basic Reproductive Number in Branching Model (Problem Statement)",
+     "page": 85
+    },
+    {
+     "num": 139,
+     "title": "Analyzing Basic Reproductive Number 2",
+     "page": 89
+    },
+    {
+     "num": 140,
+     "title": "Analyzing Basic Reproductive Number 3",
+     "page": 96
+    },
+    {
+     "num": 141,
+     "title": "Analyzing Basic Reproductive Number 4",
+     "page": 100
+    },
+    {
+     "num": 142,
+     "title": "Analyzing Basic Reproductive Number 5",
+     "page": 104
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-10.html",
+     "bytes": 43431
+    },
+    "notes_text": {
+     "path": "text/notes/week-10.txt",
+     "bytes": 18371
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_10_Assignment_Solution.pdf",
+     "bytes": 226249,
+     "pages": 9
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_10_Assignment_Solution.txt",
+     "bytes": 21209
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_10_Transcript_Lec126-142.pdf",
+     "bytes": 6310955,
+     "pages": 107
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_10_Transcript_Lec126-142.txt",
+     "bytes": 142645
+    },
+    "week_text": {
+     "path": "text/weeks/week-10.txt",
+     "bytes": 183317
+    }
+   }
+  },
+  {
+   "week": 11,
+   "nn": "11",
+   "title": "The Small-World Effect",
+   "blurb": "Milgram, six degrees, Watts–Strogatz, decentralized search, Kleinberg's exponent",
+   "lec_first": 143,
+   "lec_last": 149,
+   "lectures": [
+    {
+     "num": 143,
+     "title": "Small World Effect - An Introduction",
+     "page": 2
+    },
+    {
+     "num": 144,
+     "title": "Milgram's Experiment",
+     "page": 10
+    },
+    {
+     "num": 145,
+     "title": "The Reason",
+     "page": 16
+    },
+    {
+     "num": 146,
+     "title": "The Generative Model",
+     "page": 22
+    },
+    {
+     "num": 147,
+     "title": "Decentralized Search - I",
+     "page": 25
+    },
+    {
+     "num": 148,
+     "title": "Decentralized Search - II",
+     "page": 30
+    },
+    {
+     "num": 149,
+     "title": "Decentralized Search - III",
+     "page": 38
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-11.html",
+     "bytes": 35954
+    },
+    "notes_text": {
+     "path": "text/notes/week-11.txt",
+     "bytes": 13510
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_11_Assignment_Solution.pdf",
+     "bytes": 216103,
+     "pages": 8
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_11_Assignment_Solution.txt",
+     "bytes": 20093
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_11_Transcript_Lec143-149.pdf",
+     "bytes": 2405567,
+     "pages": 50
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_11_Transcript_Lec143-149.txt",
+     "bytes": 62286
+    },
+    "week_text": {
+     "path": "text/weeks/week-11.txt",
+     "bytes": 96982
+    }
+   }
+  },
+  {
+   "week": 12,
+   "nn": "12",
+   "title": "How to Go Viral: Search, Cores & Cascades",
+   "blurb": "myopic search, k-shell decomposition, independent cascade, coreness & pseudo-cores",
+   "lec_first": 150,
+   "lec_last": 166,
+   "lectures": [
+    {
+     "num": 150,
+     "title": "Programming Illustration - Small World Networks: Introduction",
+     "page": 2
+    },
+    {
+     "num": 151,
+     "title": "Base Code",
+     "page": 11
+    },
+    {
+     "num": 152,
+     "title": "Making Homophily Based Edges",
+     "page": 14
+    },
+    {
+     "num": 153,
+     "title": "Adding Weak Ties",
+     "page": 27
+    },
+    {
+     "num": 154,
+     "title": "Plotting Change in Diameter",
+     "page": 31
+    },
+    {
+     "num": 155,
+     "title": "Programming Illustration - Myopic Search: Introduction",
+     "page": 34
+    },
+    {
+     "num": 156,
+     "title": "Myopic Search",
+     "page": 40
+    },
+    {
+     "num": 157,
+     "title": "Myopic Search Comparison to Optimal Search",
+     "page": 56
+    },
+    {
+     "num": 158,
+     "title": "Time Taken by Myopic Search",
+     "page": 62
+    },
+    {
+     "num": 159,
+     "title": "PseudoCores: Introduction",
+     "page": 74
+    },
+    {
+     "num": 160,
+     "title": "How to Be Viral",
+     "page": 79
+    },
+    {
+     "num": 161,
+     "title": "Who Are the Right Key Nodes?",
+     "page": 83
+    },
+    {
+     "num": 162,
+     "title": "Finding the Right Key Nodes (the Core)",
+     "page": 85
+    },
+    {
+     "num": 163,
+     "title": "Coding K-Shell Decomposition",
+     "page": 96
+    },
+    {
+     "num": 164,
+     "title": "Coding Cascading Model",
+     "page": 108
+    },
+    {
+     "num": 165,
+     "title": "Coding the Importance of Core Nodes in Cascading",
+     "page": 123
+    },
+    {
+     "num": 166,
+     "title": "Pseudo Core",
+     "page": 136
+    }
+   ],
+   "files": {
+    "notes_html": {
+     "path": "notes/week-12.html",
+     "bytes": 44853
+    },
+    "notes_text": {
+     "path": "text/notes/week-12.txt",
+     "bytes": 21019
+    },
+    "solution_pdf": {
+     "path": "1_Assignment_Solutions/Week_12_Assignment_Solution.pdf",
+     "bytes": 213464,
+     "pages": 9
+    },
+    "solution_text": {
+     "path": "text/solutions/Week_12_Assignment_Solution.txt",
+     "bytes": 20025
+    },
+    "transcript_pdf": {
+     "path": "2_Transcripts/Week_12_Transcript_Lec150-166.pdf",
+     "bytes": 8879508,
+     "pages": 141
+    },
+    "transcript_text": {
+     "path": "text/transcripts/Week_12_Transcript_Lec150-166.txt",
+     "bytes": 156929
+    },
+    "week_text": {
+     "path": "text/weeks/week-12.txt",
+     "bytes": 199085
+    }
+   }
+  }
+ ]
+}

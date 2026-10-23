@@ -1,0 +1,416 @@
+SOCIAL NETWORKS · NPTEL · PROF. SUDARSHAN IYENGAR (IIT ROPAR)
+
+# Week 2 — Datasets & the Emergence of Connectedness
+
+Lectures 14–26 · where real network data lives, how to read & measure it, and the deep reason a graph connects after only ~n·log n links.
+
+🧠 the big picture, first
+
+Two halves. **(1) Real datasets:** the internet age gives us huge network datasets (friendships, roads, citations, the web…). This week teaches the file formats they come in, where to download them, and the four structural measurements you ask of any graph — **degree distribution, density, clustering coefficient, diameter** — in NetworkX and in **Gephi**. **(2) Synthetic experiments:** we finally prove the Week-1 miracle — as random links pile up, a graph becomes connected after only about **n·log n** edges (barely more than n). You'll both derive it and simulate it.
+
+### 📒 what's inside Week 2
+
+- Why datasets? & a zoo of real networks
+
+Zachary karate, ingredients, synonyms, the web, social — directed vs undirected
+- File formats & where to download
+
+edge-list, adjacency-list, GML, Pajek, GraphML, GEXF; SNAP/UCI; NetworkX readers
+- Analysing a network in NetworkX
+
+degree distribution, density, clustering coefficient, diameter, connectivity
+- Gephi — visual analysis
+
+layouts, ranking by degree, the built-in metrics
+- Emergence of connectedness — the argument
+
+the basket-of-balls intuition + the avoid-probability maths
+- Simulating it — `connectivity.py`
+
+add nodes, add random edges till connected, plot vs n·log n
+- Summary & synthetic datasets
+
+LECTURES 14–18
+
+## Why datasets — and a zoo of real networks
+
+friendship · ingredients · synonyms · the web · social — and which are directed
+
+## 1 Real network datasets, and the questions they invite
+
+Once you have data on a real network, it becomes like **Play-Doh** — you can shape endless questions from it: Is the graph connected? What are the node degrees — the average and spread? Are there communities? Decades ago we had tiny hand-collected graphs; the internet era gives us enormous ones.
+
+📖 the classic tiny dataset — Zachary's Karate Club
+A friendship network of a US university karate club: **34 nodes** (members), edges = friendships. A real fight split the club into two groups around the instructor and the administrator; Zachary's analysis predicted the split. It's the standard toy graph for testing community-detection algorithms (Week 3).
+
+### Five example networks (each teaches one idea)
+
+| network | node / edge | the surprise |
+| Ingredients | ingredient / "appear together in a popular dish" | Strong communities (e.g. sweet vs savoury). The "popular" qualifier matters: without it some dish links almost any pair and the graph goes nearly complete. E.g. salt–sugar co-occur in many dishes → edge; chili-powder–sugar rarely (bar chili-chocolate) → no edge. |
+| Synonymy | word / "are synonyms" (from a thesaurus) | It has one giant/large connected component — so there's a synonym-path from love to hate ! Synonymy looks symmetric but is not transitive : A≈B and B≈C need not make A≈C (meaning degrades along the chain). |
+| Web graph | web page / hyperlink (one page points to another) | Looks useless, but the link structure hides the answer to "which page is most important?" → Google / PageRank (Week 6). |
+| Social (Facebook, LinkedIn…) | person / friendship | Structure predicts who your next friend will be → link prediction ("People You May Know"). |
+
+📖 directed vs undirected — decide by the relationship
+Use an undirected edge when the relation is **mutual/symmetric**; a directed edge when it is **one-way**.
+
+- **Undirected:** friendship, a road between cities, a shared paper (co-authorship), a transmission line (power grid) — "if A relates to B, then B relates to A".
+- **Directed:** an **email** A→B, a **citation** (paper A cites B), a **predator→prey** food web — "X preys on Y says nothing about Y preying on X".
+
+LECTURES 19–20
+
+## File formats & where to download
+
+edge-list · adjacency-list · GML · Pajek · GraphML · GEXF · the NetworkX readers
+
+## 2 The formats network data comes in
+
+Public repositories store networks in a handful of formats. You rarely write these by hand — but you must recognise them to pick the right reader.
+
+| format | extension | layout / notes | attributes? |
+| Edge-list (CSV) | .txt / .csv | each row = one edge: source target (optionally a 3rd column = weight) | No (numbers only) |
+| Adjacency-list (CSV) | .txt / .csv | each row = a node followed by all its neighbours | No |
+| GML (Graph Modeling Language) | .gml | graph [ node [id 1] … edge [source 1 target 2] … ] | Yes (labels, attrs) |
+| Pajek | .net / .paj | *Vertices n … then *Edges / *Arcs | Yes (some) |
+| GraphML | .graphml | XML tags ( <graph><node><edge> ); <key> defines attrs | Yes (rich) |
+| GEXF | .gexf | XML (Graph Exchange XML Format), made by the Gephi team | Yes (rich) |
+
+read it as: "there's a **trade-off between simplicity and flexibility**. Edge-list & adjacency-list are dead simple but cannot carry labels/colours/attributes. GML, GraphML and GEXF are richer (XML-based for the last two) and can." GraphML/GEXF are **not** plain two-column text.
+
+#### edge-list vs adjacency-list (same 4 edges)
+
+[diagram: edge-list | 1 2 | 1 5 | 1 7 | 2 4 | adjacency-list | 1 2 5 7 | 2 4 6 | 3 1 4 7]
+
+Edge-list: one edge per row. Adjacency-list: node + all its neighbours per row.
+
+### Where to download
+
+- **SNAP** (Stanford) — the most-used repo: social, communication, citation, web, road, Wikipedia, temporal networks (with node/edge counts, some with ground-truth communities).
+- **UCI** / **KONECT** (Koblenz) — Pajek datasets, Zachary karate, air-traffic, Twitter, etc.
+
+NetworkX can also **convert** formats: read GML, write GEXF, etc.
+
+### Reading each format in NetworkX
+
+read_datasets.pypython
+
+```
+import networkx as nx
+
+g1 = nx.read_edgelist("facebook_combined.txt")   # edge-list (.txt/.csv)
+g2 = nx.read_adjlist("adj.txt")                   # adjacency-list
+g3 = nx.read_gml("karate.gml")                    # GML
+g4 = nx.read_pajek("football.net")                # Pajek (.net OR .paj)
+g5 = nx.read_graphml("wikipedia.graphml")         # GraphML
+g6 = nx.read_gexf("network.gexf")                 # GEXF
+
+print(nx.info(g1))          # #nodes, #edges, avg degree, type
+nx.number_of_nodes(g1)      # node count
+nx.number_of_edges(g1)      # edge count
+nx.is_directed(g5)          # True/False — did it load as a DiGraph?
+```
+
+⚠️ match the reader to the format
+Edge-list → `read_edgelist`; adjacency-list → `read_adjlist`; `.gml` → `read_gml`; `.net`/`.paj` → `read_pajek`; `.graphml` → `read_graphml`; `.gexf` → `read_gexf`. `nx.is_directed(G)` returns a Boolean — a food-web GraphML loads directed (`True`), an air-traffic edge-list loads undirected (`False`).
+
+- `read_pajek` can load a graph as a **MultiGraph/MultiDiGraph** (allows several edges between a pair): e.g. a football `.net` loads as a multi-digraph, karate `.paj` as a 34-node/78-edge multigraph.
+- `nx.info(G)` on a **directed** graph reports average **in-degree** and **out-degree** separately (not a single average degree).
+
+⚙️ visualising a graph in NetworkX
+Once loaded, draw it with `nx.draw(G)` then `plt.show()` (a directed graph renders with **arrowheads**). Tidy the layout with `nx.draw_circular(G)`, or pass a layout: `nx.spring_layout`, `nx.spectral_layout`. Add node labels with `nx.draw(G, with_labels=True)`.
+
+LECTURE 21
+
+## Analysing a network in NetworkX
+
+the four measurements: degree distribution · density · clustering · diameter
+
+## 3 The four structural measurements
+
+We'll compute all four on one tiny hand network — **Tom's 8-station relay** (nodes A–H; links `AB AC AD BC DE EF FG GH EG`) — so you can check every formula by hand, then see the NetworkX call.
+
+#### the 8-station relay network (A–H, 9 links) — node labels show degree
+
+[diagram: A·3 | B·2 | C·2 | D·2 | E·3 | F·2 | G·3 | H·1]
+
+blue = degree 3 (A,E,G) · mint = degree 2 (B,C,D,F) · pink = degree 1 (H). The coral link is the E–G shortcut.
+
+### (a) Degree & degree distribution
+
+📖 degree & degree distribution
+Degree of a node = how many edges touch it (its number of friends). Degree distribution = for each possible degree d, how many nodes have exactly that degree. Plot degree (x) vs count (y).
+
+degree_dist.pypython
+
+```
+import matplotlib.pyplot as plt
+
+nx.degree(G)                       # -> dict {node: its degree}
+all_degrees = list(nx.degree(G).values())      # every node's degree
+unique_degrees = sorted(set(all_degrees))      # x-axis: distinct degrees
+counts = [all_degrees.count(d) for d in unique_degrees]  # y-axis: how many nodes
+
+plt.plot(unique_degrees, counts)   # (or plt.loglog(...) for a power law)
+plt.xlabel("degree"); plt.ylabel("number of nodes"); plt.show()
+```
+
+✍️ worked example — degree distribution of the 8-station net
+- Degrees: A=3, B=2, C=2, D=2, E=3, F=2, G=3, H=1.
+- `unique_degrees` (x) = **[1, 2, 3]**.
+- Counts (y): degree 1 → 1 node (H); degree 2 → 4 nodes (B,C,D,F); degree 3 → 3 nodes (A,E,G). So `counts` = $\boxed{[1, 4, 3]}$.
+
+⚙️ power-law degree distribution (what real networks show)
+Most real networks are power-law: a **few hubs** with very high degree and a **long tail** of low-degree nodes. On **log–log axes** a power law looks like a roughly **straight line** (`plt.loglog`). Contrast a fully random `gnp` graph, whose degrees cluster around the average.
+
+### (b) Density — how full is the graph?
+
+density
+
+$$ \text{density} = \frac{\#\text{edges}}{\binom{n}{2}} = \frac{2m}{n(n-1)} $$
+
+read it as: "what fraction of all possible edges are actually present." For a simple graph it lies in **[0, 1]**: **0** for an empty graph, **1** for a complete graph. (A multigraph — several edges between a pair — can exceed 1.)
+
+✍️ worked example — density of the 8-station net
+8 nodes, 9 edges. Possible edges $\binom{8}{2}=\dfrac{8\cdot7}{2}=28$. Density $=\dfrac{9}{28}\approx \boxed{0.32}$ — a sparse graph. (NetworkX: `nx.density(G)`. Karate club → 0.139.)
+
+### (c) Clustering coefficient — do a node's friends know each other?
+
+clustering coefficient of node v
+
+$$ C(v) = \frac{\#\text{links among } v\text{'s neighbours}}{\binom{\deg(v)}{2}} $$
+
+read it as: "of all the pairs of my friends, what fraction are friends with each other." 1 = my friends form a clique; 0 = none of them know each other.
+
+✍️ worked example — clustering of station A
+- A's neighbours = {B, C, D}, so possible links among them = $\binom{3}{2}=3$.
+- Of those, only **BC** exists (not BD, not CD).
+- $C(A)=\dfrac{1}{3}\approx \boxed{0.33}$. NetworkX: `nx.clustering(G)` → dict; `nx.average_clustering(G)` → the graph average (karate → 0.57).
+
+### (d) Diameter — how far apart are the farthest two nodes?
+
+📖 diameter
+Diameter = the **maximum**, over all pairs of nodes, of the **shortest-path length** between them — i.e. the distance between the two most-distant nodes. `nx.diameter(G)`.
+
+✍️ worked example — diameter of the 8-station net
+The farthest pair is B–H (also C–H): the shortest route is **B→A→D→E→G→H**, length **5**, and nothing is farther. So `nx.diameter(G)` = $\boxed{5}$. It is not a link count (9) or a node count (8).
+
+⚙️ real networks have SMALL diameters
+Despite millions of nodes, real networks stay "close": the many connections keep everyone within a few hops (the small-world effect, Week 11). Diameter does **not** grow in proportion to n.
+
+### (e) Connectivity
+
+`nx.is_connected(G)` returns `True` when there's a path between every pair. Operationally: from any airport you can reach any other by a sequence of flights (transfers allowed). It does **not** mean a direct edge between every pair (that's complete) or equal degrees.
+
+LECTURE 22
+
+## Gephi — visual analysis
+
+a point-and-click tool for people who aren't programmers
+
+## 4 Gephi: visualise and analyse without code
+
+📖 Gephi
+Gephi is a free, open-source (Java) tool for **visualising and analysing** networks. NetworkX is more flexible for coding your own analysis; Gephi is far better for visualisation and for non-programmers. It opens most formats — its native one is **GEXF** (also CSV, GML, GraphML, Pajek).
+
+- **Layouts** rearrange nodes for readability (e.g. "No Overlap" spreads overlapping nodes). You can also **drag nodes by hand** — impossible in NetworkX without coding.
+- **Ranking**: colour or size nodes by a property, e.g. make **high-degree nodes darker/bigger** — hubs pop out instantly.
+- **Data Laboratory** tab: a spreadsheet of nodes/edges; computed metrics get added as columns and can be exported.
+- **Preview** tab: a polished render you can export to SVG/PDF/PNG.
+- **Built-in metrics** (one click each): average degree, density, diameter, modularity (communities), **PageRank**, connected components, clustering coefficient — the very measures we compute all course. Come back here as you learn each one.
+
+LECTURES 23–24
+
+## Emergence of connectedness — the argument
+
+the basket-of-balls intuition, then the avoid-probability maths
+
+## 5 Why a graph connects after only ~n·log n edges
+
+Back to the Week-1 puzzle, now made rigorous: take n nodes with no edges; add edges **one at a time, uniformly at random**. When does the graph become connected?
+
+### The intuition (why a permanent split is nearly impossible)
+
+🎯 two analogies
+- **Blindfolded shooting:** fire bullets uniformly at random into a rectangle; one quadrant is ¼ the area. If you fire 100 shots, ~25 land in that quadrant. That none land there is wildly unlikely.
+- **Basket of balls:** a basket has 10 black + 10 white balls; you draw blindfolded. Drawing 50 and getting all black is essentially impossible.
+
+✍️ worked example — the cross-cluster count
+Suppose 100 people threatened to split into groups of 70 and 30 with no link across. Total possible edges $\binom{100}{2}=\dfrac{100\cdot99}{2}\approx \dfrac{100^2}{2}=5000$. **Across-group** edges $=70\times30=2100$ — roughly half of all 5000 possible edges. For a clean split, random edge-placement must miss every one of those 2100 chances — as unlikely as drawing 2100 balls and all being "within" — so a lasting split is vanishing.
+
+(For the 50-sensor version: $\binom{50}{2}=\dfrac{50\cdot49}{2}=1225$ total; a 30/20 split has $30\times20=600$ possible cross-links, ~half of 1225.)
+
+### The maths (tracking the last lonely node)
+
+Instead of "connected", ask the easier question: when does no node stay **isolated** (degree 0)? Two calculus limits power the argument:
+
+two standard limits
+
+$$ \Big(1+\tfrac{1}{n}\Big)^{n}\!\to e,\qquad \Big(1-\tfrac{1}{n}\Big)^{n}\!\to \tfrac{1}{e} $$
+
+One new random edge picks 2 of the n nodes, so the chance it lands on a fixed node v is $2/n$; the chance it **avoids** v is $1-2/n$. Because K edges are placed independently, the avoid-chances **multiply**:
+
+P(v still isolated after K edges)
+
+$$ P(v\text{ lonely}) = \Big(1-\tfrac{2}{n}\Big)^{K} $$
+
+read it as: "v stays lonely only if every one of the K edges avoided it — and independent avoid-probabilities multiply, giving $(1-2/n)^K$."
+
+✍️ worked example — plug in K = n, then K = n·log n
+- **K = n edges:** $\big(1-\tfrac{2}{n}\big)^{n} = \Big[\big(1-\tfrac{1}{n/2}\big)^{n/2}\Big]^{2} \to \big(\tfrac{1}{e}\big)^{2}=\tfrac{1}{e^{2}}\approx 0.135$ (≈0.13 for n=50). Still a real chance v is lonely — so n edges is **not enough**.
+- **K = n·log n edges:** $\big(1-\tfrac{2}{n}\big)^{n\log n} = \Big[\big(1-\tfrac{1}{n/2}\big)^{n/2}\Big]^{2\log n}\to \big(\tfrac{1}{e}\big)^{2\log n}=\tfrac{1}{n^{2}} \to 0.$
+- So after ~n·log n edges the chance any node is isolated $\to 0$; with no isolated node (and a disconnected-but-isolate-free split being itself vanishingly unlikely) the graph is **connected with high probability**. $$ \boxed{\sim n\log n \text{ random edges} \Rightarrow \text{connected (w.h.p.)}} $$
+
+The key point is the probability **collapses to 0** as n grows; the exact exponent (≈1/n²) isn't what matters.
+
+⚙️ why "n·log n is almost as good as n"
+`log n` grows very slowly — think "the number of digits in n". For a million nodes, log n ≈ 6. So n·log n is only a **small factor** above n — a near-linear number of links suffices, not quadratic. Far fewer than the $\binom{n}{2}$ possible edges.
+
+LECTURE 25
+
+## Simulating it — `connectivity.py`
+
+add nodes → add random edges till connected → plot vs n·log n
+
+## 6 The simulation that checks the theory
+
+connectivity.pypython
+
+```
+import networkx as nx, random, numpy
+
+def add_nodes(n):
+    G = nx.Graph()
+    G.add_nodes_from(range(0, n))   # nodes 0..n-1, NO edges yet
+    return G
+
+def add_random_edge(G):
+    v1 = random.choice(list(G.nodes()))
+    v2 = random.choice(list(G.nodes()))
+    if v1 != v2:                    # skip self-loops (same node twice)
+        G.add_edge(v1, v2)
+    return G
+
+def create_instance(n):
+    G = add_nodes(n)
+    while nx.is_connected(G) == False:   # keep adding till connected
+        G = add_random_edge(G)
+    return G.number_of_edges()     # #edges at the moment it connected
+
+def create_average_instance(n):
+    L = []
+    for i in range(0, 4):          # repeat 4 times...
+        L.append(create_instance(n))
+    return numpy.average(L)         # ...average out the random spikes
+```
+
+⚙️ the algorithm in words
+- `add_nodes(n)`: empty graph + nodes 0…n−1 via `add_nodes_from(range(0,n))`. No edges → `is_connected` is **False**.
+- `add_random_edge`: pick two random nodes; the `v1 != v2` guard prevents a self-loop when the same node is drawn twice.
+- `create_instance`: loop until `nx.is_connected` becomes True, then return the edge count — **not** a fixed count, and **not** full linkage.
+- `create_average_instance`: average over several runs — one random run is spiky.
+
+✍️ dry-run trace — `create_instance(4)` on a tiny run
+| step | pick (v1,v2) | edge added? | edges | is_connected? |
+| 0 | — (add_nodes) | — | 0 | False → loop |
+| 1 | (2, 2) | no (v1==v2) | 0 | False |
+| 2 | (0, 3) | yes | 1 | False |
+| 3 | (1, 3) | yes | 2 | False |
+| 4 | (2, 0) | yes | 3 | True → stop, return 3 |
+
+Typical results: 10 nodes → ~12–16 edges; 20 → ~27; 30 → ~50. Plotting edges-to-connect vs n and overlaying **(n·log n)/2**, the two curves hug each other — confirming the order-n·log n claim (dividing by 2 doesn't change the order).
+
+Complexity of one `create_instance(n)`: it adds ~n·log n edges, each followed by a connectivity check O(n+m) where m grows to ~n·log n, so a run is roughly O(n²·log²n) — fine for the small n we plot.
+
+The lecture wraps this in a `plot_connectivity()` routine and overlays the theoretical curve:
+
+connectivity.py — plot vs n·log npython
+
+```
+import matplotlib.pyplot as plt, numpy
+
+def add_till_connectivity(G):              # keep adding till connected
+    while nx.is_connected(G) == False:
+        G = add_random_edge(G)
+    return G                               # create_instance uses this + returns G.number_of_edges()
+
+x, y = [], []
+i = 10
+while i <= 400:                            # graph sizes 10, 20, ..., 400
+    x.append(i)
+    y.append(create_average_instance(i))   # edges-to-connect, averaged over many runs
+    i = i + 10
+plt.plot(x, y)                             # the measured curve
+
+x1, y1 = [], []
+i = 10
+while i <= 400:
+    x1.append(i)
+    y1.append(i * numpy.log(i) / 2)        # numpy.log = NATURAL log (base e)
+    i = i + 10
+plt.plot(x1, y1)                           # overlay (n·log n)/2
+plt.xlabel("number of nodes"); plt.ylabel("edges to connect"); plt.show()
+```
+
+Plain `n·log n` overshoots the data — the two lines only hug once you plot **(n·log n)/2** (dividing by 2 doesn't change the order). Note `numpy.log` is the **natural** log, which is why this ties back to the e-based avoid-probability maths above.
+
+⚠️ common bugs / gotchas
+- Drop the `v1 != v2` guard → self-loops that never help connectivity (and can loop oddly).
+- `random.choice` needs a **list**: use `list(G.nodes())`.
+- Plot a single instance and the curve is spiky — average over many runs (a random experiment gives a different answer each time).
+- After editing the file, `reload` it (IPython) before re-calling — a stale import runs old code.
+
+LECTURE 26
+
+## Summary — and the power of synthetic datasets
+
+what this week bought us
+
+## 7 Wrap-up
+
+- **Datasets**: the internet age hands us huge network datasets; read them with the right NetworkX reader and measure **degree distribution, density, clustering, diameter, connectivity**. Real networks are **power-law** (hubs + long tail) with **small diameters**.
+- **Gephi**: a powerful, code-free tool for visualising and analysing graphs.
+- **Emergence of connectedness**: with only ~**n·log n** random edges a graph becomes connected — proven via the avoid-probability argument and confirmed by simulation.
+- Synthetic datasets: you can synthesize a graph of your choice (say 100 nodes) to observe a phenomenon, instead of hunting for real data — exactly what the `connectivity.py` experiment did.
+
+### Read a real network, measure four things — degree distribution, density, clustering, diameter — and remember: ~n·log n random links already connect it.
+
+density = edges / C(n,2) ∈ [0,1] · clustering(v) = links-among-neighbours / C(deg,2) · diameter = longest shortest-path · P(node lonely after K edges) = (1−2/n)^K → 0 at K ≈ n·log n.
+
+- Which of {air-traffic, power grid, food web, co-authorship} must be **directed**, and why?
+The **food web** — predation is one-way (X preys on Y ≠ Y preys on X). The others are mutual/symmetric → undirected.
+
+- An air-traffic file has one route per line as a pair of codes (`DEL BOM`). Which reader?
+`nx.read_edgelist` — one edge (source, target) per row. (`read_adjlist` is node + neighbours; `read_gml`/`read_graphml` for those formats.)
+
+- Which formats can carry node/edge **attributes** (labels, colours)?
+**GML, GraphML, GEXF** (GraphML/GEXF are XML). Plain **edge-list** and **adjacency-list** cannot — the simplicity/flexibility trade-off.
+
+- 8-station net (AB AC AD BC DE EF FG GH EG): with distinct degrees [1,2,3] on x, what are the y-counts?
+**[1, 4, 3]** — 1 node of degree 1 (H), 4 of degree 2 (B,C,D,F), 3 of degree 3 (A,E,G).
+
+- For that net, what does `nx.density` return, and its value for empty / complete graphs?
+$9/\binom{8}{2}=9/28\approx 0.32$. Empty → 0, complete → 1; a simple graph's density ∈ [0,1].
+
+- Station A links to B, C, D; only BC exists among them. A's clustering coefficient?
+$\dfrac{1}{\binom{3}{2}}=\dfrac{1}{3}\approx 0.33$ — links-present / links-possible among neighbours.
+
+- What is `nx.diameter` of the 8-station net, and what does it mean?
+**5** — the largest shortest-path length (B–H via B→A→D→E→G→H). Not the edge count or node count.
+
+- How many possible links in a 50-sensor mesh, and how many bridge a 30/20 split?
+$\binom{50}{2}=1225$ total; cross-links = $30\times20=600$ (~half). All 600 must be absent for a split → very unlikely.
+
+- P(one new link avoids a fixed sensor v), and P(v still lonely after K links)?
+Avoids with prob $1-\tfrac{2}{n}$; still lonely after K independent links with prob $\big(1-\tfrac{2}{n}\big)^{K}$ (probabilities multiply).
+
+- Why is "of order n·log n links" described as almost as good as n?
+`log n` grows very slowly (≈ number of digits in n), so n·log n is only a small factor above n — near-linear, not quadratic.
+
+- Right after `G = add_nodes(50)`, what is true?
+50 nodes, **0 edges**, and `nx.is_connected(G)` is **False** (an edgeless 50-node graph is disconnected).
+
+- Why the `if v1 != v2` check, and when does `create_instance`'s loop stop?
+It skips a **self-loop** when `random.choice` draws the same node twice. The loop stops the **instant** `nx.is_connected(G)` becomes True — not after a fixed count, not at full linkage.
+
+— end of Week 2 ✏️
+↑ back to top
