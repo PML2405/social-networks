@@ -71,7 +71,7 @@ def notes_to_text(path):
         t.decompose()
     for c in soup.find_all(string=lambda x: isinstance(x, Comment)):
         c.extract()
-    for s in soup.select("svg.defs, svg.doodle, .margin-rule"):
+    for s in soup.select("svg.defs, svg.doodle, .margin-rule, nav.nb"):
         s.decompose()
     out, code = [], []
 
@@ -253,6 +253,8 @@ def main():
         parts.append(f"\n{'='*78}\nWEEK {w['week']}: {w['title']}\n{'='*78}\n\n" + (ROOT / w["files"]["notes_text"]["path"]).read_text())
     (ROOT / "text/all-notes.txt").write_text("\n".join(parts))
 
+    make_icons()
+    patch_notes(weeks)
     write_index(weeks)
     write_llms(weeks)
     write_manifest(weeks, today)
@@ -300,59 +302,139 @@ def write_sitemap(weeks, today):
         + body + "\n</urlset>\n")
 
 
+ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><rect width="180" height="180" fill="#2E2A3D"/>
+<g stroke="#FBF7EC" stroke-width="5" stroke-linecap="round" opacity=".85"><path d="M90 44L48 120M90 44L134 112M48 120L134 112M90 44L90 92M90 92L48 120M90 92L134 112"/></g>
+<g fill="#FF7A5C"><circle cx="90" cy="44" r="15"/><circle cx="48" cy="120" r="15"/><circle cx="134" cy="112" r="15"/></g>
+<circle cx="90" cy="92" r="11" fill="#FFE98A"/></svg>"""
+
+
+def make_icons():
+    (ROOT / "assets").mkdir(exist_ok=True)
+    (ROOT / "assets/icon.svg").write_text(ICON_SVG)
+    with pymupdf.open(stream=ICON_SVG.encode(), filetype="svg") as d:
+        pix = d[0].get_pixmap(matrix=pymupdf.Matrix(1, 1), alpha=False)
+        pix.save(str(ROOT / "assets/apple-touch-icon.png"))
+
+
+NB_START, NB_END = "<!-- mobile:start -->", "<!-- mobile:end -->"
+
+
+def patch_notes(weeks):
+    """Idempotently add the phone stylesheet + bottom nav bar to every notes page."""
+    names = ["index"] + [f"week-{w['nn']}" for w in weeks]
+    for i, name in enumerate(names):
+        path = ROOT / f"notes/{name}.html"
+        s = path.read_text()
+        s = re.sub(re.escape(NB_START) + r".*?" + re.escape(NB_END) + r"\s*", "", s, flags=re.S)
+        s = re.sub(r'(<meta name="viewport" content="[^"]*?)(?:, ?viewport-fit=cover)?"', r'\1, viewport-fit=cover"', s, count=1)
+        head = (f'{NB_START}<link rel="stylesheet" href="mobile.css">'
+                f'<meta name="theme-color" content="#FBF7EC">'
+                f'<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">'
+                f'<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">{NB_END}\n')
+        s = s.replace("</head>", head + "</head>", 1)
+        if name == "index":
+            prev_a, next_a = '<a aria-disabled="true">&nbsp;</a>', '<a href="week-01.html">Week 1 &rsaquo;</a>'
+        else:
+            n = int(name[-2:])
+            prev_a = (f'<a href="week-{n-1:02d}.html">&lsaquo; Wk {n-1}</a>' if n > 1
+                      else '<a href="index.html">&lsaquo; Index</a>')
+            next_a = (f'<a href="week-{n+1:02d}.html">Wk {n+1} &rsaquo;</a>' if n < 12
+                      else '<a aria-disabled="true">&nbsp;</a>')
+        nav = (f'{NB_START}<nav class="nb" aria-label="Notes navigation">'
+               f'<a href="../index.html">&#9776; Hub</a>{prev_a}{next_a}<a href="#">&uarr; Top</a></nav>{NB_END}\n')
+        s = s.replace("</body>", nav + "</body>", 1)
+        path.write_text(s)
+
+
 def write_index(weeks):
     total_pdf = sum(w["files"][k]["bytes"] for w in weeks for k in ("solution_pdf", "transcript_pdf"))
     n_lec = sum(len(w["lectures"]) for w in weeks)
+    chips = "".join(f'<a href="#week-{w["week"]}">{w["week"]}</a>' for w in weeks)
+
+    def cp(path):
+        return f'<button class="cp" type="button" data-copy="{path}">Copy link</button>'
+
     sections = []
     for w in weeks:
-        f = w["files"]; nn = w["nn"]
+        f = w["files"]
         lecs = "".join(
-            f'<li><a href="{f["transcript_pdf"]["path"]}#page={l["page"]}">Lecture {l["num"]}: {html.escape(l["title"])}</a></li>'
+            f'<li><a href="{f["transcript_pdf"]["path"]}#page={l["page"]}">Lecture {l["num"]}: {html.escape(l["title"])}</a> <small>p.&nbsp;{l["page"]}</small></li>'
             for l in w["lectures"])
+        search = " ".join([w["title"], w["blurb"]] + [l["title"] for l in w["lectures"]]).lower()
         sections.append(f"""
-<section class="week" id="week-{w['week']}" data-text="{html.escape((w['title'] + ' ' + w['blurb'] + ' ' + ' '.join(l['title'] for l in w['lectures'])).lower())}">
-  <h2>Week {w['week']} <span>{html.escape(w['title'])}</span></h2>
+<section class="week" id="week-{w['week']}" data-text="{html.escape(search)}">
+  <h2><span class="wn">Week {w['week']}</span> {html.escape(w['title'])}</h2>
   <p class="blurb">{html.escape(w['blurb'])} &middot; Lectures {w['lec_first']}&ndash;{w['lec_last']}</p>
-  <p class="all"><a href="{f['week_text']['path']}">All of week {w['week']} as one text file</a> <small>(notes + assignment + transcript, {human(f['week_text']['bytes'])})</small></p>
+  <div class="all"><a class="btn primary" href="{f['week_text']['path']}">All of week {w['week']} (text)</a>{cp(f['week_text']['path'])}<small>notes + assignment + transcript &middot; {human(f['week_text']['bytes'])}</small></div>
   <ul class="items">
-    <li data-kind="notes"><b>Study notes</b> <a href="{f['notes_text']['path']}">Text</a> &middot; <a href="{f['notes_html']['path']}">Notebook page</a></li>
-    <li data-kind="solutions"><b>Assignment solution</b> <a href="{f['solution_text']['path']}">Text</a> &middot; <a href="{f['solution_pdf']['path']}">PDF</a> <small>({f['solution_pdf']['pages']} pp, {human(f['solution_pdf']['bytes'])})</small></li>
-    <li data-kind="transcripts"><b>Transcript, Lectures {w['lec_first']}&ndash;{w['lec_last']}</b> <a href="{f['transcript_text']['path']}">Text</a> &middot; <a href="{f['transcript_pdf']['path']}">PDF</a> <small>({f['transcript_pdf']['pages']} pp, {human(f['transcript_pdf']['bytes'])})</small></li>
+    <li data-kind="notes"><b>Study notes</b><span class="acts"><a class="btn" href="{f['notes_html']['path']}">Notebook</a><a class="btn" href="{f['notes_text']['path']}">Text</a>{cp(f['notes_text']['path'])}</span></li>
+    <li data-kind="solutions"><b>Assignment solution</b> <small>{f['solution_pdf']['pages']} pp</small><span class="acts"><a class="btn" href="{f['solution_text']['path']}">Text</a>{cp(f['solution_text']['path'])}<a class="btn" href="{f['solution_pdf']['path']}">PDF <small>{human(f['solution_pdf']['bytes'])}</small></a></span></li>
+    <li data-kind="transcripts"><b>Transcript</b> <small>Lectures {w['lec_first']}&ndash;{w['lec_last']} &middot; {f['transcript_pdf']['pages']} pp</small><span class="acts"><a class="btn" href="{f['transcript_text']['path']}">Text</a>{cp(f['transcript_text']['path'])}<a class="btn" href="{f['transcript_pdf']['path']}">PDF <small>{human(f['transcript_pdf']['bytes'])}</small></a></span></li>
   </ul>
-  <details><summary>{len(w['lectures'])} lectures</summary><ul class="lecs">{lecs}</ul></details>
+  <details><summary>{len(w['lectures'])} lectures</summary><ul class="lecs">{lecs}</ul><p class="hint">iPhone Safari ignores PDF page jumps; open the PDF and use the page number shown.</p></details>
 </section>""")
 
     page = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Social Networks Study Hub (NPTEL, IIT Ropar)</title>
 <meta name="description" content="Social Networks (NPTEL, IIT Ropar): study notes, assignment solutions and full lecture transcripts for all 12 weeks, as plain text and PDF. Paste the link into ChatGPT or Claude to ask doubts.">
+<meta name="theme-color" content="#FBF7EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b1a22" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Social Networks">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <style>
-:root{{--bg:#FBF7EC;--card:#fff;--ink:#2E2A3D;--soft:#5b5678;--line:#E2D9C4;--accent:#d9573a;--link:#2a5db0}}
-@media (prefers-color-scheme:dark){{:root{{--bg:#1b1a22;--card:#24232d;--ink:#ece9f5;--soft:#a9a4c2;--line:#3a3850;--accent:#ff8a6b;--link:#8fb4ff}}}}
+:root{{--bg:#FBF7EC;--card:#fff;--ink:#2E2A3D;--soft:#5b5678;--line:#E2D9C4;--accent:#c4452a;--link:#2a5db0;--btn:#f3ede0}}
+@media (prefers-color-scheme:dark){{:root{{--bg:#1b1a22;--card:#24232d;--ink:#ece9f5;--soft:#a9a4c2;--line:#3a3850;--accent:#ff8a6b;--link:#8fb4ff;--btn:#2f2d3b}}}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}}
-main{{max-width:880px;margin:0 auto;padding:24px 16px 80px}}
+html{{-webkit-text-size-adjust:100%;scroll-padding-top:12px}}
+body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"SF Pro Text",Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}}
+main{{max-width:880px;margin:0 auto;padding:18px max(14px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}}
 a{{color:var(--link)}}
-header h1{{font-size:2rem;margin:.2em 0 0}} header p{{color:var(--soft);margin:.3em 0}}
-.kicker{{letter-spacing:.12em;font-size:.8rem;color:var(--accent);font-weight:700}}
-.how{{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:18px 0}}
-.how code{{background:var(--bg);padding:1px 6px;border-radius:4px;word-break:break-all}}
-.bar{{position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line)}}
-.bar input{{flex:1 1 220px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}}
-.bar button{{padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}}
-.bar button[aria-pressed=true]{{background:var(--accent);color:#fff;border-color:var(--accent)}}
-.week{{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}}
-.week h2{{margin:0;font-size:1.25rem}} .week h2 span{{font-weight:500;color:var(--soft)}}
-.blurb{{color:var(--soft);margin:.2em 0 .6em;font-size:.92rem}}
-.items{{list-style:none;padding:0;margin:.4em 0}} .items li{{padding:4px 0}}
+header h1{{font-size:clamp(1.6rem,7vw,2.2rem);line-height:1.1;margin:.2em 0 .1em}} header p{{color:var(--soft);margin:.4em 0}}
+.kicker{{letter-spacing:.12em;font-size:.75rem;color:var(--accent);font-weight:700}}
+.how{{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;margin:16px 0}}
+.how p{{margin:.3em 0}} .row{{display:flex;flex-wrap:wrap;gap:8px}} .how code{{background:var(--bg);padding:1px 6px;border-radius:4px;overflow-wrap:anywhere;font-size:.85rem}}
+.btn,.cp,.chips a,.filters button{{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--btn);color:var(--ink);font:inherit;font-size:.95rem;text-decoration:none;cursor:pointer;gap:6px;white-space:nowrap}}
+.btn.primary{{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}}
+.btn small{{color:inherit;opacity:.7}}
+.cp{{color:var(--soft)}} .cp:active,.btn:active{{filter:brightness(.92)}}
+.cp{{display:none}} .js .cp{{display:inline-flex}} .cp.done{{color:#2E7D53;border-color:#2E7D53}}
+.chips{{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:6px -14px 0;padding-inline:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}}
+.chips::-webkit-scrollbar{{display:none}}
+.chips a{{min-width:44px;padding:0 10px;flex:0 0 auto}}
+.bar{{background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line)}}
+.bar input{{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:16px;-webkit-appearance:none;appearance:none}}
+.filters{{display:flex;gap:8px;overflow-x:auto;margin:8px -14px 0;padding:0 14px 2px;scrollbar-width:none}}
+.filters::-webkit-scrollbar{{display:none}}
+.filters button{{flex:0 0 auto;border-radius:999px}}
+.filters button[aria-pressed=true]{{background:var(--accent);color:#fff;border-color:var(--accent)}}
+@media(min-width:760px){{.bar{{position:sticky;top:0;z-index:5}}}}
+.week{{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}}
+.week h2{{margin:0;font-size:1.12rem;line-height:1.3}} .wn{{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;padding:0 8px;margin-right:6px;font-size:.9rem}}
+.blurb{{color:var(--soft);margin:.4em 0 .7em;font-size:.9rem}}
+.all{{display:flex;flex-wrap:wrap;align-items:center;gap:8px}} .all small{{flex:1 0 100%;color:var(--soft)}}
+.items{{list-style:none;padding:0;margin:.6em 0 .2em}} .items li{{padding:8px 0;border-top:1px solid var(--line)}}
+.items b{{display:inline-block;margin-right:4px}}
+.acts{{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}}
 .items.hide-notes [data-kind=notes],.items.hide-solutions [data-kind=solutions],.items.hide-transcripts [data-kind=transcripts]{{display:none}}
-small{{color:var(--soft)}} summary{{cursor:pointer;color:var(--soft)}} .lecs{{columns:2;font-size:.9rem}}
-@media(max-width:620px){{.lecs{{columns:1}}}}
-footer{{margin-top:30px;color:var(--soft);font-size:.9rem}}
+small{{color:var(--soft)}}
+summary{{cursor:pointer;color:var(--soft);min-height:44px;display:flex;align-items:center}}
+.lecs{{list-style:none;padding:0;margin:0}} .lecs li{{padding:9px 0;border-top:1px solid var(--line);font-size:.92rem}}
+@media(min-width:700px){{.lecs{{columns:2;column-gap:24px}}.lecs li{{break-inside:avoid}}}}
+.hint{{font-size:.8rem;color:var(--soft);margin:.4em 0 0}}
+.none{{text-align:center;color:var(--soft);padding:24px}}
+.toast{{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#2E2A3D;color:#fff;padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:.2s;z-index:20}}
+.toast.show{{opacity:1;transform:translate(-50%,0)}}
+footer{{margin-top:28px;color:var(--soft);font-size:.9rem}} footer a{{display:inline-block;padding:6px 0;margin-right:12px}}
 </style>
 </head>
 <body>
@@ -360,47 +442,63 @@ footer{{margin-top:30px;color:var(--soft);font-size:.9rem}}
 <header>
   <div class="kicker">NPTEL ONLINE COURSE &middot; IIT ROPAR</div>
   <h1>Social Networks Study Hub</h1>
-  <p>Prof. S. R. S. Iyengar &middot; 12 weeks, {n_lec} lectures, with <b>handwritten-style study notes</b>, assignment solutions and full lecture transcripts &middot; {len(weeks)*2} PDFs ({human(total_pdf)}).</p>
+  <p>Prof. S. R. S. Iyengar &middot; 12 weeks, {n_lec} lectures &middot; <b>study notes</b>, assignment solutions and full lecture transcripts ({len(weeks)*2} PDFs, {human(total_pdf)}).</p>
 </header>
 
 <div class="how">
-  <b>Using this with ChatGPT / Claude:</b> paste this site link, or one week's text link, into the chat and ask your doubt.
-  Everything is plain text, no files to upload. For one week (notes + assignment + transcript together):
-  <br><code>{BASE}text/weeks/week-05.txt</code>
-  <br>For only the condensed notes of the whole course: <a href="text/all-notes.txt">all notes as one text file</a>.
-  Index for AI tools: <a href="llms.txt">llms.txt</a>.
-  <br><small>Text is extracted from PDFs and may have small errors; the PDF is the authority. The notes are a condensed re-teach of the lectures.</small>
+  <p><b>Ask ChatGPT / Claude your doubts:</b> copy a link and paste it into the chat. Plain text, no files to upload.</p>
+  <p class="row"><button class="btn primary cp" type="button" data-copy="">Copy site link</button><button class="btn cp" type="button" data-copy="text/all-notes.txt">Copy all-notes link</button></p>
+  <p class="hint">Need one week only? Every week below has &ldquo;All of week N (text)&rdquo;: notes + assignment + transcript in one file. <a href="llms.txt">llms.txt</a> is the index for AI tools. Text is extracted from PDFs and may have small errors; the PDF is the authority.</p>
 </div>
 
+<nav class="chips" aria-label="Jump to week">{chips}</nav>
+
 <div class="bar">
-  <input id="q" type="search" placeholder="Search topics, e.g. PageRank, homophily, SIR" aria-label="Search weeks">
-  <button data-f="all" aria-pressed="true">All</button>
-  <button data-f="notes" aria-pressed="false">Notes</button>
-  <button data-f="transcripts" aria-pressed="false">Transcripts</button>
-  <button data-f="solutions" aria-pressed="false">Assignment solutions</button>
+  <input id="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="none" placeholder="Search topics: PageRank, homophily, SIR&hellip;" aria-label="Search weeks">
+  <div class="filters">
+    <button data-f="all" aria-pressed="true">All</button>
+    <button data-f="notes" aria-pressed="false">Notes</button>
+    <button data-f="transcripts" aria-pressed="false">Transcripts</button>
+    <button data-f="solutions" aria-pressed="false">Assignments</button>
+  </div>
 </div>
 
 {''.join(sections)}
+<p class="none" id="none" hidden>No week matches that search.</p>
 
 <footer>
-  <a href="{REPO}">GitHub repository</a> &middot; <a href="manifest.json">manifest.json</a> &middot; <a href="sitemap.xml">sitemap.xml</a> &middot; <a href="notes/index.html">Notebook-style notes index</a>
-  <p>Lecture numbers follow the NPTEL transcript (1&ndash;166).</p>
+  <a href="{REPO}">GitHub</a><a href="manifest.json">manifest.json</a><a href="sitemap.xml">sitemap.xml</a><a href="notes/index.html">Notebook index</a>
+  <p>Lecture numbers follow the NPTEL transcript (1&ndash;166). On iPhone: Share &rarr; Add to Home Screen to keep this as an app icon.</p>
 </footer>
 </main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){{
-  var weeks=[].slice.call(document.querySelectorAll('.week')),q=document.getElementById('q'),btns=[].slice.call(document.querySelectorAll('.bar button'));
-  var kind='all';
+  document.documentElement.className+=' js';
+  var weeks=[].slice.call(document.querySelectorAll('.week')),q=document.getElementById('q'),
+      btns=[].slice.call(document.querySelectorAll('.filters button')),none=document.getElementById('none'),kind='all',
+      toast=document.getElementById('toast'),tt;
   function apply(){{
-    var s=q.value.trim().toLowerCase();
+    var s=q.value.trim().toLowerCase(),shown=0;
     weeks.forEach(function(w){{
-      w.hidden = s && w.getAttribute('data-text').indexOf(s)<0;
-      var ul=w.querySelector('.items');
-      ul.className='items'+(kind==='all'?'':' hide-'+['notes','solutions','transcripts'].filter(function(k){{return k!==kind}}).join(' hide-'));
+      var hit=!s||w.getAttribute('data-text').indexOf(s)>=0; w.hidden=!hit; if(hit)shown++;
+      w.querySelector('.items').className='items'+(kind==='all'?'':' '+['notes','solutions','transcripts'].filter(function(k){{return k!==kind}}).map(function(k){{return 'hide-'+k}}).join(' '));
     }});
+    none.hidden=shown>0;
   }}
   q.addEventListener('input',apply);
   btns.forEach(function(b){{b.addEventListener('click',function(){{kind=b.getAttribute('data-f');btns.forEach(function(x){{x.setAttribute('aria-pressed',x===b)}});apply();}});}});
+  function say(m){{toast.textContent=m;toast.className='toast show';clearTimeout(tt);tt=setTimeout(function(){{toast.className='toast'}},1800);}}
+  function copy(text,btn){{
+    function ok(){{say('Link copied. Paste it into ChatGPT or Claude.');if(btn){{var t=btn.textContent;btn.classList.add('done');btn.textContent='Copied';setTimeout(function(){{btn.classList.remove('done');btn.textContent=t}},1500)}}}}
+    function fallback(){{var ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,text.length);try{{document.execCommand('copy');ok()}}catch(e){{say('Long-press the link to copy it')}}document.body.removeChild(ta)}}
+    if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(ok,fallback);else fallback();
+  }}
+  document.addEventListener('click',function(e){{
+    var b=e.target.closest&&e.target.closest('.cp');if(!b)return;
+    var url=new URL(b.getAttribute('data-copy')||'./',location.href).href;
+    copy(url,b);
+  }});
 }})();
 </script>
 </body>

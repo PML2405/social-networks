@@ -1,0 +1,67 @@
+/* Phone / iPhone layer for the notebook pages. Loaded after each page's own <style>. */
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; }
+.katex-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 2px 0; }
+.page svg { max-width: 100%; }
+
+/* ---- bottom navigation bar (hub / prev / next / top) ---- */
+.nb { display: none; }
+@media (max-width: 760px) {
+  .nb {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(46, 42, 61, .96); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    padding: 4px max(6px, env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  }
+  .nb a {
+    flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center;
+    color: #FBF7EC; text-decoration: none; font: 600 14px/1.1 system-ui, -apple-system, sans-serif; border-radius: 8px;
+  }
+  .nb a:active { background: rgba(255, 255, 255, .15); }
+  .nb a[aria-disabled=true] { opacity: .35; pointer-events: none; }
+}
+
+@media (max-width: 760px) {
+  body { padding: 10px 0 calc(76px + env(safe-area-inset-bottom)); }
+  .page {
+    border-radius: 0; margin-bottom: 14px; box-shadow: none;
+    padding: 26px max(14px, env(safe-area-inset-right)) 28px calc(26px + env(safe-area-inset-left));
+  }
+  .margin-rule { left: 14px; }
+  .doodle { display: none; }
+
+  /* the hand-wobble SVG filter is slow and blurs text on iPhone: keep the borders, drop the filter and tilts */
+  .sticky, .sketch-box, .index-card, .bubble, .worked, .fig, .diagram, .banner, .code, .quiz,
+  .sticky p, .page [style*="filter"] { filter: none !important; }
+  .sticky, .index-card, .fig, .code, .banner { transform: none !important; }
+
+  .cover h1 { font-size: 44px; }
+  .title-block h1 { font-size: 40px; line-height: 1.05; }
+  .lec-divider h2 { font-size: 26px; }
+  p { font-size: 16.5px; } ul.notes, ol.notes { font-size: 16px; padding-left: 20px; }
+
+  .sticky { padding: 16px 14px 16px; margin: 18px 0 24px; max-width: none; }
+  .sketch-box { padding: 12px 14px; border-radius: 14px; }
+  .worked { padding: 12px 14px; border-left-width: 8px; }
+  .quiz { padding: 16px 14px; }
+  .banner { padding: 16px 16px; }
+  .bubble { padding: 12px 14px; }
+  .index-card { min-width: 0; width: 100%; padding: 12px 12px; }
+  .eq-card { gap: 12px; }
+  .diagram { padding: 10px 8px 8px; }
+  .toc-card { padding: 14px 14px; }
+  .toc li a { display: inline-block; padding: 3px 0; }
+
+  /* tables scroll sideways inside their own box instead of widening the page */
+  table.hand { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; font-size: 14.5px; }
+  table.hand th, table.hand td { min-width: 96px; }
+
+  /* code: scroll sideways, slightly smaller, never widen the page */
+  .code { max-width: 100%; }
+  .code pre { padding: 10px 12px; -webkit-overflow-scrolling: touch; }
+  .code pre code { font-size: 12px; line-height: 1.55; white-space: pre; }
+  code.inline { overflow-wrap: anywhere; }
+  .bigO { font-size: 12px; }
+}
+
+@media print { .nb { display: none; } }

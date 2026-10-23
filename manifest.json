@@ -2,7 +2,7 @@
  "course": "Social Networks (NPTEL, IIT Ropar, Prof. S. R. S. Iyengar)",
  "base_url": "https://pml2405.github.io/social-networks/",
  "repo": "https://github.com/PML2405/social-networks",
- "generated": "2026-10-23",
+ "generated": "2026-10-24",
  "all_notes": {
   "path": "text/all-notes.txt",
   "bytes": 243692
@@ -85,7 +85,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-01.html",
-     "bytes": 67028
+     "bytes": 67541
     },
     "notes_text": {
      "path": "text/notes/week-01.txt",
@@ -192,7 +192,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-02.html",
-     "bytes": 53621
+     "bytes": 54135
     },
     "notes_text": {
      "path": "text/notes/week-02.txt",
@@ -304,7 +304,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-03.html",
-     "bytes": 51701
+     "bytes": 52215
     },
     "notes_text": {
      "path": "text/notes/week-03.txt",
@@ -411,7 +411,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-04.html",
-     "bytes": 45922
+     "bytes": 46436
     },
     "notes_text": {
      "path": "text/notes/week-04.txt",
@@ -558,7 +558,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-05.html",
-     "bytes": 46901
+     "bytes": 47415
     },
     "notes_text": {
      "path": "text/notes/week-05.txt",
@@ -660,7 +660,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-06.html",
-     "bytes": 40061
+     "bytes": 40575
     },
     "notes_text": {
      "path": "text/notes/week-06.txt",
@@ -772,7 +772,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-07.html",
-     "bytes": 40139
+     "bytes": 40653
     },
     "notes_text": {
      "path": "text/notes/week-07.txt",
@@ -884,7 +884,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-08.html",
-     "bytes": 49997
+     "bytes": 50511
     },
     "notes_text": {
      "path": "text/notes/week-08.txt",
@@ -981,7 +981,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-09.html",
-     "bytes": 48143
+     "bytes": 48658
     },
     "notes_text": {
      "path": "text/notes/week-09.txt",
@@ -1108,7 +1108,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-10.html",
-     "bytes": 43431
+     "bytes": 43946
     },
     "notes_text": {
      "path": "text/notes/week-10.txt",
@@ -1185,7 +1185,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-11.html",
-     "bytes": 35954
+     "bytes": 36470
     },
     "notes_text": {
      "path": "text/notes/week-11.txt",
@@ -1312,7 +1312,7 @@
    "files": {
     "notes_html": {
      "path": "notes/week-12.html",
-     "bytes": 44853
+     "bytes": 45362
     },
     "notes_text": {
      "path": "text/notes/week-12.txt",
